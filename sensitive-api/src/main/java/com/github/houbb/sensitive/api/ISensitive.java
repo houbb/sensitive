@@ -4,8 +4,9 @@ package com.github.houbb.sensitive.api;
  * 脱敏接口
  * @author binbin.hou
  * @date 2018/12/29
+ * @param <T> 参数类型
  */
-public interface ISensitive {
+public interface ISensitive<T> {
 
     /**
      * 对象进行脱敏操作
@@ -15,14 +16,6 @@ public interface ISensitive {
      * @param object 原始对象
      * @return 脱敏后的新对象
      */
-    Object desCopy(final Object object);
-
-    /**
-     * 脱敏对象的 toString() 便于日志打印
-     * object 对象保持不变
-     * @param object 原始对象
-     * @return 脱敏后的新对象 toString();
-     */
-    String desString(final Object object);
+    T desCopy(final T object);
 
 }

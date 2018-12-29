@@ -16,17 +16,9 @@ public final class SensitiveUtil {
      * @param object 原始对象
      * @return 脱敏后的对象
      */
-    public static Object desCopy(Object object) {
-        return SINGLETON.desCopy(object);
-    }
-
-    /**
-     * 脱敏对象的 toString()
-     * @param object 原始对象
-     * @return 脱敏后对象的 toString();
-     */
-    public static String desString(Object object) {
-        return SINGLETON.desString(object);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T> T desCopy(T object) {
+        return (T) SINGLETON.desCopy(object);
     }
 
 }

@@ -14,7 +14,7 @@ public class SensitiveUtilTest {
     public void passwordSensitiveTest() {
         User user = newUser();
         System.out.println("脱敏前原始： " + user);
-        User sensitiveUser = (User) SensitiveUtil.desCopy(user);
+        User sensitiveUser = SensitiveUtil.desCopy(user);
         System.out.println("脱敏对象： " + sensitiveUser);
         System.out.println("脱敏后原始： " + user);
     }

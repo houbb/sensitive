@@ -17,14 +17,15 @@ import java.util.List;
  * @author binbin.hou
  * @date 2018/12/29
  */
-public class SensitiveService implements ISensitive {
+public class SensitiveService<T> implements ISensitive<T> {
 
     @Override
-    public Object desCopy(Object object) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public T desCopy(T object) {
         try {
             //1. 初始化对象
             final Class clazz = object.getClass();
-            final Object newObject = clazz.newInstance();
+            final T newObject = (T) clazz.newInstance();
 
             //2. 对象的信息处理
             BeanUtil.copyProperties(object, newObject);
@@ -52,12 +53,6 @@ public class SensitiveService implements ISensitive {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public String desString(Object object) {
-        Object copy = desCopy(object);
-        return copy.toString();
     }
 
 }
