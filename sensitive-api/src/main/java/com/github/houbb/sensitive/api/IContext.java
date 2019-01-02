@@ -22,4 +22,10 @@ public interface IContext {
      */
     Field getCurrentField();
 
+    /**
+     * 获取当前对象
+     * @return 当前对象
+     */
+    Object getCurrentObject();
+
 }

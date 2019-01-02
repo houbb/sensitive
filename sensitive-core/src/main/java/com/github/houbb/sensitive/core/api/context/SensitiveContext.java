@@ -13,6 +13,11 @@ import java.util.List;
 public class SensitiveContext implements IContext {
 
     /**
+     * 当前对象
+     */
+    private Object currentObject;
+
+    /**
      * 当前字段
      */
     private Field currentField;
@@ -21,6 +26,15 @@ public class SensitiveContext implements IContext {
      * 所有字段
      */
     private List<Field> allFieldList;
+
+    @Override
+    public Object getCurrentObject() {
+        return currentObject;
+    }
+
+    public void setCurrentObject(Object currentObject) {
+        this.currentObject = currentObject;
+    }
 
     @Override
     public Field getCurrentField() {

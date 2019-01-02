@@ -34,6 +34,26 @@ public final class StrUtil {
     }
 
     /**
+     * 重复多少次
+     * @param component 组成信息
+     * @param times 重复次数
+     * @return 重复多次的字符串结果
+     */
+    public static String repeat(final String component, final int times) {
+        if(StrUtil.isEmpty(component)
+            || times <= 0) {
+            return StrUtil.EMPTY;
+        }
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for(int i = 0; i < times; i++) {
+            stringBuffer.append(component);
+        }
+
+        return stringBuffer.toString();
+    }
+
+    /**
      * 构建新的字符串
      * @param original 原始对象
      * @param middle 中间隐藏信息

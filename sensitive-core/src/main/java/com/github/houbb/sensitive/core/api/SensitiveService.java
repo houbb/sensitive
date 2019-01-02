@@ -34,6 +34,7 @@ public class SensitiveService<T> implements ISensitive<T> {
             //2.1 上下文的构造
             SensitiveContext context = new SensitiveContext();
             context.setAllFieldList(fieldList);
+            context.setCurrentObject(newObject);
 
             for (Field field : fieldList) {
                 context.setCurrentField(field);

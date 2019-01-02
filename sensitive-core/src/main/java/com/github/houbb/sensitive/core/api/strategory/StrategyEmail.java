@@ -2,6 +2,7 @@ package com.github.houbb.sensitive.core.api.strategory;
 
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.core.util.ObjectUtil;
 import com.github.houbb.sensitive.core.util.StrUtil;
 
 /**
@@ -15,8 +16,20 @@ public class StrategyEmail implements IStrategy {
 
     @Override
     public Object des(Object original, IContext context) {
+        if(ObjectUtil.isNull(original)) {
+            return null;
+        }
+
+        final String emailStr = original.toString();
         final int prefixLength = 3;
-        final String middle = "****";
+
+        final int atIndex = emailStr.indexOf(StrUtil.AT);
+        String middle = "****";
+
+        if(atIndex > 0) {
+            int middleLength = atIndex - prefixLength;
+            middle = StrUtil.repeat(StrUtil.STAR, middleLength);
+        }
         return StrUtil.buildString(original, middle, prefixLength);
     }
 

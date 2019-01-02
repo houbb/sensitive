@@ -32,7 +32,8 @@ public class StrategyChineseName implements IStrategy {
             return StrUtil.STAR + originalStr.charAt(1);
         }
 
-        StringBuffer stringBuffer = new StringBuffer(originalStr.charAt(0));
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(originalStr.charAt(0));
         for(int i = 0; i < nameLength-2; i++) {
             stringBuffer.append(StrUtil.STAR);
         }
