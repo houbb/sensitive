@@ -12,6 +12,8 @@ import java.util.Map;
  */
 public final class BeanUtil {
 
+    private BeanUtil(){}
+
     /**
      * 将 source 中的值赋给 target，
      * 条件是属性的名字+类型相同

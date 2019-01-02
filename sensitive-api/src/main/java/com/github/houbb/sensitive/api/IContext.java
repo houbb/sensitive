@@ -16,4 +16,10 @@ public interface IContext {
      */
     List<Field> getAllFieldList();
 
+    /**
+     * 获得当前字段信息
+     * @return 字段信息
+     */
+    Field getCurrentField();
+
 }

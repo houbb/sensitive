@@ -4,7 +4,8 @@ import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
 
 /**
- * 密码的脱敏策略：直接显示为空
+ * 密码的脱敏策略：
+ * 1. 直接返回 null
  * @author binbin.hou
  * @date 2018/12/29
  */

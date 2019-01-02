@@ -1,10 +1,6 @@
 package com.github.houbb.sensitive.core.util;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -14,76 +10,7 @@ import java.util.*;
  */
 public final class ReflectionUtil {
 
-    /**
-     * base toString() method;
-     * @param thisObj
-     * @return
-     */
-    public static String toString(Object thisObj) {
-        Class clazz = thisObj.getClass();
-
-        String entityName = clazz.getSimpleName();
-        Field[] fields = clazz.getDeclaredFields();
-
-        StringBuilder stringBuilder = new StringBuilder(String.format("%s{", entityName));
-
-        for(int i = 0; i < fields.length-1; i++) {
-            Field field = fields[i];
-            stringBuilder.append(buildFieldValue(thisObj, field)).append(",");
-        }
-
-        stringBuilder.append(buildFieldValue(thisObj, fields[fields.length-1]));
-        stringBuilder.append("}");
-
-        return stringBuilder.toString();
-    }
-
-    /**
-     * build "field=fieldValue"
-     * @param object
-     * @param field
-     * @return
-     */
-    private static String buildFieldValue(Object object, Field field) {
-        final String format = isType(field, String.class) ? "%s='%s'" : "%s=%s";
-        StringBuilder stringBuilder = new StringBuilder();
-        Method getMethod = getGetMethod(object.getClass(), field);
-        try {
-            Object fieldValue = getMethod.invoke(object);
-            stringBuilder = new StringBuilder(String.format(format, field.getName(), fieldValue));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    /**
-     * get the Get() of current field;
-     * @param clazz
-     * @param field
-     * @return
-     */
-    private static Method getGetMethod(Class clazz, Field field) {
-        PropertyDescriptor propertyDescriptor = null;
-        try {
-            propertyDescriptor = new PropertyDescriptor(field.getName(), clazz);
-        } catch (IntrospectionException e) {
-            throw new RuntimeException(e);
-        }
-
-        return propertyDescriptor.getReadMethod();
-    }
-
-    /**
-     * adjust just field is the type of
-     * @param field
-     * @param classType
-     * @return
-     */
-    private static Boolean isType(Field field, Class classType) {
-        return field.getType().equals(classType);
-    }
+    private ReflectionUtil(){}
 
     /**
      * 获取所有对象字段
