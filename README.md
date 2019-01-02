@@ -10,6 +10,8 @@
 [![Build Status](https://www.travis-ci.org/houbb/sensitive.svg?branch=master)](https://www.travis-ci.org/houbb/sensitive?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/houbb/sensitive/badge.svg?branch=master)](https://coveralls.io/github/houbb/sensitive?branch=master)
 
+> [变更日志](doc/CHANGE_LOG.md)
+
 ## 日志脱敏
 
 为了金融交易的安全性，国家强制规定对于以下信息是要日志脱敏的：
