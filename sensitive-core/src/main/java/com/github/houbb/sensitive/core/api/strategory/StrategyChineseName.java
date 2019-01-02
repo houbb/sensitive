@@ -12,7 +12,7 @@ import com.github.houbb.sensitive.core.util.StrUtil;
  * 2. 三个及其以上 只保留第一个和最后一个 其他用星号代替
  *
  * @author binbin.hou
- * @date 2019/1/2
+ * date 2019/1/2
  */
 public class StrategyChineseName implements IStrategy {
 

@@ -6,7 +6,7 @@ import com.github.houbb.sensitive.test.core.condition.ConditionFooPassword;
 
 /**
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public class UserPasswordCondition {
 

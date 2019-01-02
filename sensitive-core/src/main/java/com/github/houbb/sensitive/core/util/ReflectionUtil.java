@@ -6,7 +6,7 @@ import java.util.*;
 /**
  * 反射工具类
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public final class ReflectionUtil {
 

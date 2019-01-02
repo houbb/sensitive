@@ -11,7 +11,7 @@ import com.github.houbb.sensitive.core.util.StrUtil;
  *
  * 只保留前6位和后2位，其他用*代替。
  * @author binbin.hou
- * @date 2019/1/2
+ * date 2019/1/2
  */
 public class StrategyCardId implements IStrategy {
 

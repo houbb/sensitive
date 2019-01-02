@@ -3,7 +3,7 @@ package com.github.houbb.sensitive.api;
 /**
  * 脱敏接口
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  * @param <T> 参数类型
  */
 public interface ISensitive<T> {

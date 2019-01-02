@@ -5,7 +5,7 @@ import com.github.houbb.sensitive.core.api.strategory.*;
 
 /**
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public class User {
 

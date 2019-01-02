@@ -7,7 +7,7 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
@@ -25,11 +25,16 @@
 
         <plugin.maven-source-plugin.version>2.2.1</plugin.maven-source-plugin.version>
         <plugin.maven-javadoc-plugin.version>2.9.1</plugin.maven-javadoc-plugin.version>
+        <plugin.maven-gpg-plugin.version>1.5</plugin.maven-gpg-plugin.version>
+
+        <plugin.coveralls.version>4.3.0</plugin.coveralls.version>
+        <plugin.cobertura.version>2.7</plugin.cobertura.version>
 
         <!--============================== MAIN ==============================-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.compiler.level>1.7</project.compiler.level>
 
+        <!--============================== OTHER ==============================-->
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -88,5 +93,126 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--============================== ADD For sonatype START ==============================-->
+    <name>sensitive</name>
+    <description>Sensitive 基于 java 注解的日志脱敏工具.</description>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/houbb/sensitve</url>
+        <connection>https://github.com/houbb/sensitve.git</connection>
+        <developerConnection>https://houbb.github.io/</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>houbb</name>
+            <email>houbinbin.echo@gmail.com</email>
+            <url>https://houbb.github.io/</url>
+        </developer>
+    </developers>
+    <!--============================== ADD For sonatype END ==============================-->
+
+
+    <!--mvn clean deploy -P release -Darguments="gpg.passphrase=设置gpg设置密钥时候输入的Passphrase"-->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${plugin.maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${plugin.maven-javadoc-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${plugin.maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!--=================================== coveralls START ===================================-->
+                    <!--mvn cobertura:cobertura coveralls:report -DrepoToken=yourcoverallsprojectrepositorytoken-->
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <version>${plugin.coveralls.version}</version>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <version>${plugin.cobertura.version}</version>
+                        <configuration>
+                            <format>xml</format>
+                            <maxmem>256m</maxmem>
+                            <!-- aggregated reports for multi-module projects -->
+                            <aggregate>true</aggregate>
+                            <instrumentation>
+                                <excludes>
+                                    <exclude>**/*Test.class</exclude>
+                                </excludes>
+                            </instrumentation>
+                        </configuration>
+                    </plugin>
+                    <!--=================================== coveralls END ===================================-->
+
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
 </project>

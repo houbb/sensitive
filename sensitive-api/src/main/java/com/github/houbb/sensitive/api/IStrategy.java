@@ -3,7 +3,7 @@ package com.github.houbb.sensitive.api;
 /**
  * 脱敏策略
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public interface IStrategy {
 

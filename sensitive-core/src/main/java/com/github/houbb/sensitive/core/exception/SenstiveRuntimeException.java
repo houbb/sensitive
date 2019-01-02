@@ -3,7 +3,7 @@ package com.github.houbb.sensitive.core.exception;
 /**
  * 脱敏运行时异常
  * @author binbin.hou
- * @date 2019/1/2
+ * date 2019/1/2
  */
 public class SenstiveRuntimeException extends RuntimeException {
 

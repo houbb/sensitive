@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * 1. 所有的注解都要继承这个注解
  * 2. 如果一个字段上面有多个注解，则根据注解的顺序，依次执行。
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 @Inherited
 @Documented

@@ -2,7 +2,7 @@ package com.github.houbb.sensitive.api;
 
 /**
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public interface ICondition {
 

@@ -4,7 +4,7 @@ echo "============================= RELEASE START..."
 ## 版本号信息(需要手动指定)
 oldVersion="0.0.2"
 newVersion="0.0.2"
-projectName="iexcel"
+projectName="sensitive"
 
 # 删除分支
 oldBranchName="release_"${oldVersion}

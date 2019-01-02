@@ -3,7 +3,7 @@ package com.github.houbb.sensitive.core.util;
 /**
  * 字符串工具类
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public final class StrUtil {
 

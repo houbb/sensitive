@@ -9,7 +9,7 @@ import com.github.houbb.sensitive.core.util.StrUtil;
  * 脱敏规则：139****6631
  *
  * @author binbin.hou
- * @date 2019/1/2
+ * date 2019/1/2
  */
 public class StrategyPhone implements IStrategy {
 

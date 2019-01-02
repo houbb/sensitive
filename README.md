@@ -6,6 +6,10 @@
 
 用户也可以基于自己的实际需要，自定义注解。
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/sensitive/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/sensitive)
+[![Build Status](https://www.travis-ci.org/houbb/sensitive.svg?branch=master)](https://www.travis-ci.org/houbb/sensitive?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/houbb/sensitive/badge.svg?branch=master)](https://coveralls.io/github/houbb/sensitive?branch=master)
+
 ## 日志脱敏
 
 为了金融交易的安全性，国家强制规定对于以下信息是要日志脱敏的：
@@ -34,12 +38,18 @@
 
 3. 常见的脱敏内置方案
 
+4. 支持 jdk1.7+
+
 # 快速开始
 
 ## maven 导入
 
 ```xml
-
+<dependency>
+    <groupId>com.github.houbb</groupId>
+    <artifactId>sensitive</artifactId>
+    <version>${最新版本}</version>
+</dependency>
 ```
 
 ## 定义对象

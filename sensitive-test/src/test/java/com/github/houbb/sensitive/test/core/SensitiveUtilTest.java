@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * 脱敏测试类
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public class SensitiveUtilTest {
 

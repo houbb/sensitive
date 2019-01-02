@@ -15,7 +15,7 @@ import java.util.List;
  * 脱敏服务实现类
  *
  * @author binbin.hou
- * @date 2018/12/29
+ * date 2018/12/29
  */
 public class SensitiveService<T> implements ISensitive<T> {
 
