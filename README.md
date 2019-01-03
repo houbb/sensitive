@@ -50,7 +50,7 @@
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
-    <version>${最新版本}</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 
@@ -87,7 +87,7 @@ public class User {
 
 ```java
     @Test
-    public void passwordSensitiveTest() {
+    public void UserSensitiveTest() {
         User user = buildUser();
         System.out.println("脱敏前原始： " + user);
         User sensitiveUser = SensitiveUtil.desCopy(user);
@@ -140,8 +140,8 @@ public class ConditionFooPassword implements ICondition {
         try {
             Field field = context.getCurrentField();
             final Object currentObj = context.getCurrentObject();
-            final String name = (String) field.get(currentObj);
-            return !name.equals("123456");
+            final String password = (String) field.get(currentObj);
+            return !password.equals("123456");
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -175,7 +175,7 @@ public void singleSensitiveTest() {
 
 # 待优化的地方
 
-## 独享创建
+## 全新对象创建
 
 这种方式为了避免修改原始对象，创建了一个全新的对象，有点点浪费，可以优化。
 
