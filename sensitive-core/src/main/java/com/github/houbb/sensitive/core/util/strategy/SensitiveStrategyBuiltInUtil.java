@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.core.util.strategy;
 
-import com.github.houbb.sensitive.annotation.condition.SenstiveConditionAlwaysTrue;
 import com.github.houbb.sensitive.annotation.strategy.*;
 import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.api.strategory.*;
@@ -16,7 +15,7 @@ import java.util.Map;
  * 1. 注解和实现之间映射
  * @author binbin.hou
  * date 2019/1/9
- * @since 0.0.1
+ * @since 0.0.2
  */
 public final class SensitiveStrategyBuiltInUtil {
 
@@ -28,11 +27,11 @@ public final class SensitiveStrategyBuiltInUtil {
     private static final Map<Class<? extends Annotation>, IStrategy> MAP = new HashMap<>();
 
     static {
-        MAP.put(SenstiveStrategyCardId.class, new StrategyCardId());
-        MAP.put(SenstiveStrategyPassword.class, new StrategyPassword());
-        MAP.put(SenstiveStrategyPhone.class, new StrategyPhone());
-        MAP.put(SenstiveStrategyChineseName.class, new StrategyChineseName());
-        MAP.put(SenstiveStrategyEmail.class, new StrategyEmail());
+        MAP.put(SensitiveStrategyCardId.class, new StrategyCardId());
+        MAP.put(SensitiveStrategyPassword.class, new StrategyPassword());
+        MAP.put(SensitiveStrategyPhone.class, new StrategyPhone());
+        MAP.put(SensitiveStrategyChineseName.class, new StrategyChineseName());
+        MAP.put(SensitiveStrategyEmail.class, new StrategyEmail());
     }
 
     /**

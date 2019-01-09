@@ -4,6 +4,8 @@ import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.api.SensitiveUtil;
 import com.github.houbb.sensitive.core.api.strategory.StrategyEmail;
 import com.github.houbb.sensitive.test.model.User;
+import com.github.houbb.sensitive.test.model.group.UserGroup;
+import com.github.houbb.sensitive.test.model.group.UserNest;
 import org.junit.Test;
 
 /**
@@ -13,13 +15,40 @@ import org.junit.Test;
  */
 public class SensitiveUtilTest {
 
+    /**
+     * 普通脱敏测试
+     */
     @Test
-    public void passwordSensitiveTest() {
-        User user = buildUser();
+    public void commonSensitiveTest() {
+        User user = DataPrepareTest.buildUser();
         System.out.println("脱敏前原始： " + user);
         User sensitiveUser = SensitiveUtil.desCopy(user);
         System.out.println("脱敏对象： " + sensitiveUser);
         System.out.println("脱敏后原始： " + user);
+    }
+
+    /**
+     * 嵌套类用户脱敏测试
+     */
+    @Test
+    public void sensitiveUserNestTest() {
+        UserNest userNest = DataPrepareTest.buildUserNest();
+        System.out.println("脱敏前原始： " + userNest);
+        UserNest sensitiveUserNest = SensitiveUtil.desCopy(userNest);
+        System.out.println("脱敏对象： " + sensitiveUserNest);
+        System.out.println("脱敏后原始： " + userNest);
+    }
+
+    /**
+     * 嵌套类用户组脱敏测试
+     */
+    @Test
+    public void sensitiveUserGroupTest() {
+        UserGroup userGroup = DataPrepareTest.buildUserGroup();
+        System.out.println("脱敏前原始： " + userGroup);
+        UserGroup sensitiveUserGroup = SensitiveUtil.desCopy(userGroup);
+        System.out.println("脱敏对象： " + sensitiveUserGroup);
+        System.out.println("脱敏后原始： " + userGroup);
     }
 
     @Test
@@ -28,20 +57,6 @@ public class SensitiveUtilTest {
         IStrategy strategy = new StrategyEmail();
         final String emailSensitive = (String) strategy.des(email, null);
         System.out.println("脱敏后的邮箱：" + emailSensitive);
-    }
-
-    /**
-     * 构建测试对象
-     * @return 创建后的对象
-     */
-    private User buildUser() {
-        User user = new User();
-        user.setUsername("脱敏君");
-        user.setPassword("1234567");
-        user.setEmail("12345@qq.com");
-        user.setIdCard("123456190001011234");
-        user.setPhone("18888888888");
-        return user;
     }
 
 }
