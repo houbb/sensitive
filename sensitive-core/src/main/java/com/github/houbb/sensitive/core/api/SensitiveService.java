@@ -11,6 +11,11 @@ import com.github.houbb.sensitive.core.util.BeanUtil;
 import com.github.houbb.sensitive.core.util.ClassUtil;
 import com.github.houbb.sensitive.core.util.ObjectUtil;
 
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.dozer.loader.api.BeanMappingBuilder;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +38,8 @@ public class SensitiveService<T> implements ISensitive<T> {
             final T copyObject = (T) clazz.newInstance();
 
             //2. 对象的信息处理
-            BeanUtil.copyProperties(object, copyObject);
+            Mapper mapper = new DozerBeanMapper();
+            mapper.map(object, copyObject);
 
             //2.1 上下文的构造
             final SensitiveContext context = new SensitiveContext();
@@ -72,17 +78,26 @@ public class SensitiveService<T> implements ISensitive<T> {
                 // 处理 @SensitiveNest 注解
                 SensitiveNest sensitiveNest = field.getAnnotation(SensitiveNest.class);
                 if(ObjectUtil.isNotNull(sensitiveNest)) {
-                    // 为普通 javabean 或者 Iterable 对象，则做特殊处理。
+                    // 为普通 javabean 或者 Iterable/Array 对象，则做特殊处理。
                     if(ClassUtil.isNormalClass(fieldTypeClass)) {
                         final Object fieldNewObject = field.get(copyObject);
                         handleClassField(context, fieldTypeClass, fieldNewObject);
                     }
+
+                    //TODO: 这里当为数组或者列表时 处理是存在问题的。
+                    if(fieldTypeClass.isArray()) {
+                        Object[] arrays = (Object[]) field.get(copyObject);
+                        for(Object array : arrays) {
+                            handleClassField(context, array.getClass(), array);
+                        }
+                    }
+
                     if(Iterable.class.isAssignableFrom(fieldTypeClass)) {
                         final Iterable<Object> fieldIterable = (Iterable<Object>) field.get(copyObject);
                         Iterator<Object> fieldIterator = fieldIterable.iterator();
                         while(fieldIterator.hasNext()) {
                             Object fieldIterableItem = fieldIterator.next();
-                            handleClassField(context, fieldTypeClass, fieldIterableItem);
+                            handleClassField(context, fieldIterableItem.getClass(), fieldIterableItem);
                         }
                     }
                 }

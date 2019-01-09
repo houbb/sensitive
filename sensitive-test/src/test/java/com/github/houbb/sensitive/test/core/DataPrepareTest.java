@@ -21,6 +21,8 @@ public final class DataPrepareTest {
         UserNest userNest = new UserNest();
         User user = buildUser();
         userNest.setUser(user);
+        userNest.setPasswordList(Arrays.asList("1222, 23453245, 444"));
+        userNest.setPasswordArray(new String[]{"1214", "werqwerwqe", "asfsdaf"});
         return userNest;
     }
 
