@@ -37,17 +37,17 @@ public final class ClassUtil {
      * @since 0.0.1
      */
     public static List<Field> getAllFieldList(final Class clazz) {
-        List<Field> fieldList = new ArrayList<>() ;
+        Set<Field> fieldSet = new HashSet<>() ;
         Class tempClass = clazz;
         while (tempClass != null) {
-            fieldList.addAll(Arrays.asList(tempClass.getDeclaredFields()));
+            fieldSet.addAll(Arrays.asList(tempClass.getDeclaredFields()));
             tempClass = tempClass.getSuperclass();
         }
 
-        for(Field field : fieldList) {
+        for(Field field : fieldSet) {
             field.setAccessible(true);
         }
-        return fieldList;
+        return new ArrayList<>(fieldSet);
     }
 
     /**
