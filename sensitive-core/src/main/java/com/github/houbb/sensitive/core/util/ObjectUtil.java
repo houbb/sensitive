@@ -18,4 +18,13 @@ public final class ObjectUtil {
         return null == object;
     }
 
+    /**
+     * 对象是否不为空
+     * @param object 入参
+     * @return 是否为 null
+     */
+    public static boolean isNotNull(final Object object) {
+        return !isNull(object);
+    }
+
 }

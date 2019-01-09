@@ -3,6 +3,7 @@ package com.github.houbb.sensitive.core.api.context;
 import com.github.houbb.sensitive.api.IContext;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class SensitiveContext implements IContext {
     /**
      * 所有字段
      */
-    private List<Field> allFieldList;
+    private List<Field> allFieldList = new ArrayList<>();
 
     @Override
     public Object getCurrentObject() {
@@ -50,7 +51,12 @@ public class SensitiveContext implements IContext {
         return allFieldList;
     }
 
-    public void setAllFieldList(List<Field> allFieldList) {
-        this.allFieldList = allFieldList;
+    /**
+     * 添加字段信息
+     * @param fieldList 字段列表信息
+     */
+    public void addFieldList(List<Field> fieldList) {
+        this.allFieldList.addAll(fieldList);
     }
+
 }

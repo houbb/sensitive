@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.annotation.metadata;
 
-import com.github.houbb.sensitive.annotation.condition.SenstiveConditionAlwaysTrue;
 import com.github.houbb.sensitive.api.ICondition;
 
 import java.lang.annotation.*;

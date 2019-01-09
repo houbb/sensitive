@@ -16,5 +16,5 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @SensitiveStrategy(SensitiveStrategyBuiltIn.class)
-public @interface SenstiveStrategyChineseName {
+public @interface SensitiveStrategyEmail {
 }

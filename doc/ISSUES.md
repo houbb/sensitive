@@ -1,8 +1,18 @@
 # 如果对象中包含
 
-list map set collection 等属性时 会不会有问题?
+## 属性的复制  
+
+list map set collection 等属性时。
+
+会不会有问题?
 
 包含属性赋值，和属性脱敏这两个部分。
+
+复制不存在问题。
+
+## 脱敏的处理
+
+【递归处理】
 
 # Field
 
@@ -11,6 +21,8 @@ list map set collection 等属性时 会不会有问题?
 便于用户使用。
 
 # i18N
+
+支持 i18n
 
 # 多线程处理
 
