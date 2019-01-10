@@ -168,50 +168,12 @@ public class SensitiveService<T> implements ISensitive<T> {
     }
 
     /**
-     * 处理需要循环的属性
-     *
-     * @param context   上下文
-     * @param entryCollection 明细列表
-     * @param field     字段信息
-     * @return 处理后的信息列表
-     * @since 0.0.2
-     */
-    @Deprecated
-    private List<Object> handleSensitiveEntries(final SensitiveContext context,
-                                                final Collection<Object> entryCollection,
-                                                final Field field) {
-        try {
-            List<Object> resultList = new ArrayList<>(entryCollection.size());
-
-            //处理 @Sensitive
-            Sensitive sensitive = field.getAnnotation(Sensitive.class);
-            if(ObjectUtil.isNotNull(sensitive)) {
-                for(Object entry : entryCollection) {
-                    Class<? extends ICondition> conditionClass = sensitive.condition();
-                    ICondition condition = conditionClass.newInstance();
-                    if (condition.valid(context)) {
-                        Class<? extends IStrategy> strategyClass = sensitive.strategy();
-                        IStrategy strategy = strategyClass.newInstance();
-                        final Object result = strategy.des(entry, context);
-                        resultList.add(result);
-                    }
-                }
-            }
-            // 系统内置自定义注解的处理
-
-            // 其他用户自定义注解的处理
-            return resultList;
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SensitiveRuntimeException(e);
-        }
-    }
-
-    /**
      * 处理脱敏信息
      *
      * @param context    上下文
      * @param copyObject 复制的对象
      * @param field      当前字段
+     * @since 0.0.2
      */
     private void handleSensitive(final SensitiveContext context,
                                  final Object copyObject,
@@ -245,6 +207,7 @@ public class SensitiveService<T> implements ISensitive<T> {
      *
      * @param fieldTypeClass 字段类型
      * @return 是否
+     * @since 0.0.2
      */
     private boolean needHandleEntryType(final Class fieldTypeClass) {
         if(ClassUtil.isBaseClass(fieldTypeClass)

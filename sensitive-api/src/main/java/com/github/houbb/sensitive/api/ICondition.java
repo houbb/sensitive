@@ -1,8 +1,10 @@
 package com.github.houbb.sensitive.api;
 
 /**
+ * 执行上下文接口
  * @author binbin.hou
  * date 2018/12/29
+ * @since 0.0.1
  */
 public interface ICondition {
 
