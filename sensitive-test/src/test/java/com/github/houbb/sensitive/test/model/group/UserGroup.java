@@ -1,7 +1,7 @@
 package com.github.houbb.sensitive.test.model.group;
 
 import com.github.houbb.sensitive.annotation.Sensitive;
-import com.github.houbb.sensitive.annotation.SensitiveNest;
+import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.core.api.strategory.StrategyPassword;
 import com.github.houbb.sensitive.test.model.User;
 
@@ -21,30 +21,30 @@ public class UserGroup {
      */
     private User coolUser;
 
-    @SensitiveNest
+    @SensitiveEntry
     private User user;
 
-    @SensitiveNest
+    @SensitiveEntry
     private List<User> userList;
 
-    @SensitiveNest
+    @SensitiveEntry
     private Set<User> userSet;
 
-    @SensitiveNest
+    @SensitiveEntry
     private Collection<User> userCollection;
 
     /**
-     * SensitiveNest 注解不会生效
+     * SensitiveEntry 注解不会生效
      * Sensitive 注解正常执行
      */
     @Sensitive(strategy = StrategyPassword.class)
-    @SensitiveNest
+    @SensitiveEntry
     private String password;
 
     /**
-     * SensitiveNest 注解不会生效
+     * SensitiveEntry 注解不会生效
      */
-    @SensitiveNest
+    @SensitiveEntry
     private Map<String, User> userMap;
 
     public String getPassword() {

@@ -5,7 +5,7 @@
 //
 //package com.github.houbb.sensitive.core.util;
 //
-//import com.github.houbb.sensitive.core.exception.SenstiveRuntimeException;
+//import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 //
 //import java.lang.reflect.Field;
 //import java.lang.reflect.InvocationTargetException;
@@ -175,7 +175,7 @@
 //        try {
 //            return clone(value, 1);
 //        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-//            throw new SenstiveRuntimeException(e);
+//            throw new SensitiveRuntimeException(e);
 //        }
 //    }
 //
@@ -189,7 +189,7 @@
 //        try {
 //            return clone(value, -1);
 //        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-//            throw new SenstiveRuntimeException(e);
+//            throw new SensitiveRuntimeException(e);
 //        }
 //    }
 //

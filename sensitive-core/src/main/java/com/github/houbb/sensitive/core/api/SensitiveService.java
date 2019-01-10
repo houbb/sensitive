@@ -1,28 +1,24 @@
 package com.github.houbb.sensitive.core.api;
 
 import com.github.houbb.sensitive.annotation.Sensitive;
-import com.github.houbb.sensitive.annotation.SensitiveNest;
+import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.api.ICondition;
 import com.github.houbb.sensitive.api.ISensitive;
 import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
-import com.github.houbb.sensitive.core.exception.SenstiveRuntimeException;
-import com.github.houbb.sensitive.core.util.BeanUtil;
-import com.github.houbb.sensitive.core.util.ClassUtil;
-import com.github.houbb.sensitive.core.util.ObjectUtil;
-
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.dozer.loader.api.BeanMappingBuilder;
+import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
+import com.github.houbb.sensitive.core.util.*;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * 脱敏服务实现类
  *
+ * [反射处理数组](https://blog.csdn.net/snakemoving/article/details/54287681)
  * @author binbin.hou
  * @since 0.0.1
  * date 2018/12/29
@@ -32,38 +28,31 @@ public class SensitiveService<T> implements ISensitive<T> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public T desCopy(T object) {
-        try {
-            //1. 初始化对象
-            final Class clazz = object.getClass();
-            final T copyObject = (T) clazz.newInstance();
+        //1. 初始化对象
+        final Class clazz = object.getClass();
+        final SensitiveContext context = new SensitiveContext();
 
-            //2. 对象的信息处理
-            Mapper mapper = new DozerBeanMapper();
-            mapper.map(object, copyObject);
+        //2. 深度复制对象
+        final T copyObject = BeanUtil.deepCopy(object);
+        context.setCurrentObject(copyObject);
 
-            //2.1 上下文的构造
-            final SensitiveContext context = new SensitiveContext();
-            context.setCurrentObject(copyObject);
 
-            //3. 处理
-            handleClassField(context, clazz, copyObject);
-            return copyObject;
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SenstiveRuntimeException(e);
-        }
+        //3. 处理
+        handleClassField(context, copyObject, clazz);
+        return copyObject;
     }
 
     /**
      * 处理脱敏相关信息
-     * TODO: 嵌套的时候，context 中的字段列表使用起来将很不方便。
-     * @param context 执行上下文
-     * @param clazz class 类型
+     *
+     * @param context    执行上下文
      * @param copyObject 拷贝的新对象
+     * @param clazz      class 类型
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void handleClassField(final SensitiveContext context,
-                                       final Class clazz,
-                                       final Object copyObject) {
+                                  final Object copyObject,
+                                  final Class clazz) {
 
         List<Field> fieldList = ClassUtil.getAllFieldList(clazz);
         context.addFieldList(fieldList);
@@ -71,59 +60,204 @@ public class SensitiveService<T> implements ISensitive<T> {
         try {
             for (Field field : fieldList) {
                 // 设置当前处理的字段
+                final Class fieldTypeClass = field.getType();
                 context.setCurrentField(field);
 
-                final Class fieldTypeClass = field.getType();
-
-                // 处理 @SensitiveNest 注解
-                SensitiveNest sensitiveNest = field.getAnnotation(SensitiveNest.class);
-                if(ObjectUtil.isNotNull(sensitiveNest)) {
-                    // 为普通 javabean 或者 Iterable/Array 对象，则做特殊处理。
-                    if(ClassUtil.isNormalClass(fieldTypeClass)) {
+                // 处理 @SensitiveEntry 注解
+                SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
+                if (ObjectUtil.isNotNull(sensitiveEntry)) {
+                    if (ClassUtil.isJavaBeanClass(fieldTypeClass)) {
+                        // 为普通 javabean 对象
                         final Object fieldNewObject = field.get(copyObject);
-                        handleClassField(context, fieldTypeClass, fieldNewObject);
-                    }
-
-                    //TODO: 这里当为数组或者列表时 处理是存在问题的。
-                    if(fieldTypeClass.isArray()) {
+                        handleClassField(context, fieldNewObject, fieldTypeClass);
+                    } else if (ClassUtil.isArrayClass(fieldTypeClass)) {
+                        // 为数组类型
                         Object[] arrays = (Object[]) field.get(copyObject);
-                        for(Object array : arrays) {
-                            handleClassField(context, array.getClass(), array);
-                        }
-                    }
+                        if (ArrayUtil.isNotEmpty(arrays)) {
+                            Object firstArrayEntry = arrays[0];
+                            final Class entryFieldClass = firstArrayEntry.getClass();
 
-                    if(Iterable.class.isAssignableFrom(fieldTypeClass)) {
-                        final Iterable<Object> fieldIterable = (Iterable<Object>) field.get(copyObject);
-                        Iterator<Object> fieldIterator = fieldIterable.iterator();
-                        while(fieldIterator.hasNext()) {
-                            Object fieldIterableItem = fieldIterator.next();
-                            handleClassField(context, fieldIterableItem.getClass(), fieldIterableItem);
+                            //1. 如果需要特殊处理，则循环特殊处理
+                            if (needHandleEntryType(entryFieldClass)) {
+                                for (Object arrayEntry : arrays) {
+                                    handleClassField(context, arrayEntry, entryFieldClass);
+                                }
+                            } else {
+                                //2, 基础值，直接循环设置即可
+                                final int arrayLength = arrays.length;
+                                Object newArray = Array.newInstance(entryFieldClass, arrayLength);
+                                for(int i = 0; i < arrayLength; i++) {
+                                    Object entry = arrays[i];
+                                    Object result = handleSensitiveEntry(context, entry, field);
+                                    Array.set(newArray, i, result);
+                                }
+                                field.set(copyObject, newArray);
+                            }
                         }
+                    } else if (ClassUtil.isCollectionClass(fieldTypeClass)) {
+                        // Collection 接口的子类
+                        final Collection<Object> entryCollection = (Collection<Object>) field.get(copyObject);
+                        if(CollectionUtil.isNotEmpty(entryCollection)) {
+                            Object firstCollectionEntry = entryCollection.iterator().next();
+                            Class collectionEntryClass = firstCollectionEntry.getClass();
+
+                            //1. 如果需要特殊处理，则循环特殊处理
+                            if(needHandleEntryType(collectionEntryClass)) {
+                                for(Object collectionEntry : entryCollection) {
+                                    handleClassField(context, collectionEntry, collectionEntryClass);
+                                }
+                            } else {
+                                //2, 基础值，直接循环设置即可
+                                List<Object> newResultList = new ArrayList<>(entryCollection.size());
+                                for(Object entry : entryCollection) {
+                                    Object result = handleSensitiveEntry(context, entry, field);
+                                    newResultList.add(result);
+                                }
+                                field.set(copyObject, newResultList);
+                            }
+                        }
+                    } else {
+                        // 1. 常见的基本类型，不做处理
+                        // 2. 如果为 map，暂时不支持处理。后期可以考虑支持 value 的脱敏，或者 key 的脱敏
+                        // 3. 其他
+                        // 处理单个字段脱敏信息
+                        handleSensitive(context, copyObject, field);
                     }
+                } else {
+                    handleSensitive(context, copyObject, field);
                 }
+            }
 
-                //处理 @Sensitive
-                Sensitive sensitive = field.getAnnotation(Sensitive.class);
-                if (sensitive != null) {
+        } catch (IllegalAccessException e) {
+            throw new SensitiveRuntimeException(e);
+        }
+    }
+
+    /**
+     * 处理需脱敏的单个对象
+     *
+     * @param context   上下文
+     * @param entry 明细
+     * @param field     字段信息
+     * @return 处理后的信息
+     * @since 0.0.2
+     */
+    private Object handleSensitiveEntry(final SensitiveContext context,
+                                        final Object entry,
+                                        final Field field) {
+        try {
+            //处理 @Sensitive
+            Sensitive sensitive = field.getAnnotation(Sensitive.class);
+            if(ObjectUtil.isNotNull(sensitive)) {
+                Class<? extends ICondition> conditionClass = sensitive.condition();
+                ICondition condition = conditionClass.newInstance();
+                if (condition.valid(context)) {
+                    Class<? extends IStrategy> strategyClass = sensitive.strategy();
+                    IStrategy strategy = strategyClass.newInstance();
+                    return strategy.des(entry, context);
+                }
+            }
+
+            // 系统内置自定义注解的处理
+
+            // 其他用户自定义注解的处理
+            return entry;
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SensitiveRuntimeException(e);
+        }
+    }
+
+    /**
+     * 处理需要循环的属性
+     *
+     * @param context   上下文
+     * @param entryCollection 明细列表
+     * @param field     字段信息
+     * @return 处理后的信息列表
+     * @since 0.0.2
+     */
+    @Deprecated
+    private List<Object> handleSensitiveEntries(final SensitiveContext context,
+                                                final Collection<Object> entryCollection,
+                                                final Field field) {
+        try {
+            List<Object> resultList = new ArrayList<>(entryCollection.size());
+
+            //处理 @Sensitive
+            Sensitive sensitive = field.getAnnotation(Sensitive.class);
+            if(ObjectUtil.isNotNull(sensitive)) {
+                for(Object entry : entryCollection) {
                     Class<? extends ICondition> conditionClass = sensitive.condition();
                     ICondition condition = conditionClass.newInstance();
                     if (condition.valid(context)) {
                         Class<? extends IStrategy> strategyClass = sensitive.strategy();
                         IStrategy strategy = strategyClass.newInstance();
-                        final Object originalFieldVal = field.get(copyObject);
-                        final Object result = strategy.des(originalFieldVal, context);
-                        field.set(copyObject, result);
+                        final Object result = strategy.des(entry, context);
+                        resultList.add(result);
                     }
                 }
+            }
+            // 系统内置自定义注解的处理
 
-                // 系统内置自定义注解的处理
+            // 其他用户自定义注解的处理
+            return resultList;
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SensitiveRuntimeException(e);
+        }
+    }
 
-                // 其他用户自定义注解的处理
+    /**
+     * 处理脱敏信息
+     *
+     * @param context    上下文
+     * @param copyObject 复制的对象
+     * @param field      当前字段
+     */
+    private void handleSensitive(final SensitiveContext context,
+                                 final Object copyObject,
+                                 final Field field) {
+        try {
+            //处理 @Sensitive
+            Sensitive sensitive = field.getAnnotation(Sensitive.class);
+            if (sensitive != null) {
+                Class<? extends ICondition> conditionClass = sensitive.condition();
+                ICondition condition = conditionClass.newInstance();
+                if (condition.valid(context)) {
+                    Class<? extends IStrategy> strategyClass = sensitive.strategy();
+                    IStrategy strategy = strategyClass.newInstance();
+                    final Object originalFieldVal = field.get(copyObject);
+                    final Object result = strategy.des(originalFieldVal, context);
+                    field.set(copyObject, result);
+                }
             }
 
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new SenstiveRuntimeException(e);
+            // 系统内置自定义注解的处理
+
+            // 其他用户自定义注解的处理
+
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SensitiveRuntimeException(e);
         }
+    }
+
+    /**
+     * 需要特殊处理的列表/对象类型
+     *
+     * @param fieldTypeClass 字段类型
+     * @return 是否
+     */
+    private boolean needHandleEntryType(final Class fieldTypeClass) {
+        if(ClassUtil.isBaseClass(fieldTypeClass)
+            || ClassUtil.isMapClass(fieldTypeClass)) {
+            return false;
+        }
+
+        if (ClassUtil.isJavaBeanClass(fieldTypeClass)
+                || ClassUtil.isArrayClass(fieldTypeClass)
+                || ClassUtil.isCollectionClass(fieldTypeClass)) {
+            return true;
+        }
+        return false;
     }
 
 }
