@@ -40,7 +40,7 @@
 
 3. 常见的脱敏内置方案
 
-4. 支持 jdk1.7+
+4. java 深拷贝，且原始对象不用实现任何接口。
 
 # 快速开始
 
@@ -50,7 +50,7 @@
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
@@ -173,18 +173,161 @@ public void singleSensitiveTest() {
 脱敏后的邮箱：123***@qq.com
 ```
 
-<<<<<<< 4cad3df2b7dc058b8bbc118de706e9a93edfb530
-# 待优化的地方
+## 属性为集合或者对象
 
-## 全新对象创建
+如果某个属性是单个集合或者对象，则需要使用注解 `@SensitiveEntry`。
 
-这种方式为了避免修改原始对象，创建了一个全新的对象，有点点浪费，可以优化。
+- 放在集合属性上，且属性为普通对象
 
-## 其他方法
+会遍历每一个属性，执行上面的脱敏策略。
 
-可以基于 log4j2/logback 等转换器进行敏感信息的脱敏，但是不具有不同的 log 框架的可移植性。
-=======
->>>>>>> [Feature] 自定义注解的支持
+- 放在对象属性上
+
+会处理对象中各个字段上的脱敏注解信息。
+
+- 放在集合属性上，且属性为对象
+
+遍历每一个对象，处理对象中各个字段上的脱敏注解信息。
+
+### 放在集合属性上，且属性为普通对象
+
+- UserEntryBaseType.java
+
+作为演示，集合中为普通的字符串。
+
+```java
+public class UserEntryBaseType {
+
+    @SensitiveEntry
+    @Sensitive(strategy = StrategyChineseName.class)
+    private List<String> chineseNameList;
+
+    @SensitiveEntry
+    @Sensitive(strategy = StrategyChineseName.class)
+    private String[] chineseNameArray;
+    
+    //Getter & Setter & toString()
+}
+```
+
+- 构建对象
+
+```java
+/**
+ * 构建用户-属性为列表，列表中为基础属性
+ * @return 构建嵌套信息
+ * @since 0.0.2
+ */
+public static UserEntryBaseType buildUserEntryBaseType() {
+    UserEntryBaseType userEntryBaseType = new UserEntryBaseType();
+    userEntryBaseType.setChineseNameList(Arrays.asList("盘古", "女娲", "伏羲"));
+    userEntryBaseType.setChineseNameArray(new String[]{"盘古", "女娲", "伏羲"});
+    return userEntryBaseType;
+}
+```
+
+- 测试演示
+
+```java
+/**
+ * 用户属性中有集合或者map，集合中属性是基础类型-脱敏测试
+ * @since 0.0.2
+ */
+@Test
+public void sensitiveEntryBaseTypeTest() {
+    UserEntryBaseType userEntryBaseType = DataPrepareTest.buildUserEntryBaseType();
+    System.out.println("脱敏前原始： " + userEntryBaseType);
+    UserEntryBaseType sensitive = SensitiveUtil.desCopy(userEntryBaseType);
+    System.out.println("脱敏对象： " + sensitive);
+    System.out.println("脱敏后原始： " + userEntryBaseType);
+}
+```
+
+- 日志信息
+
+```
+脱敏前原始： UserEntryBaseType{chineseNameList=[盘古, 女娲, 伏羲], chineseNameArray=[盘古, 女娲, 伏羲]}
+脱敏对象： UserEntryBaseType{chineseNameList=[*古, *娲, *羲], chineseNameArray=[*古, *娲, *羲]}
+脱敏后原始： UserEntryBaseType{chineseNameList=[盘古, 女娲, 伏羲], chineseNameArray=[盘古, 女娲, 伏羲]}
+```
+
+### 放在对象属性上
+
+- 演示对象
+
+这里的 User 和上面的 User 对象一致。
+
+
+```java
+public class UserEntryObject {
+
+    @SensitiveEntry
+    private User user;
+
+    @SensitiveEntry
+    private List<User> userList;
+
+    @SensitiveEntry
+    private User[] userArray;
+    
+    //...
+}
+```
+
+- 对象构建
+
+```java
+/**
+ * 构建用户-属性为列表，数组。列表中为对象。
+ * @return 构建嵌套信息
+ * @since 0.0.2
+ */
+public static UserEntryObject buildUserEntryObject() {
+    UserEntryObject userEntryObject = new UserEntryObject();
+    User user = buildUser();
+    User user2 = buildUser();
+    User user3 = buildUser();
+    userEntryObject.setUser(user);
+    userEntryObject.setUserList(Arrays.asList(user2));
+    userEntryObject.setUserArray(new User[]{user3});
+    return userEntryObject;
+}
+```
+
+- 测试演示
+
+```java
+/**
+ * 用户属性中有集合或者对象，集合中属性是对象-脱敏测试
+ * @since 0.0.2
+ */
+@Test
+public void sensitiveEntryObjectTest() {
+    UserEntryObject userEntryObject = DataPrepareTest.buildUserEntryObject();
+    System.out.println("脱敏前原始： " + userEntryObject);
+    UserEntryObject sensitiveUserEntryObject = SensitiveUtil.desCopy(userEntryObject);
+    System.out.println("脱敏对象： " + sensitiveUserEntryObject);
+    System.out.println("脱敏后原始： " + userEntryObject);
+}
+```
+
+- 测试结果
+
+```java
+脱敏前原始： UserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}
+脱敏对象： UserEntryObject{user=User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, userList=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userArray=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]}
+脱敏后原始： UserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}
+```
+
+# 需求 & BUGS
+
+> [issues](https://github.com/houbb/sensitive/issues)
+
+# 欢迎加入开发
+
+如果你对本项目有兴趣，并且对代码有一定追求，可以申请加入本项目开发。
+
+如果你善于写文档，或者愿意补全测试案例，也非常欢迎加入。
 
 
 
