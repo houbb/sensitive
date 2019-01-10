@@ -15,6 +15,7 @@ public final class SensitiveUtil {
     /**
      * 脱敏对象
      * @param object 原始对象
+     * @param <T> 泛型
      * @return 脱敏后的对象
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
