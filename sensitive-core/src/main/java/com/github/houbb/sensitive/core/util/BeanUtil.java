@@ -1,9 +1,9 @@
 package com.github.houbb.sensitive.core.util;
 
+import com.alibaba.fastjson.JSON;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,37 +18,30 @@ public final class BeanUtil {
     private BeanUtil(){}
 
     /**
-     * 无需进行复制的特殊类型数组
-     */
-    private static Class[] needlessCloneClasses = new Class[]{String.class, Boolean.class, Character.class, Byte.class, Short.class,
-            Integer.class, Long.class, Float.class, Double.class, Void.class, Object.class, Class.class
-    };
-
-    /**
-     * 判断该类型对象是否无需复制
+     * 深度复制
+     * 1. 为了避免深拷贝要求用户实现 clone 和 序列化的相关接口
+     * 2. 为了避免使用 dozer 这种比较重的工具
+     * 3. 自己实现暂时工作量比较大
      *
-     * @param c 指定类型
-     * @return 如果不需要复制则返回真，否则返回假
+     * 暂时使用 fastJson 作为实现深度拷贝的方式
+     * @since 0.0.2
+     * @param object 对象
+     * @param <T> 泛型
+     * @return 深拷贝后的对象
      */
-    private static boolean isNeedlessClone(Class c) {
-        //基本类型
-        if (c.isPrimitive()) {
-            return true;
-        }
-        //是否在无需复制类型数组里
-        for (Class tmp : needlessCloneClasses) {
-            if (c.equals(tmp)) {
-                return true;
-            }
-        }
-        return false;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T> T deepCopy(T object) {
+        final Class clazz = object.getClass();
+        String jsonString = JSON.toJSONString(object);
+        return (T) JSON.parseObject(jsonString, clazz);
     }
+
 
     /**
      * 将 source 中的值赋给 target，
      * 条件是属性的名字+类型相同
      *
-     * TODO: 对于对象的拷贝，不应该直接设置。  需要进行深度复制。
+     * TODO: 对于对象的拷贝，不应该直接设置，需要进行深度复制。
      * 1. 不需要深拷贝的常见类型
      * 2. Iterable 对象的深度拷贝
      * 3. Map 对象的深度拷贝
@@ -57,6 +50,7 @@ public final class BeanUtil {
      *
      * @param source 原始对象
      * @param target 目标赋值对象
+     * @since 0.0.1
      */
     public static void copyProperties(final Object source, Object target) {
         try {
@@ -69,37 +63,12 @@ public final class BeanUtil {
                 if(targetField != null
                     && targetField.getType().equals(sourceField.getType())) {
                     final Object sourceFieldValue = sourceField.get(source);
-                    final Object copyFieldValue = copyValue(sourceFieldValue);
-                    targetField.set(target, copyFieldValue);
+                    targetField.set(target, sourceFieldValue);
                 }
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static Object copyValue(final Object sourceFieldValue) {
-        return sourceFieldValue;
-    }
-
-    /**
-     * 判断是否为Bean对象<br>
-     * 判定方法是是否存在只有一个参数的setXXX方法
-     *
-     * @param clazz 待测试类
-     * @return 是否为Bean对象
-     */
-    public static boolean isBean(Class<?> clazz) {
-        if (ClassUtil.isNormalClass(clazz)) {
-            final Method[] methods = clazz.getMethods();
-            for (Method method : methods) {
-                if (method.getParameterTypes().length == 1 && method.getName().startsWith("set")) {
-                    // 检测包含标准的setXXX方法即视为标准的JavaBean
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
 }

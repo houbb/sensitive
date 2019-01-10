@@ -36,6 +36,7 @@
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.12</junit.version>
+        <fastjson.version>1.2.44</fastjson.version>
     </properties>
 
     <dependencyManagement>
@@ -68,9 +69,9 @@
             </dependency>
 
             <dependency>
-                <groupId>net.sf.dozer</groupId>
-                <artifactId>dozer</artifactId>
-                <version>5.5.1</version>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
 
         </dependencies>
