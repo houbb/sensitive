@@ -173,6 +173,7 @@ public void singleSensitiveTest() {
 脱敏后的邮箱：123***@qq.com
 ```
 
+<<<<<<< 4cad3df2b7dc058b8bbc118de706e9a93edfb530
 # 待优化的地方
 
 ## 全新对象创建
@@ -182,6 +183,8 @@ public void singleSensitiveTest() {
 ## 其他方法
 
 可以基于 log4j2/logback 等转换器进行敏感信息的脱敏，但是不具有不同的 log 框架的可移植性。
+=======
+>>>>>>> [Feature] 自定义注解的支持
 
 
 

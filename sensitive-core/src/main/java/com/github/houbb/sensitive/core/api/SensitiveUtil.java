@@ -6,6 +6,7 @@ import com.github.houbb.sensitive.api.ISensitive;
  * 脱敏工具类
  * @author binbin.hou
  * date 2018/12/29
+ * @since 0.0.1
  */
 public final class SensitiveUtil {
 
