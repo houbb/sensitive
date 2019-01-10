@@ -34,7 +34,11 @@ public final class DataPrepareTest {
     public static UserEntryObject buildUserEntryObject() {
         UserEntryObject userEntryObject = new UserEntryObject();
         User user = buildUser();
+        User user2 = buildUser();
+        User user3 = buildUser();
         userEntryObject.setUser(user);
+        userEntryObject.setUserList(Arrays.asList(user2));
+        userEntryObject.setUserArray(new User[]{user3});
         return userEntryObject;
     }
 

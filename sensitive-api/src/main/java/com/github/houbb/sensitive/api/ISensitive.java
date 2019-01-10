@@ -5,6 +5,7 @@ package com.github.houbb.sensitive.api;
  * @author binbin.hou
  * date 2018/12/29
  * @param <T> 参数类型
+ * @since 0.0.1
  */
 public interface ISensitive<T> {
 

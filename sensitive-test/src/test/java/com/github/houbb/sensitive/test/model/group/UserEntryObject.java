@@ -1,8 +1,6 @@
 package com.github.houbb.sensitive.test.model.group;
 
-import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveEntry;
-import com.github.houbb.sensitive.core.api.strategory.StrategyPassword;
 import com.github.houbb.sensitive.test.model.User;
 
 import java.util.Arrays;
@@ -20,12 +18,10 @@ public class UserEntryObject {
     private User user;
 
     @SensitiveEntry
-    @Sensitive(strategy = StrategyPassword.class)
-    private List<String> chineseNameList;
+    private List<User> userList;
 
     @SensitiveEntry
-    @Sensitive(strategy = StrategyPassword.class)
-    private String[] chineseNameArray;
+    private User[] userArray;
 
     public User getUser() {
         return user;
@@ -35,28 +31,28 @@ public class UserEntryObject {
         this.user = user;
     }
 
-    public List<String> getChineseNameList() {
-        return chineseNameList;
+    public List<User> getUserList() {
+        return userList;
     }
 
-    public void setChineseNameList(List<String> chineseNameList) {
-        this.chineseNameList = chineseNameList;
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
     }
 
-    public String[] getChineseNameArray() {
-        return chineseNameArray;
+    public User[] getUserArray() {
+        return userArray;
     }
 
-    public void setChineseNameArray(String[] chineseNameArray) {
-        this.chineseNameArray = chineseNameArray;
+    public void setUserArray(User[] userArray) {
+        this.userArray = userArray;
     }
 
     @Override
     public String toString() {
         return "UserEntryObject{" +
                 "user=" + user +
-                ", chineseNameList=" + chineseNameList +
-                ", chineseNameArray=" + Arrays.toString(chineseNameArray) +
+                ", userList=" + userList +
+                ", userArray=" + Arrays.toString(userArray) +
                 '}';
     }
 }

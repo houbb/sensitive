@@ -4,6 +4,7 @@ package com.github.houbb.sensitive.api;
  * 脱敏策略
  * @author binbin.hou
  * date 2018/12/29
+ * @since 0.0.1
  */
 public interface IStrategy {
 
