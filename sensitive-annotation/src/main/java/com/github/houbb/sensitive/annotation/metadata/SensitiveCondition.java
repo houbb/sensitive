@@ -5,7 +5,7 @@ import com.github.houbb.sensitive.api.ICondition;
 import java.lang.annotation.*;
 
 /**
- * 用于自定义 sensitive 注解
+ * 用于自定义策略生效条件的 注解
  * @since 0.0.2
  * @author binbin.hou
  * date 2019/1/9

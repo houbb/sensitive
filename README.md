@@ -319,6 +319,129 @@ public void sensitiveEntryObjectTest() {
 脱敏后原始： UserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}
 ```
 
+# 系统内置脱敏策略
+
+## 引入原因
+
+如果你看了前面的内容，会看到这样的代码：
+
+```java
+@Sensitive(strategy = StrategyChineseName.class)
+private String username;
+```
+
+但是这种需求很常见，就引入更简单的写法，如下：
+
+```java
+@SensitiveStrategyChineseName
+private String name;
+```
+
+和上面效果是一致的。
+
+不足：无法灵活指定生效条件，下个版本准备解决这个问题。
+
+## 系统内置注解
+
+| 注解 | 等价 @Sensitive | 备注 |
+|:-------|:------|:------|
+| `@SensitiveStrategyChineseName` | `@Sensitive(strategy = StrategyChineseName.class)` | 中文名称脱敏 |
+| `@SensitiveStrategyPassword` | `@Sensitive(strategy = StrategyPassword.class)` |  密码脱敏 |
+| `@SensitiveStrategyEmail` | `@Sensitive(strategy = StrategyEmail.class)` | email 脱敏 |
+| `@SensitiveStrategyCardId` | `@Sensitive(strategy = StrategyCardId.class)` | 卡号脱敏 |
+| `@SensitiveStrategyPhone` | `@Sensitive(strategy = StrategyPhone.class)` | 手机号脱敏 |
+
+## 使用案例
+
+使用的方式和 `@Sensitive` 是一样的，只是一种简化，方便日常使用。
+
+与 `@SensitiveEntry` 的结合和 `@Sensitive` 完全一致，此处不再演示。
+
+- SystemBuiltInAt.java
+
+定义测试对象
+
+```java
+@SensitiveStrategyPhone
+    private String phone;
+
+    @SensitiveStrategyPassword
+    private String password;
+
+    @SensitiveStrategyChineseName
+    private String name;
+
+    @SensitiveStrategyEmail
+    private String email;
+
+    @SensitiveStrategyCardId
+    private String cardId;
+    
+    //Getter Setter
+    //toString()
+}
+```
+
+- 对象构建
+
+```java
+/**
+ * 构建系统内置对象
+ * @return 构建后的对象
+ * @since 0.0.3
+ */
+public static SystemBuiltInAt buildSystemBuiltInAt() {
+    SystemBuiltInAt systemBuiltInAt = new SystemBuiltInAt();
+    systemBuiltInAt.setName("脱敏君");
+    systemBuiltInAt.setPassword("1234567");
+    systemBuiltInAt.setEmail("12345@qq.com");
+    systemBuiltInAt.setCardId("123456190001011234");
+    systemBuiltInAt.setPhone("18888888888");
+    return systemBuiltInAt;
+}
+```
+
+- 测试方法
+
+测试方法断言如下。
+
+```java
+/**
+ * 普通属性脱敏测试
+ */
+@Test
+public void sensitiveTest() {
+    final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
+    final String sensitiveStr = "SystemBuiltInAt{phone='188****8888', password='null', name='脱*君', email='123**@qq.com', cardId='123456**********34'}";
+
+    SystemBuiltInAt systemBuiltInAt = buildSystemBuiltInAt();
+    Assert.assertEquals(originalStr, systemBuiltInAt.toString());
+
+    SystemBuiltInAt sensitive = SensitiveUtil.desCopy(systemBuiltInAt);
+    Assert.assertEquals(sensitiveStr, sensitive.toString());
+    Assert.assertEquals(originalStr, systemBuiltInAt.toString());
+}
+```
+
+## 与 @Sensitive 混合使用
+
+如果你将新增的注解 `@SensitiveStrategyChineseName` 与 `@Sensitive` 同时在一个字段上使用。
+
+为了简化逻辑，优先选择执行 `@Sensitive`，如果 `@Sensitive` 执行脱敏，
+那么 `@SensitiveStrategyChineseName` 将不会生效。  
+
+如：
+
+```java
+/**
+ * 测试字段
+ * 1.当多种注解混合的时候，为了简化逻辑，优先选择 @Sensitive 注解。
+ */
+@SensitiveStrategyChineseName
+@Sensitive(strategy = StrategyPassword.class)
+private String testField;
+```
+
 # 需求 & BUGS
 
 > [issues](https://github.com/houbb/sensitive/issues)

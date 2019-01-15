@@ -2,13 +2,17 @@ package com.github.houbb.sensitive.core.api;
 
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveEntry;
+import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
 import com.github.houbb.sensitive.api.ICondition;
 import com.github.houbb.sensitive.api.ISensitive;
 import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.util.*;
+import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -136,6 +140,11 @@ public class SensitiveService<T> implements ISensitive<T> {
     /**
      * 处理需脱敏的单个对象
      *
+     * 1. 为了简化操作，所有的自定义注解使用多个，不生效。
+     * 2. 生效顺序如下：
+     * （1）Sensitive
+     * （2）系统内置自定义注解
+     * （3）用户自定义注解
      * @param context   上下文
      * @param entry 明细
      * @param field     字段信息
@@ -158,14 +167,26 @@ public class SensitiveService<T> implements ISensitive<T> {
                 }
             }
 
-            // 系统内置自定义注解的处理
+            // 获取所有的注解
+            Annotation[] annotations = field.getAnnotations();
 
-            // 其他用户自定义注解的处理
+            // 系统内置注解 @since 0.0.3
+            if(ArrayUtil.isNotEmpty(annotations)) {
+                IStrategy systemStrategy = getSystemBuiltInStrategy(annotations);
+                if(ObjectUtil.isNotNull(systemStrategy)) {
+                    return systemStrategy.des(entry, context);
+                }
+            }
+
+            // 系统内置自定义注解的处理, release0.0.4
+            // 实现其他用户自定义注解的处理，自定义 condition，只会对 系统/用户 自定义注解生效。
             return entry;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SensitiveRuntimeException(e);
         }
     }
+
+
 
     /**
      * 处理脱敏信息
@@ -194,12 +215,44 @@ public class SensitiveService<T> implements ISensitive<T> {
             }
 
             // 系统内置自定义注解的处理
+            // 获取所有的注解
+            Annotation[] annotations = field.getAnnotations();
 
-            // 其他用户自定义注解的处理
+            // 系统内置注解 @since 0.0.3
+            if(ArrayUtil.isNotEmpty(annotations)) {
+                IStrategy systemStrategy = getSystemBuiltInStrategy(annotations);
+                if(ObjectUtil.isNotNull(systemStrategy)) {
+                    final Object originalFieldVal = field.get(copyObject);
+                    final Object result = systemStrategy.des(originalFieldVal, context);
+                    field.set(copyObject, result);
+                }
+            }
+
+            // 系统内置自定义注解的处理, release0.0.4
+            // 实现其他用户自定义注解的处理，自定义 condition，只会对 系统/用户 自定义注解生效。
 
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SensitiveRuntimeException(e);
         }
+    }
+
+    /**
+     * 获取系统内置的
+     * @param annotations 字段上的注解列表
+     * @return 对应的策略系统内置实现类
+     */
+    private IStrategy getSystemBuiltInStrategy(final Annotation[] annotations) {
+        for(Annotation annotation : annotations) {
+            // 获取当前注解上声明的注解
+            SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
+            if(ObjectUtil.isNotNull(sensitiveStrategy)) {
+                Class builtInClass = sensitiveStrategy.value();
+                if(SensitiveStrategyBuiltIn.class.equals(builtInClass)) {
+                    return SensitiveStrategyBuiltInUtil.require(annotation.annotationType());
+                }
+            }
+        }
+        return null;
     }
 
     /**

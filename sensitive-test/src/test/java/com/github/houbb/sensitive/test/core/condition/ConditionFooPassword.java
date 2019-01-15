@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
  * 让这些 123456 的密码不进行脱敏
  * @author binbin.hou
  * date 2019/1/2
+ * @since 0.0.1
  */
 public class ConditionFooPassword implements ICondition {
     @Override

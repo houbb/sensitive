@@ -1,9 +1,13 @@
 package com.github.houbb.sensitive.test.core;
 
-import com.github.houbb.sensitive.test.model.User;
-import com.github.houbb.sensitive.test.model.group.UserEntryObject;
-import com.github.houbb.sensitive.test.model.group.UserEntryBaseType;
-import com.github.houbb.sensitive.test.model.group.UserGroup;
+
+import com.github.houbb.sensitive.test.model.sensitive.User;
+import com.github.houbb.sensitive.test.model.sensitive.entry.UserEntryBaseType;
+import com.github.houbb.sensitive.test.model.sensitive.entry.UserEntryObject;
+import com.github.houbb.sensitive.test.model.sensitive.entry.UserGroup;
+import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAt;
+import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAtEntry;
+import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInMixed;
 
 import java.util.*;
 
@@ -77,6 +81,44 @@ public final class DataPrepareTest {
         user.setIdCard("123456190001011234");
         user.setPhone("18888888888");
         return user;
+    }
+
+    /**
+     * 构建系统内置对象
+     * @return 构建后的对象
+     * @since 0.0.3
+     */
+    public static SystemBuiltInAt buildSystemBuiltInAt() {
+        SystemBuiltInAt systemBuiltInAt = new SystemBuiltInAt();
+        systemBuiltInAt.setName("脱敏君");
+        systemBuiltInAt.setPassword("1234567");
+        systemBuiltInAt.setEmail("12345@qq.com");
+        systemBuiltInAt.setCardId("123456190001011234");
+        systemBuiltInAt.setPhone("18888888888");
+        return systemBuiltInAt;
+    }
+
+    /**
+     * 构建系统内置对象
+     * @return 构建后的对象
+     * @since 0.0.3
+     */
+    public static SystemBuiltInAtEntry buildSystemBuiltInAtEntry() {
+        SystemBuiltInAt systemBuiltInAt = buildSystemBuiltInAt();
+        SystemBuiltInAtEntry systemBuiltInAtEntry = new SystemBuiltInAtEntry();
+        systemBuiltInAtEntry.setEntry(systemBuiltInAt);
+        return systemBuiltInAtEntry;
+    }
+
+    /**
+     * 构建系统内置+Sensitive 注解混合测试
+     * @return 混合
+     * @since 0.0.3
+     */
+    public static SystemBuiltInMixed buildSystemBuiltInMixed() {
+        SystemBuiltInMixed mixed = new SystemBuiltInMixed();
+        mixed.setTestField("混合");
+        return mixed;
     }
 
 }

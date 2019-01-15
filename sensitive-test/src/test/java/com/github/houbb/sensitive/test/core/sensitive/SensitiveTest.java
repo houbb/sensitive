@@ -1,13 +1,11 @@
-package com.github.houbb.sensitive.test.core.api;
+package com.github.houbb.sensitive.test.core.sensitive;
 
 import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.api.SensitiveUtil;
 import com.github.houbb.sensitive.core.api.strategory.StrategyEmail;
 import com.github.houbb.sensitive.test.core.DataPrepareTest;
-import com.github.houbb.sensitive.test.model.User;
-import com.github.houbb.sensitive.test.model.group.UserEntryBaseType;
-import com.github.houbb.sensitive.test.model.group.UserEntryObject;
-import com.github.houbb.sensitive.test.model.group.UserGroup;
+import com.github.houbb.sensitive.test.model.sensitive.User;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -25,9 +23,10 @@ public class SensitiveTest {
     @Test
     public void singleSensitiveTest() {
         final String email = "123456@qq.com";
+        final String exceptResult = "123***@qq.com";
         IStrategy strategy = new StrategyEmail();
         final String emailSensitive = (String) strategy.des(email, null);
-        System.out.println("脱敏后的邮箱：" + emailSensitive);
+        Assert.assertEquals(exceptResult, emailSensitive);
     }
 
     /**
@@ -36,11 +35,15 @@ public class SensitiveTest {
      */
     @Test
     public void commonSensitiveTest() {
+        final String originalStr = "User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}";
+        final String sensitiveStr = "User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}";
+
         User user = DataPrepareTest.buildUser();
-        System.out.println("脱敏前原始： " + user);
+        Assert.assertEquals(originalStr, user.toString());
+
         User sensitiveUser = SensitiveUtil.desCopy(user);
-        System.out.println("脱敏对象： " + sensitiveUser);
-        System.out.println("脱敏后原始： " + user);
+        Assert.assertEquals(sensitiveStr, sensitiveUser.toString());
+        Assert.assertEquals(originalStr, user.toString());
     }
 
 }

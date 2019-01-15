@@ -1,9 +1,9 @@
-package com.github.houbb.sensitive.test.model.group;
+package com.github.houbb.sensitive.test.model.sensitive.entry;
 
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.core.api.strategory.StrategyPassword;
-import com.github.houbb.sensitive.test.model.User;
+import com.github.houbb.sensitive.test.model.sensitive.User;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.Set;
 /**
  * @author binbin.hou
  * date 2019/1/9
+ * @since 0.0.2
  */
 public class UserGroup {
 
