@@ -1,15 +1,20 @@
 package com.github.houbb.sensitive.annotation.metadata;
 
-import com.github.houbb.sensitive.api.ICondition;
+import com.github.houbb.sensitive.api.metadata.ISensitiveCondition;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 用于自定义策略生效条件的 注解
- * @since 0.0.2
+ * 用于自定义策略生效条件的注解
+ * @since 0.0.4
  * @author binbin.hou
  * date 2019/1/9
- * @see com.github.houbb.sensitive.api.ICondition 条件
+ * @see com.github.houbb.sensitive.api.metadata.ISensitiveCondition 条件接口
  */
 @Inherited
 @Documented
@@ -21,6 +26,6 @@ public @interface SensitiveCondition {
      * 策略生效的条件
      * @return 对应的条件实现
      */
-    Class<? extends ICondition> value();
+    Class<? extends ISensitiveCondition> value();
 
 }
