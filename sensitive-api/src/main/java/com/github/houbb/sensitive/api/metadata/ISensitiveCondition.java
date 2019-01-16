@@ -1,24 +1,25 @@
-package com.github.houbb.sensitive.annotation.condition;
+/*
+ * Copyright (c)  2019. houbinbin Inc.
+ * sensitive All rights reserved.
+ */
 
-import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
-import com.github.houbb.sensitive.api.impl.ConditionAlwaysTrue;
+package com.github.houbb.sensitive.api.metadata;
 
-import java.lang.annotation.*;
+import com.github.houbb.sensitive.api.ICondition;
+
+import java.lang.annotation.Annotation;
 
 /**
- * 恒为真条件注解
+ * 自定义脱敏条件接口
+ *
  * 1. 当用户自定义的时候，可以允许用户不定义对应的策略，但是我们目前支持定义。
  * 如果用户定义了其他方法，我们不做处理。
  * @author binbin.hou
- * date 2019/1/9
- * @since 0.0.2
+ * date 2019/01/16
+ * @param <T> 参数类型
+ * @since 0.0.4
  */
-@Inherited
-@Documented
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-@SensitiveCondition(ConditionAlwaysTrue.class)
-public @interface SenstiveConditionAlwaysTrue {
+public interface ISensitiveCondition<T> extends ICondition {
 
     /**
      * 条件对应的策略
@@ -27,6 +28,6 @@ public @interface SenstiveConditionAlwaysTrue {
      * 3. 如果指定了多个条件注解，则按照注解的默认获取顺序，依次判断条件是否生效，依次指定生效条件的策略。
      * @return 对应的策略列表
      */
-    Class<? extends Annotation>[] strategy() default {};
+    Class<? extends Annotation>[] strategy();
 
 }
