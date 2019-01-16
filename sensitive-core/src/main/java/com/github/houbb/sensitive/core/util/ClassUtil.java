@@ -57,6 +57,11 @@ public final class ClassUtil {
         }
 
         for (Field field : fieldSet) {
+            if(Modifier.isFinal(field.getModifiers())
+                    && Modifier.isStatic(field.getModifiers())) {
+                // 不处理 static final 的字段
+                continue;
+            }
             field.setAccessible(true);
         }
         return new ArrayList<>(fieldSet);
