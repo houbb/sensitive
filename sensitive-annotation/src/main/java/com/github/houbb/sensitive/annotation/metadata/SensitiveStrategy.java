@@ -1,8 +1,13 @@
 package com.github.houbb.sensitive.annotation.metadata;
 
-import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.api.metadata.ISensitiveStrategy;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 用于自定义 sensitive 脱敏策略注解
@@ -12,6 +17,10 @@ import java.lang.annotation.*;
  * @since 0.0.4
  * @author binbin.hou
  * date 2019/1/9
+<<<<<<< 3b95423ea655115774d719535a99699e36ac3731
+=======
+ * @see com.github.houbb.sensitive.api.metadata.ISensitiveStrategy 策略接口
+>>>>>>> [Feature] 添加自定义注解和接口
  */
 @Inherited
 @Documented
@@ -23,6 +32,6 @@ public @interface SensitiveStrategy {
      * 自定义脱敏的策略实现
      * @return 策略实现类信息
      */
-    Class<? extends IStrategy> value();
+    Class<? extends ISensitiveStrategy> value();
 
 }
