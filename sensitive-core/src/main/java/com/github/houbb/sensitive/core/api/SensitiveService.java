@@ -40,8 +40,6 @@ public class SensitiveService<T> implements ISensitive<T> {
 
         //2. 深度复制对象
         final T copyObject = BeanUtil.deepCopy(object);
-        context.setCurrentObject(copyObject);
-
 
         //3. 处理
         handleClassField(context, copyObject, clazz);
@@ -59,9 +57,10 @@ public class SensitiveService<T> implements ISensitive<T> {
     private void handleClassField(final SensitiveContext context,
                                   final Object copyObject,
                                   final Class clazz) {
-
+        // 每一个实体对应的字段，只对当前 clazz 生效。
         List<Field> fieldList = ClassUtil.getAllFieldList(clazz);
-        context.addFieldList(fieldList);
+        context.setAllFieldList(fieldList);
+        context.setCurrentObject(copyObject);
 
         try {
             for (Field field : fieldList) {
@@ -172,17 +171,16 @@ public class SensitiveService<T> implements ISensitive<T> {
 
             // 获取所有的注解
             Annotation[] annotations = field.getAnnotations();
-
-            // 系统内置注解 @since 0.0.3
             if (ArrayUtil.isNotEmpty(annotations)) {
-                IStrategy systemStrategy = getSystemBuiltInStrategy(annotations);
-                if (ObjectUtil.isNotNull(systemStrategy)) {
-                    return systemStrategy.des(entry, context);
+                ICondition condition = getCondition(annotations);
+                if (ObjectUtil.isNull(condition)
+                        || condition.valid(context)) {
+                    IStrategy strategy = getStrategy(annotations);
+                    if (ObjectUtil.isNotNull(strategy)) {
+                        return strategy.des(entry, context);
+                    }
                 }
             }
-
-            // 系统内置自定义注解的处理, release0.0.4
-            // 实现其他用户自定义注解的处理，自定义 condition，只会对 系统/用户 自定义注解生效。
             return entry;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SensitiveRuntimeException(e);
@@ -218,9 +216,6 @@ public class SensitiveService<T> implements ISensitive<T> {
 
             // 系统内置自定义注解的处理,获取所有的注解
             Annotation[] annotations = field.getAnnotations();
-
-            // 系统内置注解 @since 0.0.3
-            // 用户自定义注解 @since 0.0.4
             if (ArrayUtil.isNotEmpty(annotations)) {
                 ICondition condition = getCondition(annotations);
                 if (ObjectUtil.isNull(condition)
@@ -239,47 +234,11 @@ public class SensitiveService<T> implements ISensitive<T> {
     }
 
     /**
-     * 获取系统内置的
+     * 获取策略
      *
-     * @param annotations 字段上的注解列表
-     * @return 对应的策略系统内置实现类
+     * @param annotations 字段对应注解
+     * @return 策略
      */
-    @Deprecated
-    private IStrategy getSystemBuiltInStrategy(final Annotation[] annotations) {
-        for (Annotation annotation : annotations) {
-            // 获取当前注解上声明的注解
-            SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
-            if (ObjectUtil.isNotNull(sensitiveStrategy)) {
-                Class builtInClass = sensitiveStrategy.value();
-                if (SensitiveStrategyBuiltIn.class.equals(builtInClass)) {
-                    return SensitiveStrategyBuiltInUtil.require(annotation.annotationType());
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 获取用户自定义策略
-     * 1. SensitiveStrategy
-     * 2. 不是系统的内置策略
-     *
-     * @param annotations 字段上的注解
-     * @return 对应的用户自定义策略
-     */
-    private IStrategy getCustomStrategy(final Annotation[] annotations) {
-        for (Annotation annotation : annotations) {
-            SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
-            if (ObjectUtil.isNotNull(sensitiveStrategy)) {
-                Class<? extends IStrategy> customClass = sensitiveStrategy.value();
-                if (!SensitiveStrategyBuiltIn.class.equals(customClass)) {
-                    return ClassUtil.newInstance(customClass);
-                }
-            }
-        }
-        return null;
-    }
-
     private IStrategy getStrategy(final Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
