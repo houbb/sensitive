@@ -1,5 +1,7 @@
 package com.github.houbb.sensitive.core.util;
 
+import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -184,4 +186,18 @@ public final class ClassUtil {
                 && !clazz.isPrimitive();
     }
 
+
+    /**
+     * 获取对象的实例化
+     * @param clazz 类
+     * @param <T> 泛型
+     * @return 实例化对象
+     */
+    public static <T> T newInstance(final Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SensitiveRuntimeException(e);
+        }
+    }
 }

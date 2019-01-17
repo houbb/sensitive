@@ -2,6 +2,7 @@ package com.github.houbb.sensitive.core.api;
 
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveEntry;
+import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
 import com.github.houbb.sensitive.api.ICondition;
 import com.github.houbb.sensitive.api.ISensitive;
@@ -21,8 +22,9 @@ import java.util.List;
 
 /**
  * 脱敏服务实现类
- *
+ * <p>
  * [反射处理数组](https://blog.csdn.net/snakemoving/article/details/54287681)
+ *
  * @author binbin.hou
  * @since 0.0.1
  * date 2018/12/29
@@ -90,7 +92,7 @@ public class SensitiveService<T> implements ISensitive<T> {
                                 //2, 基础值，直接循环设置即可
                                 final int arrayLength = arrays.length;
                                 Object newArray = Array.newInstance(entryFieldClass, arrayLength);
-                                for(int i = 0; i < arrayLength; i++) {
+                                for (int i = 0; i < arrayLength; i++) {
                                     Object entry = arrays[i];
                                     Object result = handleSensitiveEntry(context, entry, field);
                                     Array.set(newArray, i, result);
@@ -101,19 +103,19 @@ public class SensitiveService<T> implements ISensitive<T> {
                     } else if (ClassUtil.isCollectionClass(fieldTypeClass)) {
                         // Collection 接口的子类
                         final Collection<Object> entryCollection = (Collection<Object>) field.get(copyObject);
-                        if(CollectionUtil.isNotEmpty(entryCollection)) {
+                        if (CollectionUtil.isNotEmpty(entryCollection)) {
                             Object firstCollectionEntry = entryCollection.iterator().next();
                             Class collectionEntryClass = firstCollectionEntry.getClass();
 
                             //1. 如果需要特殊处理，则循环特殊处理
-                            if(needHandleEntryType(collectionEntryClass)) {
-                                for(Object collectionEntry : entryCollection) {
+                            if (needHandleEntryType(collectionEntryClass)) {
+                                for (Object collectionEntry : entryCollection) {
                                     handleClassField(context, collectionEntry, collectionEntryClass);
                                 }
                             } else {
                                 //2, 基础值，直接循环设置即可
                                 List<Object> newResultList = new ArrayList<>(entryCollection.size());
-                                for(Object entry : entryCollection) {
+                                for (Object entry : entryCollection) {
                                     Object result = handleSensitiveEntry(context, entry, field);
                                     newResultList.add(result);
                                 }
@@ -139,15 +141,16 @@ public class SensitiveService<T> implements ISensitive<T> {
 
     /**
      * 处理需脱敏的单个对象
-     *
+     * <p>
      * 1. 为了简化操作，所有的自定义注解使用多个，不生效。
      * 2. 生效顺序如下：
      * （1）Sensitive
      * （2）系统内置自定义注解
      * （3）用户自定义注解
-     * @param context   上下文
-     * @param entry 明细
-     * @param field     字段信息
+     *
+     * @param context 上下文
+     * @param entry   明细
+     * @param field   字段信息
      * @return 处理后的信息
      * @since 0.0.2
      */
@@ -157,7 +160,7 @@ public class SensitiveService<T> implements ISensitive<T> {
         try {
             //处理 @Sensitive
             Sensitive sensitive = field.getAnnotation(Sensitive.class);
-            if(ObjectUtil.isNotNull(sensitive)) {
+            if (ObjectUtil.isNotNull(sensitive)) {
                 Class<? extends ICondition> conditionClass = sensitive.condition();
                 ICondition condition = conditionClass.newInstance();
                 if (condition.valid(context)) {
@@ -171,9 +174,9 @@ public class SensitiveService<T> implements ISensitive<T> {
             Annotation[] annotations = field.getAnnotations();
 
             // 系统内置注解 @since 0.0.3
-            if(ArrayUtil.isNotEmpty(annotations)) {
+            if (ArrayUtil.isNotEmpty(annotations)) {
                 IStrategy systemStrategy = getSystemBuiltInStrategy(annotations);
-                if(ObjectUtil.isNotNull(systemStrategy)) {
+                if (ObjectUtil.isNotNull(systemStrategy)) {
                     return systemStrategy.des(entry, context);
                 }
             }
@@ -185,7 +188,6 @@ public class SensitiveService<T> implements ISensitive<T> {
             throw new SensitiveRuntimeException(e);
         }
     }
-
 
 
     /**
@@ -214,23 +216,23 @@ public class SensitiveService<T> implements ISensitive<T> {
                 }
             }
 
-            // 系统内置自定义注解的处理
-            // 获取所有的注解
+            // 系统内置自定义注解的处理,获取所有的注解
             Annotation[] annotations = field.getAnnotations();
 
             // 系统内置注解 @since 0.0.3
-            if(ArrayUtil.isNotEmpty(annotations)) {
-                IStrategy systemStrategy = getSystemBuiltInStrategy(annotations);
-                if(ObjectUtil.isNotNull(systemStrategy)) {
-                    final Object originalFieldVal = field.get(copyObject);
-                    final Object result = systemStrategy.des(originalFieldVal, context);
-                    field.set(copyObject, result);
+            // 用户自定义注解 @since 0.0.4
+            if (ArrayUtil.isNotEmpty(annotations)) {
+                ICondition condition = getCondition(annotations);
+                if (ObjectUtil.isNull(condition)
+                        || condition.valid(context)) {
+                    IStrategy strategy = getStrategy(annotations);
+                    if (ObjectUtil.isNotNull(strategy)) {
+                        final Object originalFieldVal = field.get(copyObject);
+                        final Object result = strategy.des(originalFieldVal, context);
+                        field.set(copyObject, result);
+                    }
                 }
             }
-
-            // 系统内置自定义注解的处理, release0.0.4
-            // 实现其他用户自定义注解的处理，自定义 condition，只会对 系统/用户 自定义注解生效。
-
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SensitiveRuntimeException(e);
         }
@@ -238,22 +240,78 @@ public class SensitiveService<T> implements ISensitive<T> {
 
     /**
      * 获取系统内置的
+     *
      * @param annotations 字段上的注解列表
      * @return 对应的策略系统内置实现类
      */
+    @Deprecated
     private IStrategy getSystemBuiltInStrategy(final Annotation[] annotations) {
-        for(Annotation annotation : annotations) {
+        for (Annotation annotation : annotations) {
             // 获取当前注解上声明的注解
             SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
-            if(ObjectUtil.isNotNull(sensitiveStrategy)) {
+            if (ObjectUtil.isNotNull(sensitiveStrategy)) {
                 Class builtInClass = sensitiveStrategy.value();
-                if(SensitiveStrategyBuiltIn.class.equals(builtInClass)) {
+                if (SensitiveStrategyBuiltIn.class.equals(builtInClass)) {
                     return SensitiveStrategyBuiltInUtil.require(annotation.annotationType());
                 }
             }
         }
         return null;
     }
+
+    /**
+     * 获取用户自定义策略
+     * 1. SensitiveStrategy
+     * 2. 不是系统的内置策略
+     *
+     * @param annotations 字段上的注解
+     * @return 对应的用户自定义策略
+     */
+    private IStrategy getCustomStrategy(final Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
+            if (ObjectUtil.isNotNull(sensitiveStrategy)) {
+                Class<? extends IStrategy> customClass = sensitiveStrategy.value();
+                if (!SensitiveStrategyBuiltIn.class.equals(customClass)) {
+                    return ClassUtil.newInstance(customClass);
+                }
+            }
+        }
+        return null;
+    }
+
+    private IStrategy getStrategy(final Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
+            if (ObjectUtil.isNotNull(sensitiveStrategy)) {
+                Class<? extends IStrategy> clazz = sensitiveStrategy.value();
+                if (SensitiveStrategyBuiltIn.class.equals(clazz)) {
+                    return SensitiveStrategyBuiltInUtil.require(annotation.annotationType());
+                } else {
+                    return ClassUtil.newInstance(clazz);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取用户自定义条件
+     *
+     * @param annotations 字段上的注解
+     * @return 对应的用户自定义条件
+     */
+    private ICondition getCondition(final Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            SensitiveCondition sensitiveCondition = annotation.annotationType().getAnnotation(SensitiveCondition.class);
+            if (ObjectUtil.isNotNull(sensitiveCondition)) {
+                Class<? extends ICondition> customClass = sensitiveCondition.value();
+                return ClassUtil.newInstance(customClass);
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 需要特殊处理的列表/对象类型
@@ -263,8 +321,8 @@ public class SensitiveService<T> implements ISensitive<T> {
      * @since 0.0.2
      */
     private boolean needHandleEntryType(final Class fieldTypeClass) {
-        if(ClassUtil.isBaseClass(fieldTypeClass)
-            || ClassUtil.isMapClass(fieldTypeClass)) {
+        if (ClassUtil.isBaseClass(fieldTypeClass)
+                || ClassUtil.isMapClass(fieldTypeClass)) {
             return false;
         }
 
