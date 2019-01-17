@@ -2,7 +2,6 @@ package com.github.houbb.sensitive.api.impl;
 
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.api.metadata.ISensitiveStrategy;
 
 /**
  * 用于标识为系统内置的注解实现方式
@@ -14,7 +13,7 @@ import com.github.houbb.sensitive.api.metadata.ISensitiveStrategy;
  * date 2019/1/9
  * @since 0.0.2
  */
-public class SensitiveStrategyBuiltIn implements ISensitiveStrategy {
+public class SensitiveStrategyBuiltIn implements IStrategy {
 
     @Override
     public Object des(Object original, IContext context) {
