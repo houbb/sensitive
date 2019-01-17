@@ -34,13 +34,15 @@
 
 # 特性
 
-1. 基于注解的日志脱敏
+1. 基于注解的日志脱敏。
 
-2. 可以自定义策略实现，策略生效条件
+2. 可以自定义策略实现，策略生效条件。
 
-3. 常见的脱敏内置方案
+3. 常见的脱敏内置方案。
 
 4. java 深拷贝，且原始对象不用实现任何接口。
+
+5. 支持用户自定义注解。
 
 # 快速开始
 
@@ -50,7 +52,7 @@
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
 </dependency>
 ```
 
@@ -440,6 +442,157 @@ public void sensitiveTest() {
 @SensitiveStrategyChineseName
 @Sensitive(strategy = StrategyPassword.class)
 private String testField;
+```
+
+# 自定义注解
+
+v0.0.4 新增功能。允许功能自定义条件注解和策略注解。
+
+## 案例
+
+### 自定义注解
+
+- 策略脱敏
+
+```java
+/**
+ * 自定义密码脱敏策略
+ * @author binbin.hou
+ * date 2019/1/17
+ * @since 0.0.4
+ */
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@SensitiveStrategy(CustomPasswordStrategy.class)
+public @interface SensitiveCustomPasswordStrategy {
+}
+```
+
+- 脱敏生效条件
+
+```java
+/**
+ * 自定义密码脱敏策略生效条件
+ * @author binbin.hou
+ * date 2019/1/17
+ * @since 0.0.4
+ */
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@SensitiveCondition(ConditionFooPassword.class)
+public @interface SensitiveCustomPasswordCondition{
+}
+```
+
+- TIPS
+
+`@SensitiveStrategy` 策略单独使用的时候，默认是生效的。
+
+如果有 `@SensitiveCondition` 注解，则只有当条件满足时，才会执行脱敏策略。
+
+`@SensitiveCondition` 只会对系统内置注解和自定义注解生效，因为 `@Sensitive` 有属于自己的策略生效条件。
+
+- 策略优先级
+
+`@Sensitive` 优先生效，然后是系统内置注解，最后是用户自定义注解。
+
+### 对应的实现
+
+两个元注解 `@SensitiveStrategy`、`@SensitiveCondition` 分别指定了对应的实现。
+
+- CustomPasswordStrategy.java
+
+```java
+public class CustomPasswordStrategy implements IStrategy {
+
+    @Override
+    public Object des(Object original, IContext context) {
+        return "**********************";
+    }
+
+}
+```
+
+- ConditionFooPassword.java
+
+```java
+/**
+ * 让这些 123456 的密码不进行脱敏
+ * @author binbin.hou
+ * date 2019/1/2
+ * @since 0.0.1
+ */
+public class ConditionFooPassword implements ICondition {
+    @Override
+    public boolean valid(IContext context) {
+        try {
+            Field field = context.getCurrentField();
+            final Object currentObj = context.getCurrentObject();
+            final String name = (String) field.get(currentObj);
+            return !name.equals("123456");
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}
+```
+
+### 定义测试对象
+
+定义一个使用自定义注解的对象。
+ 
+```java
+public class CustomPasswordModel {
+
+    @SensitiveCustomPasswordCondition
+    @SensitiveCustomPasswordStrategy
+    private String password;
+
+    @SensitiveCustomPasswordCondition
+    @SensitiveStrategyPassword
+    private String fooPassword;
+    
+    //其他方法
+}
+```
+
+### 测试
+
+```java
+/**
+ * 自定义注解测试
+ */
+@Test
+public void customAnnotationTest() {
+    final String originalStr = "CustomPasswordModel{password='hello', fooPassword='123456'}";
+    final String sensitiveStr = "CustomPasswordModel{password='**********************', fooPassword='123456'}";
+    CustomPasswordModel model = buildCustomPasswordModel();
+    Assert.assertEquals(originalStr, model.toString());
+
+    CustomPasswordModel sensitive = SensitiveUtil.desCopy(model);
+    Assert.assertEquals(sensitiveStr, sensitive.toString());
+    Assert.assertEquals(originalStr, model.toString());
+}
+```
+
+构建对象的方法如下：
+
+```java
+/**
+ * 构建自定义密码对象
+ * @return 对象
+ */
+private CustomPasswordModel buildCustomPasswordModel(){
+    CustomPasswordModel model = new CustomPasswordModel();
+    model.setPassword("hello");
+    model.setFooPassword("123456");
+    return model;
+}
 ```
 
 # 需求 & BUGS

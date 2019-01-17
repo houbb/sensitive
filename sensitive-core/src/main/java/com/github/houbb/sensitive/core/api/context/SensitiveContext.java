@@ -1,6 +1,7 @@
 package com.github.houbb.sensitive.core.api.context;
 
 import com.github.houbb.sensitive.api.IContext;
+import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
  * 脱敏上下文
  * @author binbin.hou
  * date 2019/1/2
+ * @since 0.0.1
  */
 public class SensitiveContext implements IContext {
 
@@ -42,6 +44,28 @@ public class SensitiveContext implements IContext {
         return currentField;
     }
 
+    /**
+     * @since 0.0.4
+     * @return 获取当前字段名称
+     */
+    @Override
+    public String getCurrentFieldName() {
+        return this.currentField.getName();
+    }
+
+    /**
+     * @since 0.0.4
+     * @return 获取当前字段值
+     */
+    @Override
+    public Object getCurrentFieldValue() {
+        try {
+            return this.currentField.get(this.currentObject);
+        } catch (IllegalAccessException e) {
+            throw new SensitiveRuntimeException(e);
+        }
+    }
+
     public void setCurrentField(Field currentField) {
         this.currentField = currentField;
     }
@@ -52,9 +76,19 @@ public class SensitiveContext implements IContext {
     }
 
     /**
+     * 设置当前字段
+     * @param allFieldList 所有字段列表
+     */
+    public void setAllFieldList(List<Field> allFieldList) {
+        this.allFieldList = allFieldList;
+    }
+
+    /**
      * 添加字段信息
+     * 本方法不再使用，将在下个版本直接移除。
      * @param fieldList 字段列表信息
      */
+    @Deprecated
     public void addFieldList(List<Field> fieldList) {
         this.allFieldList.addAll(fieldList);
     }
