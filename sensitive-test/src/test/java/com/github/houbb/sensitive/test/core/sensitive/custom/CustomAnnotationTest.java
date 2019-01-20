@@ -1,15 +1,18 @@
 package com.github.houbb.sensitive.test.core.sensitive.custom;
 
 import com.github.houbb.sensitive.core.api.SensitiveUtil;
+import com.github.houbb.sensitive.test.model.custom.CustomPasswordEntryModel;
 import com.github.houbb.sensitive.test.model.custom.CustomPasswordModel;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * 自定义注解测试
  * @author binbin.hou
  * date 2019/1/17
+ * @since 0.0.4
  */
-public class CustomConditionTest {
+public class CustomAnnotationTest {
 
     /**
      * 自定义注解测试
@@ -22,6 +25,24 @@ public class CustomConditionTest {
         Assert.assertEquals(originalStr, model.toString());
 
         CustomPasswordModel sensitive = SensitiveUtil.desCopy(model);
+        Assert.assertEquals(sensitiveStr, sensitive.toString());
+        Assert.assertEquals(originalStr, model.toString());
+    }
+
+    /**
+     * 自定义注解测试
+     */
+    @Test
+    public void customAnnotationEntryTest() {
+        final String originalStr = "CustomPasswordEntryModel{entry=CustomPasswordModel{password='hello', fooPassword='123456'}}";
+        final String sensitiveStr = "CustomPasswordEntryModel{entry=CustomPasswordModel{password='**********************', fooPassword='123456'}}";
+        CustomPasswordModel entry = buildCustomPasswordModel();
+        CustomPasswordEntryModel model = new CustomPasswordEntryModel();
+        model.setEntry(entry);
+
+        Assert.assertEquals(originalStr, model.toString());
+
+        CustomPasswordEntryModel sensitive = SensitiveUtil.desCopy(model);
         Assert.assertEquals(sensitiveStr, sensitive.toString());
         Assert.assertEquals(originalStr, model.toString());
     }
