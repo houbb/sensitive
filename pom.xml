@@ -7,7 +7,11 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
+<<<<<<< 09f798140f8dc87ebb8e518d418d1d3c29611d86
     <version>0.0.4</version>
+=======
+    <version>0.0.4-SNAPSHOT</version>
+>>>>>>> modify branch 0.0.3 TO 0.0.4-SNAPSHOT
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
