@@ -49,7 +49,7 @@
 ```xml
 <dependency>
     <groupId>com.github.houbb</groupId>
-    <artifactId>sensitive</artifactId>
+    <artifactId>sensitive-core</artifactId>
     <version>0.0.2</version>
 </dependency>
 ```
