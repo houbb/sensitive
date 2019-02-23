@@ -49,8 +49,8 @@
 ```xml
 <dependency>
     <groupId>com.github.houbb</groupId>
-    <artifactId>sensitive</artifactId>
-    <version>${最新版本}</version>
+    <artifactId>sensitive-core</artifactId>
+    <version>0.0.1</version>
 </dependency>
 ```
 
