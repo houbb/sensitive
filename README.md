@@ -44,6 +44,10 @@
 
 5. 支持用户自定义注解。
 
+## v0.0.5 新特性
+
+1. 支持 jdk7，应用范围更广。
+
 # 快速开始
 
 ## maven 导入
@@ -52,7 +56,7 @@
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
 </dependency>
 ```
 

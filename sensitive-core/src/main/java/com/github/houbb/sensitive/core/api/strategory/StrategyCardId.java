@@ -1,8 +1,8 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
+import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.core.util.StrUtil;
 
 /**
  * 二代身份证号脱敏加密：
@@ -19,7 +19,7 @@ public class StrategyCardId implements IStrategy {
     public Object des(Object original, IContext context) {
         final int prefixLength = 6;
         final String middle = "**********";
-        return StrUtil.buildString(original, middle, prefixLength);
+        return StringUtil.buildString(original, middle, prefixLength);
     }
 
 }

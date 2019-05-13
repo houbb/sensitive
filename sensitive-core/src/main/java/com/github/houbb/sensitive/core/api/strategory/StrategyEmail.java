@@ -1,9 +1,10 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
+import com.github.houbb.heaven.constant.PunctuationConst;
+import com.github.houbb.heaven.util.lang.ObjectUtil;
+import com.github.houbb.heaven.util.lang.StringUtil;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.core.util.ObjectUtil;
-import com.github.houbb.sensitive.core.util.StrUtil;
 
 /**
  * 邮箱脱敏策略
@@ -23,14 +24,14 @@ public class StrategyEmail implements IStrategy {
         final String emailStr = original.toString();
         final int prefixLength = 3;
 
-        final int atIndex = emailStr.indexOf(StrUtil.AT);
+        final int atIndex = emailStr.indexOf(PunctuationConst.AT);
         String middle = "****";
 
         if(atIndex > 0) {
             int middleLength = atIndex - prefixLength;
-            middle = StrUtil.repeat(StrUtil.STAR, middleLength);
+            middle = StringUtil.repeat(PunctuationConst.STAR, middleLength);
         }
-        return StrUtil.buildString(original, middle, prefixLength);
+        return StringUtil.buildString(original, middle, prefixLength);
     }
 
 }

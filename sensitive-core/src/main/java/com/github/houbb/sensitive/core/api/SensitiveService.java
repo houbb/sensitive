@@ -1,5 +1,10 @@
 package com.github.houbb.sensitive.core.api;
 
+import com.github.houbb.heaven.util.lang.ObjectUtil;
+import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
+import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
+import com.github.houbb.heaven.util.util.ArrayUtil;
+import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
@@ -71,11 +76,11 @@ public class SensitiveService<T> implements ISensitive<T> {
                 // 处理 @SensitiveEntry 注解
                 SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
                 if (ObjectUtil.isNotNull(sensitiveEntry)) {
-                    if (ClassUtil.isJavaBeanClass(fieldTypeClass)) {
+                    if (ClassTypeUtil.isJavaBean(fieldTypeClass)) {
                         // 为普通 javabean 对象
                         final Object fieldNewObject = field.get(copyObject);
                         handleClassField(context, fieldNewObject, fieldTypeClass);
-                    } else if (ClassUtil.isArrayClass(fieldTypeClass)) {
+                    } else if (ClassTypeUtil.isArray(fieldTypeClass)) {
                         // 为数组类型
                         Object[] arrays = (Object[]) field.get(copyObject);
                         if (ArrayUtil.isNotEmpty(arrays)) {
@@ -99,7 +104,7 @@ public class SensitiveService<T> implements ISensitive<T> {
                                 field.set(copyObject, newArray);
                             }
                         }
-                    } else if (ClassUtil.isCollectionClass(fieldTypeClass)) {
+                    } else if (ClassTypeUtil.isCollection(fieldTypeClass)) {
                         // Collection 接口的子类
                         final Collection<Object> entryCollection = (Collection<Object>) field.get(copyObject);
                         if (CollectionUtil.isNotEmpty(entryCollection)) {
@@ -280,14 +285,14 @@ public class SensitiveService<T> implements ISensitive<T> {
      * @since 0.0.2
      */
     private boolean needHandleEntryType(final Class fieldTypeClass) {
-        if (ClassUtil.isBaseClass(fieldTypeClass)
-                || ClassUtil.isMapClass(fieldTypeClass)) {
+        if (ClassTypeUtil.isBase(fieldTypeClass)
+                || ClassTypeUtil.isMap(fieldTypeClass)) {
             return false;
         }
 
-        if (ClassUtil.isJavaBeanClass(fieldTypeClass)
-                || ClassUtil.isArrayClass(fieldTypeClass)
-                || ClassUtil.isCollectionClass(fieldTypeClass)) {
+        if (ClassTypeUtil.isJavaBean(fieldTypeClass)
+                || ClassTypeUtil.isArray(fieldTypeClass)
+                || ClassTypeUtil.isCollection(fieldTypeClass)) {
             return true;
         }
         return false;
