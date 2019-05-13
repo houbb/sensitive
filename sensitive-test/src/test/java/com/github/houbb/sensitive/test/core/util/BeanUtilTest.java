@@ -14,10 +14,9 @@ import org.junit.Test;
 public class BeanUtilTest {
 
     @Test
-    public void copyPropertiesTest() {
+    public void deepCopyTest() {
         UserGroup userGroup = DataPrepareTest.buildUserGroup();
-        UserGroup copyUserGroup = new UserGroup();
-        BeanUtil.copyProperties(userGroup, copyUserGroup);
+        UserGroup copyUserGroup = BeanUtil.deepCopy(userGroup);
 
         Assert.assertEquals(copyUserGroup.toString(), userGroup.toString());
     }

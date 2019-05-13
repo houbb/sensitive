@@ -10,6 +10,8 @@ import com.github.houbb.sensitive.api.ISensitive;
  */
 public final class SensitiveUtil {
 
+    private SensitiveUtil(){}
+
     /**
      * 脱敏对象
      *
