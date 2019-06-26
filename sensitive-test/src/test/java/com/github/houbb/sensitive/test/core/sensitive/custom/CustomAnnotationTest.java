@@ -47,6 +47,35 @@ public class CustomAnnotationTest {
         Assert.assertEquals(originalStr, model.toString());
     }
 
+    /**
+     * 自定义注解测试 JSON
+     * @since 0.0.6
+     */
+    @Test
+    public void customAnnotationJsonTest() {
+        final String originalStr = "CustomPasswordModel{password='hello', fooPassword='123456'}";
+        final String sensitiveJson = "{\"fooPassword\":\"123456\",\"password\":\"**********************\"}";
+        CustomPasswordModel model = buildCustomPasswordModel();
+
+        Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(model));
+        Assert.assertEquals(originalStr, model.toString());
+    }
+
+    /**
+     * 自定义注解测试 JSON
+     * @since 0.0.6
+     */
+    @Test
+    public void customAnnotationEntryJsonTest() {
+        final String originalStr = "CustomPasswordEntryModel{entry=CustomPasswordModel{password='hello', fooPassword='123456'}}";
+        final String sensitiveJson = "{\"entry\":{\"fooPassword\":\"123456\",\"password\":\"**********************\"}}";
+        CustomPasswordModel entry = buildCustomPasswordModel();
+        CustomPasswordEntryModel model = new CustomPasswordEntryModel();
+        model.setEntry(entry);
+
+        Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(model));
+        Assert.assertEquals(originalStr, model.toString());
+    }
 
     /**
      * 构建自定义密码对象

@@ -1,5 +1,6 @@
 package com.github.houbb.sensitive.core.api.context;
 
+import com.github.houbb.heaven.annotation.NotThreadSafe;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * date 2019/1/2
  * @since 0.0.1
  */
+@NotThreadSafe
 public class SensitiveContext implements IContext {
 
     /**
@@ -29,6 +31,27 @@ public class SensitiveContext implements IContext {
      * 所有字段
      */
     private List<Field> allFieldList = new ArrayList<>();
+
+    /**
+     * 类信息
+     * @since 0.0.6
+     */
+    private Class beanClass;
+
+    /**
+     * 明细信息
+     * @since 0.0.6
+     */
+    private Object entry;
+
+    /**
+     * 新建一个对象实例
+     * @return this
+     * @since 0.0.6
+     */
+    public static SensitiveContext newInstance() {
+        return new SensitiveContext();
+    }
 
     @Override
     public Object getCurrentObject() {
@@ -91,6 +114,24 @@ public class SensitiveContext implements IContext {
     @Deprecated
     public void addFieldList(List<Field> fieldList) {
         this.allFieldList.addAll(fieldList);
+    }
+
+    @Override
+    public Class getBeanClass() {
+        return beanClass;
+    }
+
+    public void setBeanClass(Class beanClass) {
+        this.beanClass = beanClass;
+    }
+
+    @Override
+    public Object getEntry() {
+        return entry;
+    }
+
+    public void setEntry(Object entry) {
+        this.entry = entry;
     }
 
 }

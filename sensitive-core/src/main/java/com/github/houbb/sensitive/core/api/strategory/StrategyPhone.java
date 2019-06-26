@@ -1,8 +1,9 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
-import com.github.houbb.heaven.util.lang.StringUtil;
+import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 手机号脱敏
@@ -15,9 +16,7 @@ public class StrategyPhone implements IStrategy {
 
     @Override
     public Object des(Object original, IContext context) {
-        final int prefixLength = 3;
-        final String middle = "****";
-        return StringUtil.buildString(original, middle, prefixLength);
+        return SensitiveStrategyUtil.phone(ObjectUtil.objectToString(original));
     }
 
 }

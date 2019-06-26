@@ -1,5 +1,8 @@
 package com.github.houbb.sensitive.core.api;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.ContextValueFilter;
+import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
@@ -15,6 +18,7 @@ import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
+import com.github.houbb.sensitive.core.support.filter.DefaultContextValueFilter;
 import com.github.houbb.sensitive.core.util.*;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
@@ -34,6 +38,7 @@ import java.util.List;
  * @since 0.0.1
  * date 2018/12/29
  */
+@ThreadSafe
 public class SensitiveService<T> implements ISensitive<T> {
 
     @Override
@@ -49,6 +54,17 @@ public class SensitiveService<T> implements ISensitive<T> {
         //3. 处理
         handleClassField(context, copyObject, clazz);
         return copyObject;
+    }
+
+    @Override
+    public String desJson(T object) {
+        if(ObjectUtil.isNull(object)) {
+            return JSON.toJSONString(object);
+        }
+
+        final SensitiveContext context = new SensitiveContext();
+        ContextValueFilter filter = new DefaultContextValueFilter(context);
+        return JSON.toJSONString(object, filter);
     }
 
     /**

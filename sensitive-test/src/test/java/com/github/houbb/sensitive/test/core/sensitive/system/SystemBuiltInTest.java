@@ -47,4 +47,33 @@ public class SystemBuiltInTest {
         Assert.assertEquals(originalStr, entry.toString());
     }
 
+    /**
+     * 普通属性脱敏 JSON 测试
+     * @since 0.0.6
+     */
+    @Test
+    public void sensitiveJsonTest() {
+        final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
+        final String sensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}";
+
+        SystemBuiltInAt systemBuiltInAt = DataPrepareTest.buildSystemBuiltInAt();
+        Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(systemBuiltInAt));
+        Assert.assertEquals(originalStr, systemBuiltInAt.toString());
+    }
+
+    /**
+     * 属性包含对象 JSON
+     * @since 0.0.6
+     */
+    @Test
+    public void sensitiveEntryJsonTest() {
+        final String originalStr = "SystemBuiltInAtEntry{entry=SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}}";
+        final String sensitiveJson = "{\"entry\":{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}}";
+
+        SystemBuiltInAtEntry entry = DataPrepareTest.buildSystemBuiltInAtEntry();
+
+        Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(entry));
+        Assert.assertEquals(originalStr, entry.toString());
+    }
+
 }

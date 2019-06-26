@@ -19,4 +19,13 @@ public interface ISensitive<T> {
      */
     T desCopy(final T object);
 
+    /**
+     * 返回脱敏后的 json
+     * 1. 避免 desCopy 造成的对象新建的性能浪费
+     * @param object 对象
+     * @return json
+     * @since 0.0.6
+     */
+    String desJson(final T object);
+
 }

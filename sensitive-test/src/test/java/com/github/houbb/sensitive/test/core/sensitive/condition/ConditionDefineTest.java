@@ -29,6 +29,21 @@ public class ConditionDefineTest {
     }
 
     /**
+     * 条件测试 JSON
+     * @since 0.0.6
+     */
+    @Test
+    public void conditionPasswordJsonTest() {
+        final String originalStr = "User{username='脱敏君', idCard='123456190001011234', password='123456', email='12345@qq.com', phone='18888888888'}";
+        final String sensitiveJson = "{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"password\":\"123456\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}";
+
+        SensitiveConditionPassword user = buildUser();
+
+        Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(user));
+        Assert.assertEquals(originalStr, user.toString());
+    }
+
+    /**
      * 构建测试用户对象
      * @return 创建后的对象
      * @since 0.0.1

@@ -2,6 +2,7 @@ package com.github.houbb.sensitive.test.core;
 
 
 import com.github.houbb.sensitive.test.model.sensitive.User;
+import com.github.houbb.sensitive.test.model.sensitive.entry.UserCollection;
 import com.github.houbb.sensitive.test.model.sensitive.entry.UserEntryBaseType;
 import com.github.houbb.sensitive.test.model.sensitive.entry.UserEntryObject;
 import com.github.houbb.sensitive.test.model.sensitive.entry.UserGroup;
@@ -119,6 +120,25 @@ public final class DataPrepareTest {
         SystemBuiltInMixed mixed = new SystemBuiltInMixed();
         mixed.setTestField("混合");
         return mixed;
+    }
+
+    /**
+     * 构建用户-属性为列表，数组，对象、数组
+     * @return 对象
+     * @since 0.0.6
+     */
+    public static UserCollection buildUserCollection() {
+        UserCollection userCollection = new UserCollection();
+        User user = buildUser();
+
+        userCollection.setUserCollection(Collections.singletonList(user));
+        userCollection.setUserList(Arrays.asList(user));
+        userCollection.setUserSet(new HashSet<>(Arrays.asList(user)));
+        userCollection.setUserArray(new User[]{user});
+        Map<String, User> map = new HashMap<>();
+        map.put("map", user);
+        userCollection.setUserMap(map);
+        return userCollection;
     }
 
 }

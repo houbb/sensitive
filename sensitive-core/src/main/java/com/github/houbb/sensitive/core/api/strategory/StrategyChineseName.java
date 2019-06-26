@@ -1,9 +1,9 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
-import com.github.houbb.heaven.constant.PunctuationConst;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 中文名称脱敏策略：
@@ -18,27 +18,7 @@ public class StrategyChineseName implements IStrategy {
 
     @Override
     public Object des(Object original, IContext context) {
-        if(ObjectUtil.isNull(original)) {
-            return original;
-        }
-
-        final String originalStr = original.toString();
-        final int nameLength = originalStr.length();
-        if(1 == nameLength) {
-            return originalStr;
-        }
-
-        if(2 == nameLength) {
-            return PunctuationConst.STAR + originalStr.charAt(1);
-        }
-
-        StringBuilder stringBuffer = new StringBuilder();
-        stringBuffer.append(originalStr.charAt(0));
-        for(int i = 0; i < nameLength-2; i++) {
-            stringBuffer.append(PunctuationConst.STAR);
-        }
-        stringBuffer.append(originalStr.charAt(nameLength -1));
-        return stringBuffer.toString();
+        return SensitiveStrategyUtil.chineseName(ObjectUtil.objectToString(original));
     }
 
 }

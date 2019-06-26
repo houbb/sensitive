@@ -29,4 +29,18 @@ public class SystemBuiltInMixedTest {
         Assert.assertEquals(originalStr, entry.toString());
     }
 
+    /**
+     * 系统内置+Sensitive注解测试JSON
+     * @since 0.0.6
+     */
+    @Test
+    public void systemBuiltInAndSensitiveJsonTest() {
+        final String originalStr = "SystemBuiltInMixed{testField='混合'}";
+        final String sensitiveJson = "{}";
+        SystemBuiltInMixed entry = DataPrepareTest.buildSystemBuiltInMixed();
+
+        Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(entry));
+        Assert.assertEquals(originalStr, entry.toString());
+    }
+
 }

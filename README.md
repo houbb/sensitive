@@ -44,11 +44,19 @@
 
 5. 支持用户自定义注解。
 
-## v0.0.5 新特性
+## v0.0.6 新特性
 
-1. 支持 jdk7，应用范围更广。
+- 支持直接生成脱敏后的 JSON
+
+避免创建中间对象，进一步提升性能。
 
 # 快速开始
+
+## 环境准备
+
+JDK 7+
+
+Maven 3.x
 
 ## maven 导入
 
@@ -599,6 +607,74 @@ private CustomPasswordModel buildCustomPasswordModel(){
 }
 ```
 
+# 生成脱敏后的 JSON
+
+## 说明
+
+为了避免生成中间脱敏对象，v0.0.6 之后直接支持生成脱敏后的 JSON。
+
+## 使用方法
+
+新增工具类方法，可以直接返回脱敏后的 JSON。
+
+生成的 JSON 是脱敏的，原对象属性值不受影响。
+
+```java
+public static String desJson(Object object)
+```
+
+## 注解的使用方式
+
+和 `SensitiveUtil.desCopy()` 完全一致。
+
+## 使用示例代码
+
+所有的测试案例中，都添加了对应的 `desJson(Object)` 测试代码，可以参考。
+
+此处只展示最基本的使用。
+
+```java
+@Test
+public void sensitiveJsonTest() {
+    final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
+    final String sensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}";
+
+    SystemBuiltInAt systemBuiltInAt = DataPrepareTest.buildSystemBuiltInAt();
+    Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(systemBuiltInAt));
+    Assert.assertEquals(originalStr, systemBuiltInAt.toString());
+}
+```
+
+## 注意
+
+本次 JSON 脱敏基于 [FastJSON](https://github.com/alibaba/fastjson)。
+
+FastJSON 在序列化本身存在一定限制。当对象中有集合，集合中还是对象时，结果不尽如人意。
+
+### 示例代码
+
+本测试案例可见测试代码。
+
+```java
+@Test
+public void sensitiveUserCollectionJsonTest() {
+    final String originalStr = "UserCollection{userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userSet=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userCollection=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
+    final String commonJson = "{\"userArray\":[{\"email\":\"12345@qq.com\",\"idCard\":\"123456190001011234\",\"password\":\"1234567\",\"phone\":\"18888888888\",\"username\":\"脱敏君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
+    final String sensitiveJson = "{\"userArray\":[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
+
+    UserCollection userCollection = DataPrepareTest.buildUserCollection();
+
+    Assert.assertEquals(commonJson, JSON.toJSONString(userCollection));
+    Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(userCollection));
+    Assert.assertEquals(originalStr, userCollection.toString());
+}
+```
+
+### 解决方案
+
+如果有这种需求，建议使用原来的 `desCopy(Object)`。
+
+
 # 需求 & BUGS
 
 > [issues](https://github.com/houbb/sensitive/issues)
@@ -608,8 +684,3 @@ private CustomPasswordModel buildCustomPasswordModel(){
 如果你对本项目有兴趣，并且对代码有一定追求，可以申请加入本项目开发。
 
 如果你善于写文档，或者愿意补全测试案例，也非常欢迎加入。
-
-
-
-
-

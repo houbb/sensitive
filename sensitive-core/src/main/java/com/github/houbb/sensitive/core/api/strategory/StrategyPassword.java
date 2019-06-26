@@ -1,7 +1,9 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
+import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 密码的脱敏策略：
@@ -13,7 +15,7 @@ public class StrategyPassword implements IStrategy {
 
     @Override
     public Object des(Object original, IContext context) {
-        return null;
+        return SensitiveStrategyUtil.password(ObjectUtil.objectToString(original));
     }
 
 }

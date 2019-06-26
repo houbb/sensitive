@@ -1,8 +1,12 @@
 package com.github.houbb.sensitive.core.util.strategy;
 
 import com.github.houbb.heaven.util.lang.ObjectUtil;
+import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
+import com.github.houbb.heaven.util.util.Optional;
+import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
 import com.github.houbb.sensitive.annotation.strategy.*;
 import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.strategory.*;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
@@ -45,6 +49,30 @@ public final class SensitiveStrategyBuiltInUtil {
             throw new SensitiveRuntimeException("不支持的系统内置方法，用户请勿在自定义注解中使用[SensitiveStrategyBuiltIn]!");
         }
         return strategy;
+    }
+
+    /**
+     * 获取策略
+     *
+     * @param annotations 字段对应注解
+     * @return 策略
+     * @since 0.0.6
+     */
+    public static Optional<IStrategy> getStrategyOpt(final Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
+            if (ObjectUtil.isNotNull(sensitiveStrategy)) {
+                Class<? extends IStrategy> clazz = sensitiveStrategy.value();
+                IStrategy strategy = null;
+                if (SensitiveStrategyBuiltIn.class.equals(clazz)) {
+                    strategy = SensitiveStrategyBuiltInUtil.require(annotation.annotationType());
+                } else {
+                    strategy = ClassUtil.newInstance(clazz);
+                }
+                return Optional.ofNullable(strategy);
+            }
+        }
+        return Optional.empty();
     }
 
 }
