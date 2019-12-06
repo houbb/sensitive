@@ -141,4 +141,19 @@ public final class DataPrepareTest {
         return userCollection;
     }
 
+    /**
+     * 构建用户列表
+     * @return 构建的列表
+     * @since 0.0.7
+     */
+    public static List<User> buildUserList() {
+        List<User> userList = new ArrayList<>();
+        userList.add(buildUser());
+
+        User user2 = buildUser();
+        user2.setUsername("集合测试");
+        userList.add(user2);
+        return userList;
+    }
+
 }

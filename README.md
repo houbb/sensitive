@@ -44,11 +44,13 @@
 
 5. 支持用户自定义注解。
 
-## v0.0.6 新特性
+6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-- 支持直接生成脱敏后的 JSON
+## v0.0.7 新特性
 
-避免创建中间对象，进一步提升性能。
+- 支持集合的脱敏处理
+
+方便一次处理一个集合
 
 # 快速开始
 
@@ -64,7 +66,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.7</version>
 </dependency>
 ```
 
@@ -674,6 +676,38 @@ public void sensitiveUserCollectionJsonTest() {
 
 如果有这种需求，建议使用原来的 `desCopy(Object)`。
 
+# 针对集合的处理
+
+`v0.0.7` 支持的新特性，便于用户处理集合相关的脱敏。
+
+如果列表为空，则直接返回空列表。
+
+更多测试代码参见 [SensitiveUtilCollectionTest.java]()
+
+## 集合脱敏-对象拷贝
+
+- List<T> desCopyCollection(Collection<T> collection)
+
+返回脱敏后的对象集合
+
+```java
+List<User> userList = DataPrepareTest.buildUserList();
+List<User> sensitiveList = SensitiveUtil.desCopyCollection(userList);
+Assert.assertEquals("[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, User{username='集**试', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]", sensitiveList.toString());
+```
+
+## 集合脱敏-json
+
+- List<String> desJsonCollection(Collection<?> collection)
+
+返回脱敏后的 json 列表
+
+```java
+List<User> userList = DataPrepareTest.buildUserList();
+
+List<String> sensitiveJsonList = SensitiveUtil.desJsonCollection(userList);
+Assert.assertEquals("[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}, {\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"集**试\"}]", sensitiveJsonList.toString());
+```
 
 # 需求 & BUGS
 
