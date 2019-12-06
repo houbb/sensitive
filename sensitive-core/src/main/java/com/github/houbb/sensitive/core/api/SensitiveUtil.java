@@ -2,6 +2,8 @@ package com.github.houbb.sensitive.core.api;
 
 import com.github.houbb.heaven.support.instance.impl.Instances;
 
+import java.util.Collection;
+
 /**
  * 脱敏工具类
  * @author binbin.hou
@@ -26,6 +28,21 @@ public final class SensitiveUtil {
     public static <T> T desCopy(T object) {
         return (T) Instances.singletion(SensitiveService.class)
                 .desCopy(object);
+    }
+
+    /**
+     * 脱敏集合内对象
+     *
+     * 循环调用desCopy实现
+     * 可以使用 {@link ThreadLocal} 简单优化。
+     * @param srcCollection 原始对象集合
+     * @param <T> 泛型
+     * @return 脱敏后的对象集合
+     * @since 0.0.4 以前用的是单例。建议使用 spring 等容器管理 ISensitive 实现。
+     */
+    public static <T> Collection<T> desCopyCollection(Collection<T> srcCollection){
+        return Instances.singletion(SensitiveService.class)
+                .desCopyCollection(srcCollection);
     }
 
     /**

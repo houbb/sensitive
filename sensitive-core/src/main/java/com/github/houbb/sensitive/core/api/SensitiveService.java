@@ -57,6 +57,20 @@ public class SensitiveService<T> implements ISensitive<T> {
     }
 
     @Override
+    public Collection<T> desCopyCollection(Collection<T> srcCollection){
+        Class<? extends Collection> aClass = srcCollection.getClass();
+        try {
+            Collection<T> resultCollection = aClass.newInstance();
+            for (T object: srcCollection){
+                resultCollection.add(desCopy(object));
+            }
+            return resultCollection;
+        } catch (Exception e) {
+            throw new SensitiveRuntimeException(e);
+        }
+    }
+
+    @Override
     public String desJson(T object) {
         if(ObjectUtil.isNull(object)) {
             return JSON.toJSONString(object);

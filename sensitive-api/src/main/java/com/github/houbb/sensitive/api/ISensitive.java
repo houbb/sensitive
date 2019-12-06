@@ -1,5 +1,7 @@
 package com.github.houbb.sensitive.api;
 
+import java.util.Collection;
+
 /**
  * 脱敏接口
  * @author binbin.hou
@@ -18,6 +20,13 @@ public interface ISensitive<T> {
      * @return 脱敏后的新对象
      */
     T desCopy(final T object);
+
+    /**
+     * 对Collection内部对象进行脱敏，循环调用desCopy，方便使用
+     * @param srcCollection
+     * @return
+     */
+    Collection<T> desCopyCollection(Collection<T> srcCollection);
 
     /**
      * 返回脱敏后的 json
