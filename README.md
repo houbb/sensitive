@@ -682,7 +682,7 @@ public void sensitiveUserCollectionJsonTest() {
 
 如果列表为空，则直接返回空列表。
 
-更多测试代码参见 [SensitiveUtilCollectionTest.java]()
+更多测试代码参见 [SensitiveUtilCollectionTest.java](https://github.com/houbb/sensitive/blob/release_0.0.7/sensitive-test/src/test/java/com/github/houbb/sensitive/test/core/sensitive/collection/SensitiveUtilCollectionTest.java)
 
 ## 集合脱敏-对象拷贝
 
