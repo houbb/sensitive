@@ -26,6 +26,8 @@ public final class BeanUtil {
      * @param object 对象
      * @param <T> 泛型
      * @return 深拷贝后的对象
+     *
+     * TODO: 这里的对象拷贝应该使用 bean-mapping 这种对象深度复制来处理，避免序列化的性能损失。
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> T deepCopy(T object) {

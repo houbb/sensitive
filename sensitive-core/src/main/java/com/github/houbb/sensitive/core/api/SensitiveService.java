@@ -3,6 +3,7 @@ package com.github.houbb.sensitive.core.api;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.ContextValueFilter;
 import com.github.houbb.heaven.annotation.ThreadSafe;
+import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
@@ -79,7 +80,7 @@ public class SensitiveService<T> implements ISensitive<T> {
                                   final Object copyObject,
                                   final Class clazz) {
         // 每一个实体对应的字段，只对当前 clazz 生效。
-        List<Field> fieldList = ClassUtil.getAllFieldList(clazz);
+        List<Field> fieldList = ClassFieldListCache.getInstance().get(clazz);
         context.setAllFieldList(fieldList);
         context.setCurrentObject(copyObject);
 

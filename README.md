@@ -7,8 +7,6 @@
 用户也可以基于自己的实际需要，自定义注解。
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/sensitive/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/sensitive)
-[![Build Status](https://www.travis-ci.org/houbb/sensitive.svg?branch=master)](https://www.travis-ci.org/houbb/sensitive?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/houbb/sensitive/badge.svg?branch=master)](https://coveralls.io/github/houbb/sensitive?branch=master)
 
 > [变更日志](doc/CHANGE_LOG.md)
 
@@ -46,11 +44,9 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.7 新特性
+## v0.0.8 新特性
 
-- 支持集合的脱敏处理
-
-方便一次处理一个集合
+添加类反射 cache，初步提升性能。
 
 # 快速开始
 
@@ -66,7 +62,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8</version>
 </dependency>
 ```
 

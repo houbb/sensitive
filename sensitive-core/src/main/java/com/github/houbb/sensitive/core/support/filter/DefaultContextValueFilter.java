@@ -2,22 +2,17 @@ package com.github.houbb.sensitive.core.support.filter;
 
 import com.alibaba.fastjson.serializer.BeanContext;
 import com.alibaba.fastjson.serializer.ContextValueFilter;
-import com.github.houbb.heaven.annotation.CommonEager;
 import com.github.houbb.heaven.annotation.ThreadSafe;
+import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
-import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
-import com.github.houbb.heaven.util.lang.reflect.ReflectFieldUtil;
 import com.github.houbb.heaven.util.util.ArrayUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.heaven.util.util.Optional;
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveEntry;
-import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
-import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
 import com.github.houbb.sensitive.api.ICondition;
 import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.util.condition.SensitiveConditions;
@@ -65,7 +60,7 @@ public class DefaultContextValueFilter implements ContextValueFilter {
         // 信息初始化
         final Field field = context.getField();
         final Class clazz = context.getBeanClass();
-        final List<Field> fieldList = ClassUtil.getAllFieldList(clazz);
+        final List<Field> fieldList = ClassFieldListCache.getInstance().get(clazz);
         sensitiveContext.setCurrentField(field);
         sensitiveContext.setCurrentObject(object);
         sensitiveContext.setBeanClass(clazz);
