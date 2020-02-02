@@ -5,6 +5,7 @@ import com.github.houbb.sensitive.core.api.SensitiveUtil;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 import com.github.houbb.sensitive.test.core.DataPrepareTest;
 import com.github.houbb.sensitive.test.model.sensitive.User;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -12,6 +13,7 @@ import org.junit.Test;
  * @author binbin.hou
  * @since 0.0.9
  */
+@Ignore
 public class SensitiveBenchmarkTest {
 
     private static final int COUNT = 1000000;
