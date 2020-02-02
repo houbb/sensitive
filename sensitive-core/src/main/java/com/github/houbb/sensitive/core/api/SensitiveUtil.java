@@ -1,8 +1,8 @@
 package com.github.houbb.sensitive.core.api;
 
-import com.github.houbb.heaven.support.instance.impl.Instances;
 import com.github.houbb.heaven.util.guava.Guavas;
 import com.github.houbb.heaven.util.util.CollectionUtil;
+import com.github.houbb.sensitive.core.bs.SensitiveBs;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,8 +29,7 @@ public final class SensitiveUtil {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> T desCopy(T object) {
-        return (T) Instances.singleton(SensitiveService.class)
-                .desCopy(object);
+        return SensitiveBs.newInstance().desCopy(object);
     }
 
     /**
@@ -42,8 +41,7 @@ public final class SensitiveUtil {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static String desJson(Object object) {
-        return Instances.singleton(SensitiveService.class)
-                .desJson(object);
+        return SensitiveBs.newInstance().desJson(object);
     }
 
     /**
