@@ -9,7 +9,7 @@
 [![Build Status](https://travis-ci.com/houbb/sensitive.svg?branch=master)](https://travis-ci.com/houbb/sensitive)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/sensitive/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/sensitive)
 
-> [变更日志](doc/CHANGE_LOG.md)
+> [变更日志](CHANGE_LOG.md)
 
 ## 日志脱敏
 
@@ -45,9 +45,11 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.9 变更
+## v0.0.10 变更
 
-1. 新增脱敏引导类，允许自定义深度拷贝实现。
+1. 更新 fast-json 为最新版本依赖（安全问题）
+
+2. 更新 heaven 版本依赖为最新
 
 # 快速开始
 
@@ -63,7 +65,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.9</version>
+    <version>0.0.10</version>
 </dependency>
 ```
 

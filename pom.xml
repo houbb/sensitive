@@ -7,7 +7,7 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.9</version>
+    <version>0.0.10</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
@@ -35,11 +35,11 @@
         <project.compiler.level>1.7</project.compiler.level>
 
         <!--============================== INTER ==============================-->
-        <heaven.version>0.1.63</heaven.version>
+        <heaven.version>0.1.105</heaven.version>
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.12</junit.version>
-        <fastjson.version>1.2.44</fastjson.version>
+        <fastjson.version>1.2.70</fastjson.version>
     </properties>
 
     <dependencyManagement>
