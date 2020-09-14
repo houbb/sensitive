@@ -68,8 +68,8 @@ public class DefaultContextValueFilter implements ContextValueFilter {
 
         // 这里将缺少对于列表/集合/数组 的处理。可以单独实现。
         // 设置当前处理的字段
-        SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
-        if(ObjectUtil.isNull(sensitiveEntry)) {
+        boolean haveSensitiveEntry = sensitiveContext.haveSensitiveEntryAnnotation(field);
+        if(!haveSensitiveEntry) {
             sensitiveContext.setEntry(value);
             return handleSensitive(sensitiveContext, field);
         }
