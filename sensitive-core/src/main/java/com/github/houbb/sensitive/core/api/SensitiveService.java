@@ -17,6 +17,7 @@ import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.support.filter.DefaultContextValueFilter;
+import com.github.houbb.sensitive.core.util.entry.SensitiveEntryUtil;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
 import java.lang.annotation.Annotation;
@@ -88,8 +89,7 @@ public class SensitiveService<T> implements ISensitive<T> {
                 context.setCurrentField(field);
 
                 // 处理 @SensitiveEntry 注解
-                boolean isSensitiveEntry = context.haveSensitiveEntryAnnotation(field);
-                if (isSensitiveEntry) {
+                if (SensitiveEntryUtil.hasSensitiveEntry(field)) {
                     if (ClassTypeUtil.isJavaBean(fieldTypeClass)) {
                         // 为普通 javabean 对象
                         final Object fieldNewObject = field.get(copyObject);

@@ -47,11 +47,9 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.10 变更
+## v0.0.11 变更
 
-1. 更新 fast-json 为最新版本依赖（安全问题）
-
-2. 更新 heaven 版本依赖为最新
+1. 支持 `@SensitiveEntry` 注解自定义
 
 # 快速开始
 
@@ -67,7 +65,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.10</version>
+    <version>0.0.11</version>
 </dependency>
 ```
 
@@ -622,14 +620,17 @@ private CustomPasswordModel buildCustomPasswordModel(){
 }
 ```
 
-- v0.0.11 新增功能。允许功能自定义级联脱敏注解。
-
 ## 案例2
+
+- v0.0.11 新增功能。允许功能自定义级联脱敏注解。
 
 ### 自定义级联脱敏注解
 
-
 - 自定义级联脱敏注解
+
+可以根据自己的业务需要，在自定义的注解上使用 `@SensitiveEntry`。
+
+使用方式保持和 `@SensitiveEntry` 一样即可。
 
 ```java
 /**
@@ -677,7 +678,7 @@ public class CustomUserEntryObject {
 ```java
 /**
  * 用户属性中有集合或者对象，集合中属性是对象-脱敏测试
- * @since 0.0.10
+ * @since 0.0.11
  */
 @Test
 public void customSensitiveEntryObjectTest() {

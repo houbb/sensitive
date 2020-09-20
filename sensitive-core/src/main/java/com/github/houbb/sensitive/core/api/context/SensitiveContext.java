@@ -1,11 +1,9 @@
 package com.github.houbb.sensitive.core.api.context;
 
 import com.github.houbb.heaven.annotation.NotThreadSafe;
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,28 +138,6 @@ public class SensitiveContext implements IContext {
 
     public void setEntry(Object entry) {
         this.entry = entry;
-    }
-
-    /**
-     * 字段上是否直接或间接包含@SensitiveEntry
-     *
-     * @param field 字段
-     * @since 0.0.11
-     */
-    public boolean haveSensitiveEntryAnnotation(Field field) {
-        // 属性上直接含有@SensitiveEntry注解
-        SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
-        if (sensitiveEntry != null) {
-            return true;
-        }
-        // 属性上包含自定义的对象属性(间接@SensitiveEntry)注解
-        for (Annotation annotation : field.getAnnotations()) {
-            sensitiveEntry = annotation.annotationType().getAnnotation(SensitiveEntry.class);
-            if (sensitiveEntry != null) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

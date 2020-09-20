@@ -16,6 +16,7 @@ import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.util.condition.SensitiveConditions;
+import com.github.houbb.sensitive.core.util.entry.SensitiveEntryUtil;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
 import java.lang.annotation.Annotation;
@@ -68,7 +69,7 @@ public class DefaultContextValueFilter implements ContextValueFilter {
 
         // 这里将缺少对于列表/集合/数组 的处理。可以单独实现。
         // 设置当前处理的字段
-        boolean haveSensitiveEntry = sensitiveContext.haveSensitiveEntryAnnotation(field);
+        boolean haveSensitiveEntry = SensitiveEntryUtil.hasSensitiveEntry(field);
         if(!haveSensitiveEntry) {
             sensitiveContext.setEntry(value);
             return handleSensitive(sensitiveContext, field);
