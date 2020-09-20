@@ -472,11 +472,12 @@ private String testField;
 
 # 自定义注解
 
-v0.0.4 新增功能。允许功能自定义条件注解和策略注解。
+- v0.0.4 新增功能。允许功能自定义条件注解和策略注解。
+- v0.0.11 新增功能。允许功能自定义级联脱敏注解。
 
-## 案例
+## 案例1
 
-### 自定义注解
+### 自定义密码脱敏策略&自定义密码脱敏策略生效条件
 
 - 策略脱敏
 
@@ -618,6 +619,114 @@ private CustomPasswordModel buildCustomPasswordModel(){
     model.setPassword("hello");
     model.setFooPassword("123456");
     return model;
+}
+```
+
+- v0.0.11 新增功能。允许功能自定义级联脱敏注解。
+
+## 案例2
+
+### 自定义级联脱敏注解
+
+
+- 自定义级联脱敏注解
+
+```java
+/**
+ * 级联脱敏注解,如果对象中属性为另外一个对象(集合)，则可以使用这个注解指定。
+ * <p>
+ * 1. 如果属性为 Iterable 的子类集合，则当做列表处理，遍历其中的对象
+ * 2. 如果是普通对象，则处理对象中的脱敏信息
+ * 3. 如果是普通字段/MAP，则不做处理
+ *
+ * @author dev-sxl
+ * date 2020-09-14
+ * @since 0.0.11
+ */
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@SensitiveEntry
+public @interface SensitiveEntryCustom {
+}
+```
+
+### 定义测试对象
+
+定义一个使用自定义注解的对象。
+ 
+```java
+public class CustomUserEntryObject {
+
+    @SensitiveEntryCustom
+    private User user;
+
+    @SensitiveEntryCustom
+    private List<User> userList;
+
+    @SensitiveEntryCustom
+    private User[] userArray;
+
+    // 其他方法...
+}
+```
+
+### 测试
+
+```java
+/**
+ * 用户属性中有集合或者对象，集合中属性是对象-脱敏测试
+ * @since 0.0.10
+ */
+@Test
+public void customSensitiveEntryObjectTest() {
+    final String originalStr = "CustomUserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}";
+    final String sensitiveStr = "CustomUserEntryObject{user=User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, userList=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userArray=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]}";
+
+    CustomUserEntryObject userEntryObject = DataPrepareTest.buildCustomUserEntryObject();
+    Assert.assertEquals(originalStr, userEntryObject.toString());
+
+    CustomUserEntryObject sensitiveUserEntryObject = SensitiveUtil.desCopy(userEntryObject);
+    Assert.assertEquals(sensitiveStr, sensitiveUserEntryObject.toString());
+    Assert.assertEquals(originalStr, userEntryObject.toString());
+}
+```
+
+构建对象的方法如下：
+
+```java
+/**
+ * 构建用户-属性为列表，数组。列表中为对象。
+ *
+ * @return 构建嵌套信息
+ * @since 0.0.11
+ */
+public static CustomUserEntryObject buildCustomUserEntryObject() {
+    CustomUserEntryObject userEntryObject = new CustomUserEntryObject();
+    User user = buildUser();
+    User user2 = buildUser();
+    User user3 = buildUser();
+    userEntryObject.setUser(user);
+    userEntryObject.setUserList(Arrays.asList(user2));
+    userEntryObject.setUserArray(new User[]{user3});
+    return userEntryObject;
+}
+
+/**
+ * 构建测试用户对象
+ *
+ * @return 创建后的对象
+ * @since 0.0.1
+ */
+public static User buildUser() {
+    User user = new User();
+    user.setUsername("脱敏君");
+    user.setPassword("1234567");
+    user.setEmail("12345@qq.com");
+    user.setIdCard("123456190001011234");
+    user.setPhone("18888888888");
+    return user;
 }
 ```
 

@@ -1,15 +1,18 @@
 package com.github.houbb.sensitive.core.api.context;
 
 import com.github.houbb.heaven.annotation.NotThreadSafe;
+import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.api.IContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 脱敏上下文
+ *
  * @author binbin.hou
  * date 2019/1/2
  * @since 0.0.1
@@ -34,18 +37,21 @@ public class SensitiveContext implements IContext {
 
     /**
      * 类信息
+     *
      * @since 0.0.6
      */
     private Class beanClass;
 
     /**
      * 明细信息
+     *
      * @since 0.0.6
      */
     private Object entry;
 
     /**
      * 新建一个对象实例
+     *
      * @return this
      * @since 0.0.6
      */
@@ -68,8 +74,8 @@ public class SensitiveContext implements IContext {
     }
 
     /**
-     * @since 0.0.4
      * @return 获取当前字段名称
+     * @since 0.0.4
      */
     @Override
     public String getCurrentFieldName() {
@@ -77,8 +83,8 @@ public class SensitiveContext implements IContext {
     }
 
     /**
-     * @since 0.0.4
      * @return 获取当前字段值
+     * @since 0.0.4
      */
     @Override
     public Object getCurrentFieldValue() {
@@ -100,6 +106,7 @@ public class SensitiveContext implements IContext {
 
     /**
      * 设置当前字段
+     *
      * @param allFieldList 所有字段列表
      */
     public void setAllFieldList(List<Field> allFieldList) {
@@ -109,6 +116,7 @@ public class SensitiveContext implements IContext {
     /**
      * 添加字段信息
      * 本方法不再使用，将在下个版本直接移除。
+     *
      * @param fieldList 字段列表信息
      */
     @Deprecated
@@ -132,6 +140,28 @@ public class SensitiveContext implements IContext {
 
     public void setEntry(Object entry) {
         this.entry = entry;
+    }
+
+    /**
+     * 字段上是否直接或间接包含@SensitiveEntry
+     *
+     * @param field 字段
+     * @since 0.0.11
+     */
+    public boolean haveSensitiveEntryAnnotation(Field field) {
+        // 属性上直接含有@SensitiveEntry注解
+        SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
+        if (sensitiveEntry != null) {
+            return true;
+        }
+        // 属性上包含自定义的对象属性(间接@SensitiveEntry)注解
+        for (Annotation annotation : field.getAnnotations()) {
+            sensitiveEntry = annotation.annotationType().getAnnotation(SensitiveEntry.class);
+            if (sensitiveEntry != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

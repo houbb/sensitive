@@ -10,7 +10,6 @@ import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
 import com.github.houbb.heaven.util.util.ArrayUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
 import com.github.houbb.sensitive.api.*;
@@ -18,7 +17,6 @@ import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.support.filter.DefaultContextValueFilter;
-import com.github.houbb.sensitive.core.util.*;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
 import java.lang.annotation.Annotation;
@@ -58,7 +56,7 @@ public class SensitiveService<T> implements ISensitive<T> {
 
     @Override
     public String desJson(final T object, final ISensitiveConfig config) {
-        if(ObjectUtil.isNull(object)) {
+        if (ObjectUtil.isNull(object)) {
             return JSON.toJSONString(object);
         }
 
@@ -90,8 +88,8 @@ public class SensitiveService<T> implements ISensitive<T> {
                 context.setCurrentField(field);
 
                 // 处理 @SensitiveEntry 注解
-                SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
-                if (ObjectUtil.isNotNull(sensitiveEntry)) {
+                boolean isSensitiveEntry = context.haveSensitiveEntryAnnotation(field);
+                if (isSensitiveEntry) {
                     if (ClassTypeUtil.isJavaBean(fieldTypeClass)) {
                         // 为普通 javabean 对象
                         final Object fieldNewObject = field.get(copyObject);
