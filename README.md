@@ -47,9 +47,9 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.11 变更
+## v0.0.12 变更
 
-1. 支持 `@SensitiveEntry` 注解自定义
+1. 默认关闭 FastJSON 的循环依赖功能
 
 # 快速开始
 
@@ -65,7 +65,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.11</version>
+    <version>0.0.12</version>
 </dependency>
 ```
 
@@ -873,3 +873,9 @@ SensitiveBs.newInstance()
 如果你对本项目有兴趣，并且对代码有一定追求，可以申请加入本项目开发。
 
 如果你善于写文档，或者愿意补全测试案例，也非常欢迎加入。
+
+# ROAD-MAP
+
+- [ ] 考虑添加针对 MAP 的脱敏支持
+
+- [ ] 考虑对 JSON 的可拓展性，不拘泥于 FastJSON
