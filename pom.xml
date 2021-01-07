@@ -38,7 +38,7 @@
         <heaven.version>0.1.105</heaven.version>
 
         <!--============================== OTHER ==============================-->
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <fastjson.version>1.2.70</fastjson.version>
     </properties>
 
