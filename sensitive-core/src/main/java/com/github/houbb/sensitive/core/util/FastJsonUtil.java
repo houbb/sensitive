@@ -13,9 +13,9 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  * date 2018/12/29
  * @since 0.0.2
  */
-public final class BeanUtil {
+public final class FastJsonUtil {
 
-    private BeanUtil(){}
+    private FastJsonUtil(){}
 
     /**
      * 深度复制
