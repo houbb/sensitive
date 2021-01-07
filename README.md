@@ -876,8 +876,6 @@ SensitiveBs.newInstance()
 
 # ROAD-MAP
 
-- [ ] BeanUtil#deepCopy() 抽象为接口，便于用户自定义
-
 - [ ] 考虑添加针对 MAP 的脱敏支持
 
 - [ ] 考虑对 JSON 的可拓展性，不拘泥于 FastJSON
