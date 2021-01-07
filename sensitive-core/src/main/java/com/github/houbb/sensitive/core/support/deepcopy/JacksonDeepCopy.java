@@ -2,7 +2,7 @@ package com.github.houbb.sensitive.core.support.deepcopy;
 
 import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.sensitive.api.IDeepCopy;
-import com.github.houbb.sensitive.core.util.FastJsonUtil;
+import com.github.houbb.sensitive.core.util.JacksonUtil;
 
 /**
  * fastjson 的深度拷贝
@@ -10,11 +10,11 @@ import com.github.houbb.sensitive.core.util.FastJsonUtil;
  * @since 0.0.9
  */
 @ThreadSafe
-public class FastJsonDeepCopy implements IDeepCopy {
+public class JacksonDeepCopy implements IDeepCopy {
 
     @Override
     public <T> T deepCopy(T object) {
-        return FastJsonUtil.deepCopy(object);
+        return JacksonUtil.deepCopy(object);
     }
 
 }

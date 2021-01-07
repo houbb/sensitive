@@ -2,7 +2,6 @@ package com.github.houbb.sensitive.core.support.deepcopy;
 
 import com.github.houbb.heaven.support.instance.impl.Instances;
 import com.github.houbb.sensitive.api.IDeepCopy;
-import com.github.houbb.sensitive.core.util.BeanUtil;
 
 /**
  * 深度拷贝工具类
