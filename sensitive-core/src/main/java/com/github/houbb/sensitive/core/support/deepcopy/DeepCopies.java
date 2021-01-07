@@ -16,7 +16,7 @@ public final class DeepCopies {
      * @since 0.0.9
      */
     public static IDeepCopy json() {
-        return Instances.singleton(FastJsonDeepCopy.class);
+        return Instances.singleton(JacksonDeepCopy.class);
     }
 
 }
