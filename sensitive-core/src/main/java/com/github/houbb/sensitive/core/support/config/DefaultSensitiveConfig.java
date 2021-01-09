@@ -1,6 +1,6 @@
 package com.github.houbb.sensitive.core.support.config;
 
-import com.github.houbb.sensitive.api.IDeepCopy;
+import com.github.houbb.deep.copy.api.IDeepCopy;
 import com.github.houbb.sensitive.api.ISensitiveConfig;
 
 /**
