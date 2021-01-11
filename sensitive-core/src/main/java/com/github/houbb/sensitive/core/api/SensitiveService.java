@@ -2,6 +2,7 @@ package com.github.houbb.sensitive.core.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.ContextValueFilter;
+import com.github.houbb.deep.copy.api.IDeepCopy;
 import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;

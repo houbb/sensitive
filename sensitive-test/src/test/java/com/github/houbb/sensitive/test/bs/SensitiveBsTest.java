@@ -1,7 +1,7 @@
 package com.github.houbb.sensitive.test.bs;
 
+import com.github.houbb.deep.copy.fastjson.FastJsonDeepCopy;
 import com.github.houbb.sensitive.core.bs.SensitiveBs;
-import com.github.houbb.sensitive.core.support.deepcopy.DeepCopies;
 import com.github.houbb.sensitive.test.core.DataPrepareTest;
 import com.github.houbb.sensitive.test.model.sensitive.User;
 import org.junit.Assert;
@@ -44,7 +44,7 @@ public class SensitiveBsTest {
         User user = DataPrepareTest.buildUser();
 
         SensitiveBs.newInstance()
-                .deepCopy(DeepCopies.json())
+                .deepCopy(FastJsonDeepCopy.getInstance())
                 .desJson(user);
     }
 

@@ -7,7 +7,7 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.13-SNAPSHOT</version>
+    <version>0.0.14-SNAPSHOT</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
@@ -35,7 +35,8 @@
         <project.compiler.level>1.7</project.compiler.level>
 
         <!--============================== INTER ==============================-->
-        <heaven.version>0.1.105</heaven.version>
+        <heaven.version>0.1.120</heaven.version>
+        <deep-copy.version>0.0.1</deep-copy.version>
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.13.1</junit.version>
@@ -69,6 +70,17 @@
                 <groupId>com.github.houbb</groupId>
                 <artifactId>heaven</artifactId>
                 <version>${heaven.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.houbb</groupId>
+                <artifactId>deep-copy-api</artifactId>
+                <version>${deep-copy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.houbb</groupId>
+                <artifactId>deep-copy-fastjson</artifactId>
+                <version>${deep-copy.version}</version>
             </dependency>
 
             <!--========================= OTHER =========================-->
