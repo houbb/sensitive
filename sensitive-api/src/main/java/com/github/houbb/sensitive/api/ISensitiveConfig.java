@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.api;
 
-import com.github.houbb.deep.copy.api.IDeepCopy;
 
 /**
  * 脱敏配置接口
