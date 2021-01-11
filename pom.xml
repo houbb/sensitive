@@ -32,7 +32,7 @@
 
         <!--============================== MAIN ==============================-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.compiler.level>1.7</project.compiler.level>
+        <project.compiler.level>1.8</project.compiler.level>
 
         <!--============================== INTER ==============================-->
         <heaven.version>0.1.120</heaven.version>
