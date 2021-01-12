@@ -72,17 +72,6 @@
                 <version>${heaven.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.github.houbb</groupId>
-                <artifactId>deep-copy-api</artifactId>
-                <version>${deep-copy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.houbb</groupId>
-                <artifactId>deep-copy-fastjson</artifactId>
-                <version>${deep-copy.version}</version>
-            </dependency>
-
             <!--========================= OTHER =========================-->
             <dependency>
                 <groupId>junit</groupId>
