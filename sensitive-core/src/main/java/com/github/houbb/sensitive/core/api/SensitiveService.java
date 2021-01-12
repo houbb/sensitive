@@ -7,7 +7,6 @@ import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
-import com.github.houbb.heaven.util.util.ArrayUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveIgnore;
@@ -93,11 +92,10 @@ public class SensitiveService<T> implements ISensitive<T> {
                 final Class fieldTypeClass = field.getType();
                 context.setCurrentField(field);
 
-                if (ClassTypeUtil.isJavaBean(fieldTypeClass) && fieldTypeClass != String.class) {
-                    // 为普通 javabean 对象
-                    final Object fieldNewObject = field.get(copyObject);
-                    handleClassField(context, fieldNewObject, fieldTypeClass);
-                } else if (ClassTypeUtil.isArray(fieldTypeClass)) {
+                if (fieldTypeClass == String.class) {
+                    // 处理单个字段脱敏信息
+                    handleSensitive(context, copyObject, field);
+                } else if (fieldTypeClass.isArray()) {
                     // 为数组类型
                     final Object array = field.get(copyObject);
                     final Class entryFieldClass = fieldTypeClass.getComponentType();
@@ -136,11 +134,9 @@ public class SensitiveService<T> implements ISensitive<T> {
                         }
                     }
                 } else {
-                    // 1. 常见的基本类型，不做处理
-                    // 2. 如果为 map，暂时不支持处理。后期可以考虑支持 value 的脱敏，或者 key 的脱敏
-                    // 3. 其他
-                    // 处理单个字段脱敏信息
-                    handleSensitive(context, copyObject, field);
+                    // 当作 javabean 对象处理内部字段
+                    final Object fieldNewObject = field.get(copyObject);
+                    handleClassField(context, fieldNewObject, fieldTypeClass);
                 }
             }
         } catch (
@@ -169,36 +165,19 @@ public class SensitiveService<T> implements ISensitive<T> {
                                         final Object entry,
                                         final Field field) {
         try {
-            //处理 @Sensitive
-            Sensitive sensitive = field.getAnnotation(Sensitive.class);
-            if (ObjectUtil.isNotNull(sensitive)) {
-                Class<? extends ICondition> conditionClass = sensitive.condition();
-                ICondition condition = conditionClass.newInstance();
-                if (condition.valid(context)) {
-                    Class<? extends IStrategy> strategyClass = sensitive.strategy();
-                    IStrategy strategy = strategyClass.newInstance();
-                    return strategy.des(entry, context);
-                }
-            }
+            prepareSensitiveContext(context, field);
 
-            // 获取所有的注解
-            Annotation[] annotations = field.getAnnotations();
-            if (ArrayUtil.isNotEmpty(annotations)) {
-                ICondition condition = getCondition(annotations);
-                if (ObjectUtil.isNull(condition)
-                        || condition.valid(context)) {
-                    IStrategy strategy = getStrategy(annotations);
-                    if (ObjectUtil.isNotNull(strategy)) {
-                        return strategy.des(entry, context);
-                    }
-                }
+            if (null == context.getStrategy()) {
+                return entry;
             }
-            return entry;
+            if (null != context.getCondition() && !context.getCondition().valid(context)) {
+                return entry;
+            }
+            return context.getStrategy().des(entry, context);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SensitiveRuntimeException(e);
         }
     }
-
 
     /**
      * 处理脱敏信息
@@ -212,77 +191,53 @@ public class SensitiveService<T> implements ISensitive<T> {
                                  final Object copyObject,
                                  final Field field) {
         try {
-            //处理 @Sensitive
-            Sensitive sensitive = field.getAnnotation(Sensitive.class);
-            if (sensitive != null) {
-                Class<? extends ICondition> conditionClass = sensitive.condition();
-                ICondition condition = conditionClass.newInstance();
-                if (condition.valid(context)) {
-                    Class<? extends IStrategy> strategyClass = sensitive.strategy();
-                    IStrategy strategy = strategyClass.newInstance();
-                    final Object originalFieldVal = field.get(copyObject);
-                    final Object result = strategy.des(originalFieldVal, context);
-                    field.set(copyObject, result);
-                }
+            prepareSensitiveContext(context, field);
+
+            if (null == context.getStrategy()) {
+                return;
+            }
+            if (null != context.getCondition() && !context.getCondition().valid(context)) {
+                return;
             }
 
-            // 系统内置自定义注解的处理,获取所有的注解
-            Annotation[] annotations = field.getAnnotations();
-            if (ArrayUtil.isNotEmpty(annotations)) {
-                ICondition condition = getCondition(annotations);
-                if (ObjectUtil.isNull(condition)
-                        || condition.valid(context)) {
-                    IStrategy strategy = getStrategy(annotations);
-                    if (ObjectUtil.isNotNull(strategy)) {
-                        final Object originalFieldVal = field.get(copyObject);
-                        final Object result = strategy.des(originalFieldVal, context);
-                        field.set(copyObject, result);
-                    }
-                }
-            }
+            final Object originalFieldVal = field.get(copyObject);
+            final Object result = context.getStrategy().des(originalFieldVal, context);
+            field.set(copyObject, result);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new SensitiveRuntimeException(e);
         }
     }
 
-    /**
-     * 获取策略
-     *
-     * @param annotations 字段对应注解
-     * @return 策略
-     */
-    private IStrategy getStrategy(final Annotation[] annotations) {
+    private void prepareSensitiveContext(SensitiveContext context, Field field) throws InstantiationException, IllegalAccessException {
+        Sensitive sensitive = field.getAnnotation(Sensitive.class);
+        if (sensitive != null) {
+            context.setCondition(sensitive.condition().newInstance());
+            context.setStrategy(sensitive.strategy().newInstance());
+        } else {
+            // 系统内置自定义注解的处理,获取所有的注解
+            parseStrategyFromField(context, field);
+        }
+    }
+
+    private void parseStrategyFromField(SensitiveContext context, Field field) {
+        Annotation[] annotations = field.getAnnotations();
         for (Annotation annotation : annotations) {
+            SensitiveCondition sensitiveCondition = annotation.annotationType().getAnnotation(SensitiveCondition.class);
             SensitiveStrategy sensitiveStrategy = annotation.annotationType().getAnnotation(SensitiveStrategy.class);
             if (ObjectUtil.isNotNull(sensitiveStrategy)) {
                 Class<? extends IStrategy> clazz = sensitiveStrategy.value();
                 if (SensitiveStrategyBuiltIn.class.equals(clazz)) {
-                    return SensitiveStrategyBuiltInUtil.require(annotation.annotationType());
+                    context.setStrategy(SensitiveStrategyBuiltInUtil.require(annotation.annotationType()));
                 } else {
-                    return ClassUtil.newInstance(clazz);
+                    context.setStrategy(ClassUtil.newInstance(clazz));
                 }
             }
-        }
-        return null;
-    }
-
-    /**
-     * 获取用户自定义条件
-     *
-     * @param annotations 字段上的注解
-     * @return 对应的用户自定义条件
-     */
-    private ICondition getCondition(final Annotation[] annotations) {
-        for (Annotation annotation : annotations) {
-            SensitiveCondition sensitiveCondition = annotation.annotationType().getAnnotation(SensitiveCondition.class);
             if (ObjectUtil.isNotNull(sensitiveCondition)) {
                 Class<? extends ICondition> customClass = sensitiveCondition.value();
-                return ClassUtil.newInstance(customClass);
+                context.setCondition(ClassUtil.newInstance(customClass));
             }
         }
-        return null;
     }
-
 
     /**
      * 需要特殊处理的列表/对象类型
