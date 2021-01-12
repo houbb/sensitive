@@ -96,23 +96,19 @@ public class SensitiveService<T> implements ISensitive<T> {
                         handleClassField(context, fieldNewObject, fieldTypeClass);
                     } else if (ClassTypeUtil.isArray(fieldTypeClass)) {
                         // 为数组类型
+                        final Object array = field.get(copyObject);
                         final Class entryFieldClass = fieldTypeClass.getComponentType();
-                        Object[] arrays = (Object[]) field.get(copyObject);
-                        //1. 如果需要特殊处理，则循环特殊处理
-                        if (needHandleEntryType(entryFieldClass)) {
-                            for (Object arrayEntry : arrays) {
+                        final int length = Array.getLength(array);
+
+                        for (int i = 0; i < length; i++) {
+                            Object arrayEntry = Array.get(array, i);
+                            // 如果需要特殊处理，则循环特殊处理
+                            if (needHandleEntryType(entryFieldClass)) {
                                 handleClassField(context, arrayEntry, entryFieldClass);
+                            } else {
+                                Object result = handleSensitiveEntry(context, arrayEntry, field);
+                                Array.set(array, i, result);
                             }
-                        } else {
-                            //2, 基础值，直接循环设置即可
-                            final int arrayLength = arrays.length;
-                            Object newArray = Array.newInstance(entryFieldClass, arrayLength);
-                            for (int i = 0; i < arrayLength; i++) {
-                                Object entry = arrays[i];
-                                Object result = handleSensitiveEntry(context, entry, field);
-                                Array.set(newArray, i, result);
-                            }
-                            field.set(copyObject, newArray);
                         }
                     } else if (ClassTypeUtil.isCollection(fieldTypeClass)) {
                         // Collection 接口的子类
