@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.test.model.sensitive.system;
 
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 
 /**
  * 系统内置注解-对象
@@ -10,7 +9,6 @@ import com.github.houbb.sensitive.annotation.SensitiveEntry;
  */
 public class SystemBuiltInAtEntry {
 
-    @SensitiveEntry
     private SystemBuiltInAt entry;
 
     public SystemBuiltInAt getEntry() {

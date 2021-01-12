@@ -10,13 +10,11 @@ import com.github.houbb.heaven.util.util.ArrayUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.heaven.util.util.Optional;
 import com.github.houbb.sensitive.annotation.Sensitive;
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.api.ICondition;
 import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.util.condition.SensitiveConditions;
-import com.github.houbb.sensitive.core.util.entry.SensitiveEntryUtil;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
 import java.lang.annotation.Annotation;
@@ -29,7 +27,6 @@ import java.util.List;
 /**
  * 默认的上下文过滤器
  * (1) 和原来的对象有区别。因为是根据 JSON 的序列化来构建的。
- * 所以 {@link SensitiveEntry} 放在对象时，则不用特殊处理。
  * 只需要处理 集合、数组集合。
  * （2）0.0.6 这一期暂时不做代码的优化。保证功能性的正确。
  *
@@ -69,14 +66,13 @@ public class DefaultContextValueFilter implements ContextValueFilter {
 
         // 这里将缺少对于列表/集合/数组 的处理。可以单独实现。
         // 设置当前处理的字段
-        boolean haveSensitiveEntry = SensitiveEntryUtil.hasSensitiveEntry(field);
-        if(!haveSensitiveEntry) {
-            sensitiveContext.setEntry(value);
-            return handleSensitive(sensitiveContext, field);
-        }
 
         //2. 处理 @SensitiveEntry 注解
         final Class fieldTypeClass = field.getType();
+        if (fieldTypeClass == String.class) {
+            sensitiveContext.setEntry(value);
+            return handleSensitive(sensitiveContext, field);
+        }
         if (ClassTypeUtil.isJavaBean(fieldTypeClass)) {
             //不作处理，因为 json 本身就会进行递归处理
             return value;

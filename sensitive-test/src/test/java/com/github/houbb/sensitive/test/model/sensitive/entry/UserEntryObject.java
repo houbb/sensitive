@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.test.model.sensitive.entry;
 
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 import com.github.houbb.sensitive.test.model.sensitive.User;
 
 import java.util.Arrays;
@@ -14,13 +13,10 @@ import java.util.List;
  */
 public class UserEntryObject {
 
-    @SensitiveEntry
     private User user;
 
-    @SensitiveEntry
     private List<User> userList;
 
-    @SensitiveEntry
     private User[] userArray;
 
     public User getUser() {
