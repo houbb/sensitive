@@ -96,27 +96,23 @@ public class SensitiveService<T> implements ISensitive<T> {
                         handleClassField(context, fieldNewObject, fieldTypeClass);
                     } else if (ClassTypeUtil.isArray(fieldTypeClass)) {
                         // 为数组类型
+                        final Class entryFieldClass = fieldTypeClass.getComponentType();
                         Object[] arrays = (Object[]) field.get(copyObject);
-                        if (ArrayUtil.isNotEmpty(arrays)) {
-                            Object firstArrayEntry = arrays[0];
-                            final Class entryFieldClass = firstArrayEntry.getClass();
-
-                            //1. 如果需要特殊处理，则循环特殊处理
-                            if (needHandleEntryType(entryFieldClass)) {
-                                for (Object arrayEntry : arrays) {
-                                    handleClassField(context, arrayEntry, entryFieldClass);
-                                }
-                            } else {
-                                //2, 基础值，直接循环设置即可
-                                final int arrayLength = arrays.length;
-                                Object newArray = Array.newInstance(entryFieldClass, arrayLength);
-                                for (int i = 0; i < arrayLength; i++) {
-                                    Object entry = arrays[i];
-                                    Object result = handleSensitiveEntry(context, entry, field);
-                                    Array.set(newArray, i, result);
-                                }
-                                field.set(copyObject, newArray);
+                        //1. 如果需要特殊处理，则循环特殊处理
+                        if (needHandleEntryType(entryFieldClass)) {
+                            for (Object arrayEntry : arrays) {
+                                handleClassField(context, arrayEntry, entryFieldClass);
                             }
+                        } else {
+                            //2, 基础值，直接循环设置即可
+                            final int arrayLength = arrays.length;
+                            Object newArray = Array.newInstance(entryFieldClass, arrayLength);
+                            for (int i = 0; i < arrayLength; i++) {
+                                Object entry = arrays[i];
+                                Object result = handleSensitiveEntry(context, entry, field);
+                                Array.set(newArray, i, result);
+                            }
+                            field.set(copyObject, newArray);
                         }
                     } else if (ClassTypeUtil.isCollection(fieldTypeClass)) {
                         // Collection 接口的子类
