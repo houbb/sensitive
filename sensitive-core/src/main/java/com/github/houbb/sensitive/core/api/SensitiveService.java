@@ -5,7 +5,6 @@ import com.alibaba.fastjson.serializer.ContextValueFilter;
 import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
-import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
 import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
@@ -17,6 +16,7 @@ import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 import com.github.houbb.sensitive.core.support.filter.DefaultContextValueFilter;
+import com.github.houbb.sensitive.core.util.ClassTypeUtil;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
 
 import java.lang.annotation.Annotation;
