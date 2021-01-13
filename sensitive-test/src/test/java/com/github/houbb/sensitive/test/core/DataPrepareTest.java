@@ -93,6 +93,7 @@ public final class DataPrepareTest {
         userGroup.setUserCollection(Collections.singletonList(user));
         userGroup.setUserList(Arrays.asList(user));
         userGroup.setUserSet(new HashSet<>(Arrays.asList(user)));
+        userGroup.setPasswordSet(new HashSet<>(Arrays.asList("1234567")));
         Map<String, User> map = new HashMap<>();
         map.put("map", user);
         userGroup.setUserMap(map);

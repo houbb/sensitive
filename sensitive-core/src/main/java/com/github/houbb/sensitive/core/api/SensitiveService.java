@@ -6,7 +6,6 @@ import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
-import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.SensitiveIgnore;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
@@ -22,7 +21,6 @@ import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUti
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,10 +37,9 @@ import java.util.List;
 public class SensitiveService<T> implements ISensitive<T> {
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public T desCopy(T object, final ISensitiveConfig config) {
         //1. 初始化对象
-        final Class clazz = object.getClass();
+        final Class<?> clazz = object.getClass();
         final SensitiveContext context = new SensitiveContext();
 
         //2. 深度复制对象
@@ -50,7 +47,7 @@ public class SensitiveService<T> implements ISensitive<T> {
         final T copyObject = deepCopy.deepCopy(object);
 
         //3. 处理
-        handleClassField(context, copyObject, clazz);
+        handleObject(context, copyObject, clazz);
         return copyObject;
     }
 
@@ -72,10 +69,10 @@ public class SensitiveService<T> implements ISensitive<T> {
      * @param copyObject 拷贝的新对象
      * @param clazz      class 类型
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private void handleClassField(final SensitiveContext context,
-                                  final Object copyObject,
-                                  final Class clazz) {
+    @SuppressWarnings({"unchecked"})
+    private void handleObject(final SensitiveContext context,
+                              final Object copyObject,
+                              final Class<?> clazz) {
         // 每一个实体对应的字段，只对当前 clazz 生效。
         List<Field> fieldList = ClassFieldListCache.getInstance().get(clazz);
         context.setAllFieldList(fieldList);
@@ -88,62 +85,58 @@ public class SensitiveService<T> implements ISensitive<T> {
                     continue;
                 }
 
-                // 设置当前处理的字段
-                final Class fieldTypeClass = field.getType();
-                context.setCurrentField(field);
+                prepareSensitiveContext(context, field);
 
+                // 设置当前处理的字段
+                final Class<?> fieldTypeClass = field.getType();
                 if (ClassTypeUtil.isBase(fieldTypeClass)) {
                     // 处理单个字段脱敏信息
-                    handleSensitive(context, copyObject, field);
+                    DesensitizeField(context, copyObject, field);
                 } else if (fieldTypeClass.isArray()) {
                     // 为数组类型
-                    final Object array = field.get(copyObject);
-                    final Class entryFieldClass = fieldTypeClass.getComponentType();
-                    final int length = Array.getLength(array);
-
-                    for (int i = 0; i < length; i++) {
-                        Object arrayEntry = Array.get(array, i);
-                        // 如果需要特殊处理，则循环特殊处理
-                        if (needHandleEntryType(entryFieldClass)) {
-                            handleClassField(context, arrayEntry, entryFieldClass);
-                        } else {
-                            Object result = handleSensitiveEntry(context, arrayEntry, field);
-                            Array.set(array, i, result);
-                        }
-                    }
+                    Object array = field.get(copyObject);
+                    handleArrayObject(context, array);
                 } else if (ClassTypeUtil.isCollection(fieldTypeClass)) {
                     // Collection 接口的子类
-                    final Collection<Object> entryCollection = (Collection<Object>) field.get(copyObject);
-                    if (CollectionUtil.isNotEmpty(entryCollection)) {
-                        Object firstCollectionEntry = entryCollection.iterator().next();
-                        Class collectionEntryClass = firstCollectionEntry.getClass();
-
-                        //1. 如果需要特殊处理，则循环特殊处理
-                        if (needHandleEntryType(collectionEntryClass)) {
-                            for (Object collectionEntry : entryCollection) {
-                                handleClassField(context, collectionEntry, collectionEntryClass);
-                            }
-                        } else {
-                            //2, 基础值，直接循环设置即可
-                            List<Object> newResultList = new ArrayList<>(entryCollection.size());
-                            for (Object entry : entryCollection) {
-                                Object result = handleSensitiveEntry(context, entry, field);
-                                newResultList.add(result);
-                            }
-                            field.set(copyObject, newResultList);
-                        }
-                    }
+                    Collection<Object> collection = (Collection<Object>) field.get(copyObject);
+                    collection = handleArrayCollection(context, collection);
+                    field.set(copyObject, collection);
                 } else {
                     // 当作 javabean 对象处理内部字段
                     final Object fieldNewObject = field.get(copyObject);
-                    handleClassField(context, fieldNewObject, fieldTypeClass);
+                    handleObject(context, fieldNewObject, fieldTypeClass);
                 }
             }
-        } catch (
-                IllegalAccessException e) {
+        } catch (IllegalAccessException | InstantiationException e) {
             throw new SensitiveRuntimeException(e);
         }
+    }
 
+    @SuppressWarnings({"unchecked"})
+    private Collection<Object> handleArrayCollection(SensitiveContext context, Collection<Object> collection) throws IllegalAccessException, InstantiationException {
+        Collection<Object> resultCollection = collection.getClass().newInstance();
+        for (Object value : collection) {
+            value = getDesensitizedObjectWrapper(context, value);
+            resultCollection.add(value);
+        }
+        return resultCollection;
+    }
+
+    private void handleArrayObject(SensitiveContext context, Object array) {
+        for (int i = 0; i < Array.getLength(array); i++) {
+            Object value = Array.get(array, i);
+            value = getDesensitizedObjectWrapper(context, value);
+            Array.set(array, i, value);
+        }
+    }
+
+    private Object getDesensitizedObjectWrapper(SensitiveContext context, Object object) {
+        if (ClassTypeUtil.isBase(object.getClass())) {
+            object = getDesensitizedObject(context, object);
+        } else {
+            handleObject(context, object, object.getClass());
+        }
+        return object;
     }
 
     /**
@@ -156,27 +149,19 @@ public class SensitiveService<T> implements ISensitive<T> {
      * （3）用户自定义注解
      *
      * @param context 上下文
-     * @param entry   明细
-     * @param field   字段信息
+     * @param object  明细
      * @return 处理后的信息
      * @since 0.0.2
      */
-    private Object handleSensitiveEntry(final SensitiveContext context,
-                                        final Object entry,
-                                        final Field field) {
-        try {
-            prepareSensitiveContext(context, field);
-
-            if (null == context.getStrategy()) {
-                return entry;
-            }
-            if (null != context.getCondition() && !context.getCondition().valid(context)) {
-                return entry;
-            }
-            return context.getStrategy().des(entry, context);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SensitiveRuntimeException(e);
+    private Object getDesensitizedObject(final SensitiveContext context,
+                                         final Object object) {
+        if (null == context.getStrategy()) {
+            return object;
         }
+        if (null != context.getCondition() && !context.getCondition().valid(context)) {
+            return object;
+        }
+        return context.getStrategy().des(object, context);
     }
 
     /**
@@ -187,28 +172,14 @@ public class SensitiveService<T> implements ISensitive<T> {
      * @param field      当前字段
      * @since 0.0.2
      */
-    private void handleSensitive(final SensitiveContext context,
-                                 final Object copyObject,
-                                 final Field field) {
-        try {
-            prepareSensitiveContext(context, field);
-
-            if (null == context.getStrategy()) {
-                return;
-            }
-            if (null != context.getCondition() && !context.getCondition().valid(context)) {
-                return;
-            }
-
-            final Object originalFieldVal = field.get(copyObject);
-            final Object result = context.getStrategy().des(originalFieldVal, context);
-            field.set(copyObject, result);
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new SensitiveRuntimeException(e);
-        }
+    private void DesensitizeField(final SensitiveContext context,
+                                  final Object copyObject,
+                                  final Field field) throws IllegalAccessException {
+        final Object originalFieldVal = field.get(copyObject);
+        field.set(copyObject, getDesensitizedObject(context, originalFieldVal));
     }
 
-    private void prepareSensitiveContext(SensitiveContext context, Field field) throws InstantiationException, IllegalAccessException {
+    private void prepareSensitiveContext(SensitiveContext context, Field field) throws IllegalAccessException, InstantiationException {
         Sensitive sensitive = field.getAnnotation(Sensitive.class);
         if (sensitive != null) {
             context.setCondition(sensitive.condition().newInstance());
@@ -217,6 +188,7 @@ public class SensitiveService<T> implements ISensitive<T> {
             // 系统内置自定义注解的处理,获取所有的注解
             parseStrategyFromField(context, field);
         }
+        context.setCurrentField(field);
     }
 
     private void parseStrategyFromField(SensitiveContext context, Field field) {
@@ -238,26 +210,4 @@ public class SensitiveService<T> implements ISensitive<T> {
             }
         }
     }
-
-    /**
-     * 需要特殊处理的列表/对象类型
-     *
-     * @param fieldTypeClass 字段类型
-     * @return 是否
-     * @since 0.0.2
-     */
-    private boolean needHandleEntryType(final Class fieldTypeClass) {
-        if (ClassTypeUtil.isBase(fieldTypeClass)
-                || ClassTypeUtil.isMap(fieldTypeClass)) {
-            return false;
-        }
-
-        if (ClassTypeUtil.isJavaBean(fieldTypeClass)
-                || ClassTypeUtil.isArray(fieldTypeClass)
-                || ClassTypeUtil.isCollection(fieldTypeClass)) {
-            return true;
-        }
-        return false;
-    }
-
 }

@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.core.util;
 
-import com.github.houbb.heaven.util.common.ArgUtil;
 import sun.reflect.generics.reflectiveObjects.WildcardTypeImpl;
 
 import java.lang.reflect.*;
@@ -37,8 +36,8 @@ public class ClassTypeUtil {
     }
 
     public static boolean isEnum(Class<?> clazz) {
-        ArgUtil.notNull(clazz, "clazz");
         return clazz.isEnum();
+        
     }
 
     public static boolean isAbstract(Class<?> clazz) {

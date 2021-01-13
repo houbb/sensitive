@@ -29,6 +29,9 @@ public class UserGroup {
 
     private Set<User> userSet;
 
+    @Sensitive(strategy = StrategyPassword.class)
+    private Set<String> passwordSet;
+
     private Collection<User> userCollection;
 
     @Sensitive(strategy = StrategyPassword.class)
@@ -42,6 +45,14 @@ public class UserGroup {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<String> getPasswordSet() {
+        return passwordSet;
+    }
+
+    public void setPasswordSet(Set<String> passwordSet) {
+        this.passwordSet = passwordSet;
     }
 
     public User getCoolUser() {
@@ -99,6 +110,7 @@ public class UserGroup {
                 ", user=" + user +
                 ", userList=" + userList +
                 ", userSet=" + userSet +
+                ", userPassword=" + passwordSet +
                 ", userCollection=" + userCollection +
                 ", password='" + password + '\'' +
                 ", userMap=" + userMap +
