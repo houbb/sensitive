@@ -4,13 +4,14 @@ import com.github.houbb.heaven.util.common.ArgUtil;
 import sun.reflect.generics.reflectiveObjects.WildcardTypeImpl;
 
 import java.lang.reflect.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ClassTypeUtil {
-    private static final Class[] BASE_TYPE_CLASS = new Class[]{String.class, Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class, Object.class, Class.class};
+    private static final Set<Class<?>> BASE_TYPE_CLASS_SET = new HashSet<>();
+
+    static {
+        BASE_TYPE_CLASS_SET.addAll(Arrays.asList(String.class, Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class, Object.class, Class.class));
+    }
 
     private ClassTypeUtil() {
     }
@@ -32,21 +33,7 @@ public class ClassTypeUtil {
     }
 
     public static boolean isBase(Class<?> clazz) {
-        if (clazz.isPrimitive()) {
-            return true;
-        } else {
-            Class[] var1 = BASE_TYPE_CLASS;
-            int var2 = var1.length;
-
-            for (int var3 = 0; var3 < var2; ++var3) {
-                Class baseClazz = var1[var3];
-                if (baseClazz.equals(clazz)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
+        return clazz.isPrimitive() || BASE_TYPE_CLASS_SET.contains(clazz);
     }
 
     public static boolean isEnum(Class<?> clazz) {

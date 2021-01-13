@@ -92,7 +92,7 @@ public class SensitiveService<T> implements ISensitive<T> {
                 final Class fieldTypeClass = field.getType();
                 context.setCurrentField(field);
 
-                if (fieldTypeClass == String.class) {
+                if (ClassTypeUtil.isBase(fieldTypeClass)) {
                     // 处理单个字段脱敏信息
                     handleSensitive(context, copyObject, field);
                 } else if (fieldTypeClass.isArray()) {
