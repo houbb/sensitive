@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.test.model.bugs;
 
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 
 /**
  * @author binbin.hou
@@ -8,7 +7,6 @@ import com.github.houbb.sensitive.annotation.SensitiveEntry;
  */
 public class Father {
 
-    @SensitiveEntry
     private Child child;
 
     public Child getChild() {

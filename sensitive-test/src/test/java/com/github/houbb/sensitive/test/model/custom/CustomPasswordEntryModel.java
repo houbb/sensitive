@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.test.model.custom;
 
-import com.github.houbb.sensitive.annotation.SensitiveEntry;
 
 /**
  * @author binbin.hou
@@ -9,7 +8,6 @@ import com.github.houbb.sensitive.annotation.SensitiveEntry;
  */
 public class CustomPasswordEntryModel {
 
-    @SensitiveEntry
     private CustomPasswordModel entry;
 
     public CustomPasswordModel getEntry() {

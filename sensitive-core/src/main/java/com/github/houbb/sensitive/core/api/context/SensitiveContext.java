@@ -1,7 +1,9 @@
 package com.github.houbb.sensitive.core.api.context;
 
 import com.github.houbb.heaven.annotation.NotThreadSafe;
+import com.github.houbb.sensitive.api.ICondition;
 import com.github.houbb.sensitive.api.IContext;
+import com.github.houbb.sensitive.api.IStrategy;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
 import java.lang.reflect.Field;
@@ -46,6 +48,26 @@ public class SensitiveContext implements IContext {
      * @since 0.0.6
      */
     private Object entry;
+
+    private ICondition condition;
+
+    private IStrategy strategy;
+
+    public ICondition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(ICondition condition) {
+        this.condition = condition;
+    }
+
+    public IStrategy getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(IStrategy strategy) {
+        this.strategy = strategy;
+    }
 
     /**
      * 新建一个对象实例

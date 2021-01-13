@@ -29,12 +29,20 @@
             <artifactId>heaven</artifactId>
         </dependency>
 
+        <!--========================= OTHER =========================-->
         <dependency>
-            <groupId>com.github.houbb</groupId>
-            <artifactId>deep-copy-fastjson</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
 
-        <!--========================= OTHER =========================-->
     </dependencies>
 
 </project>

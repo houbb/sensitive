@@ -1,8 +1,8 @@
 package com.github.houbb.sensitive.test.model.sensitive.entry;
 
 import com.github.houbb.sensitive.annotation.Sensitive;
+import com.github.houbb.sensitive.annotation.SensitiveIgnore;
 import com.github.houbb.sensitive.core.api.strategory.StrategyPassword;
-import com.github.houbb.sensitive.test.annotation.custom.SensitiveEntryCustom;
 import com.github.houbb.sensitive.test.model.sensitive.User;
 
 import java.util.Collection;
@@ -20,26 +20,18 @@ public class CustomUserGroup {
     /**
      * 不参与脱敏的用户
      */
+    @SensitiveIgnore
     private User coolUser;
 
-    @SensitiveEntryCustom
     private User user;
 
-    @SensitiveEntryCustom
     private List<User> userList;
 
-    @SensitiveEntryCustom
     private Set<User> userSet;
 
-    @SensitiveEntryCustom
     private Collection<User> userCollection;
 
-    /**
-     * SensitiveEntry 注解不会生效
-     * Sensitive 注解正常执行
-     */
     @Sensitive(strategy = StrategyPassword.class)
-    @SensitiveEntryCustom
     private String password;
 
     /**

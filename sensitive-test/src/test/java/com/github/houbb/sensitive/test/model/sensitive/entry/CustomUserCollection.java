@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.test.model.sensitive.entry;
 
-import com.github.houbb.sensitive.test.annotation.custom.SensitiveEntryCustom;
 import com.github.houbb.sensitive.test.model.sensitive.User;
 
 import java.util.Collection;
@@ -16,22 +15,14 @@ import java.util.Set;
  */
 public class CustomUserCollection {
 
-    @SensitiveEntryCustom
     private User[] userArray;
 
-    @SensitiveEntryCustom
     private List<User> userList;
 
-    @SensitiveEntryCustom
     private Set<User> userSet;
 
-    @SensitiveEntryCustom
     private Collection<User> userCollection;
 
-    /**
-     * SensitiveEntry 注解不会生效
-     */
-    @SensitiveEntryCustom
     private Map<String, User> userMap;
 
     public User[] getUserArray() {
