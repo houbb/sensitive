@@ -47,9 +47,9 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.13 变更
+## v0.0.14 变更
 
-1. 将深度复制相关接口独立为单独的应用，便于后期拓展。
+1. 升级 FastJson 版本到 v1.2.83，安全问题
 
 # 快速开始
 
@@ -65,7 +65,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.13</version>
+    <version>0.0.14</version>
 </dependency>
 ```
 
@@ -903,5 +903,3 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 # ROAD-MAP
 
 - [ ] 考虑添加针对 MAP 的脱敏支持
-
-- [ ] 考虑对 JSON 的可拓展性，不拘泥于 FastJSON
