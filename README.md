@@ -27,6 +27,8 @@
 
 5. 密码
 
+6. 身份证号
+
 ## 持久化加密
 
 存储的时候上面的信息都需要加密，密码为不可逆加密，其他为可逆加密。
@@ -47,9 +49,9 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.14 变更
+## v0.0.15 变更
 
-1. 升级 FastJson 版本到 v1.2.83，安全问题
+1. 内置身份证号脱敏脱敏策略
 
 # 快速开始
 
@@ -65,9 +67,24 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.14</version>
+    <version>0.0.15</version>
 </dependency>
 ```
+
+## 基本工具类
+
+v0.0.15 放开基本工具类，可以只使用用工具方法。满足更灵活的场景，比如重写 toString() 等。
+
+`SensitiveStrategyUtil` 中内置了几种脱敏工具方法，如下：
+
+| 序号 | 方法 | 说明 | 入参例子 | 出参例子 |
+|:---|:---|:---|:---|:---|
+| 1 | password | 密码 | 123456 | `null` |
+| 2 | chineseName | 中文姓名 | 张三丰 | `张*丰` |
+| 3 | phone | 手机号 | 13012347894 | `130****7894` |
+| 4 | email | 邮箱 | 123456@gmail.com | `123***@gmail.com` |
+| 5 | cardId | 卡号 | 1234888888888888884321 | `123488**********884321` |
+| 6 | idNo | 身份证号 | 130701199310308888 | `130*************88` |
 
 ## 核心 api 简介
 
@@ -82,12 +99,12 @@ Maven 3.x
 
 ## 定义对象
 
-- User.java
+- UserIdNo.java
 
 我们对 password 使用脱敏，指定脱敏策略为 StrategyPassword。(直接返回 null)
 
 ```java
-public class User {
+public class UserIdNo {
 
     @Sensitive(strategy = StrategyChineseName.class)
     private String username;
@@ -104,43 +121,50 @@ public class User {
     @Sensitive(strategy = StrategyPhone.class)
     private String phone;
     
+    @Sensitive(strategy = StrategyIdNo.class)
+    private String idNo;
     //Getter & Setter
     //toString()
 }
 ```
 
-- 测试
+- 数据准备
+
+构建一个最简单的测试对象：
 
 ```java
-    @Test
-    public void UserSensitiveTest() {
-        User user = buildUser();
-        System.out.println("脱敏前原始： " + user);
-        User sensitiveUser = SensitiveUtil.desCopy(user);
-        System.out.println("脱敏对象： " + sensitiveUser);
-        System.out.println("脱敏后原始： " + user);
-    }
-
-    private User buildUser() {
-        User user = new User();
-        user.setUsername("脱敏君");
-        user.setPassword("123456");
-        user.setEmail("12345@qq.com");
-        user.setIdCard("123456190001011234");
-        user.setPhone("18888888888");
-        return user;
-    }
+public static UserIdNo buildUserIdNo() {
+    UserIdNo user = new UserIdNo();
+    user.setUsername("脱敏君");
+    user.setPassword("1234567");
+    user.setEmail("12345@qq.com");
+    user.setIdCard("123456190001011234");
+    user.setPhone("18888888888");
+    user.setIdNo("130701199310308888");
+    return user;
+}
 ```
 
-- 输出信息如下
+- 测试代码
 
 ```
-脱敏前原始： User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}
-脱敏对象： User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}
-脱敏后原始： User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}
+final String originalStr = "UserIdNo{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888', idNo='130701199310308888'}";
+final String sensitiveStr = "UserIdNo{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888', idNo='130*************88'}";
+final String expectSensitiveJson = "{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"idNo\":\"130*************88\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}";
+
+UserIdNo user = DataPrepareTest.buildUserIdNo();
+
+UserIdNo sensitiveUser = SensitiveUtil.desCopy(user);
+Assert.assertEquals(sensitiveStr, sensitiveUser.toString());
+Assert.assertEquals(originalStr, user.toString());
+
+String sensitiveJson = SensitiveUtil.desJson(user);
+Assert.assertEquals(expectSensitiveJson, sensitiveJson);
 ```
 
 我们可以直接利用 `sensitiveUser` 去打印日志信息，而这个对象对于代码其他流程不影响，我们依然可以使用原来的 `user` 对象。
+
+当然，也可以使用 `sensitiveJson` 打印日志信息。
 
 ## 自定义脱敏策略生效的场景
 
@@ -376,6 +400,7 @@ private String name;
 | `@SensitiveStrategyEmail` | `@Sensitive(strategy = StrategyEmail.class)` | email 脱敏 |
 | `@SensitiveStrategyCardId` | `@Sensitive(strategy = StrategyCardId.class)` | 卡号脱敏 |
 | `@SensitiveStrategyPhone` | `@Sensitive(strategy = StrategyPhone.class)` | 手机号脱敏 |
+| `@SensitiveStrategyIdNo` | `@Sensitive(strategy = StrategyIdNo.class)` | 身份证脱敏 |
 
 ## 使用案例
 
@@ -383,47 +408,42 @@ private String name;
 
 与 `@SensitiveEntry` 的结合和 `@Sensitive` 完全一致，此处不再演示。
 
-- SystemBuiltInAt.java
+- SystemBuiltInAtIdNo.java
 
 定义测试对象
 
 ```java
 @SensitiveStrategyPhone
-    private String phone;
+private String phone;
 
-    @SensitiveStrategyPassword
-    private String password;
+@SensitiveStrategyPassword
+private String password;
 
-    @SensitiveStrategyChineseName
-    private String name;
+@SensitiveStrategyChineseName
+private String name;
 
-    @SensitiveStrategyEmail
-    private String email;
+@SensitiveStrategyEmail
+private String email;
 
-    @SensitiveStrategyCardId
-    private String cardId;
-    
-    //Getter Setter
-    //toString()
-}
+@SensitiveStrategyCardId
+private String cardId;
+
+@SensitiveStrategyIdNo
+private String idNo;
 ```
 
 - 对象构建
 
 ```java
-/**
- * 构建系统内置对象
- * @return 构建后的对象
- * @since 0.0.3
- */
-public static SystemBuiltInAt buildSystemBuiltInAt() {
-    SystemBuiltInAt systemBuiltInAt = new SystemBuiltInAt();
-    systemBuiltInAt.setName("脱敏君");
-    systemBuiltInAt.setPassword("1234567");
-    systemBuiltInAt.setEmail("12345@qq.com");
-    systemBuiltInAt.setCardId("123456190001011234");
-    systemBuiltInAt.setPhone("18888888888");
-    return systemBuiltInAt;
+public static SystemBuiltInAtIdNo buildSystemBuiltInAtIdNo() {
+    SystemBuiltInAtIdNo dto = new SystemBuiltInAtIdNo();
+    dto.setName("脱敏君");
+    dto.setPassword("1234567");
+    dto.setEmail("12345@qq.com");
+    dto.setCardId("123456190001011234");
+    dto.setPhone("18888888888");
+    dto.setIdNo("130701199310308888");
+    return dto;
 }
 ```
 
@@ -432,22 +452,20 @@ public static SystemBuiltInAt buildSystemBuiltInAt() {
 测试方法断言如下。
 
 ```java
-/**
- * 普通属性脱敏测试
- */
-@Test
-public void sensitiveTest() {
-    final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
-    final String sensitiveStr = "SystemBuiltInAt{phone='188****8888', password='null', name='脱*君', email='123**@qq.com', cardId='123456**********34'}";
+final String expectOriginalStr = "SystemBuiltInAtIdNo{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234', idNo='130701199310308888'}";
+final String expectSensitiveStr = "SystemBuiltInAtIdNo{phone='188****8888', password='null', name='脱*君', email='123**@qq.com', cardId='123456**********34', idNo='130*************88'}";
+final String expectSensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"idNo\":\"130*************88\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}";
 
-    SystemBuiltInAt systemBuiltInAt = buildSystemBuiltInAt();
-    Assert.assertEquals(originalStr, systemBuiltInAt.toString());
+SystemBuiltInAtIdNo original = DataPrepareTest.buildSystemBuiltInAtIdNo();
+SystemBuiltInAtIdNo sensitive = SensitiveUtil.desCopy(original);
+Assert.assertEquals(expectOriginalStr, original.toString());
+Assert.assertEquals(expectSensitiveStr, sensitive.toString());
 
-    SystemBuiltInAt sensitive = SensitiveUtil.desCopy(systemBuiltInAt);
-    Assert.assertEquals(sensitiveStr, sensitive.toString());
-    Assert.assertEquals(originalStr, systemBuiltInAt.toString());
-}
+String sensitiveJson = SensitiveUtil.desJson(original);
+Assert.assertEquals(expectSensitiveJson, sensitiveJson);
 ```
+
+和上面使用方式类似。`original` 的属性不受任何影响，可以使用 `sensitive` 或者 `sensitiveJson` 输出日志。
 
 ## 与 @Sensitive 混合使用
 
@@ -902,9 +920,9 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
 # ROAD-MAP
 
-- [ ] 针对地址、身份证的默认脱敏策略
+- [x] 针对身份证的默认脱敏策略
 
-- [ ] 脱敏实现独立为工具方法，便于直接使用。
+- [x] 脱敏实现独立为工具方法，便于直接使用。
 
 喜欢重载 toString()，或特殊的场景
 

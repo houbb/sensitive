@@ -6,15 +6,14 @@ import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import java.lang.annotation.*;
 
 /**
- * 密码脱敏注解
+ * 中国身份证号脱敏注解
  * @author binbin.hou
- * date 2019/1/9
- * @since 0.0.2
+ * @since 0.0.15
  */
 @Inherited
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @SensitiveStrategy(SensitiveStrategyBuiltIn.class)
-public @interface SensitiveStrategyPassword {
+public @interface SensitiveStrategyIdNo {
 }

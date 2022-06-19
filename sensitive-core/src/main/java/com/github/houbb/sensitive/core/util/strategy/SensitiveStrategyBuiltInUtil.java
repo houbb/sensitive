@@ -36,6 +36,7 @@ public final class SensitiveStrategyBuiltInUtil {
         MAP.put(SensitiveStrategyPhone.class, new StrategyPhone());
         MAP.put(SensitiveStrategyChineseName.class, new StrategyChineseName());
         MAP.put(SensitiveStrategyEmail.class, new StrategyEmail());
+        MAP.put(SensitiveStrategyIdNo.class, new StrategyIdNo());
     }
 
     /**

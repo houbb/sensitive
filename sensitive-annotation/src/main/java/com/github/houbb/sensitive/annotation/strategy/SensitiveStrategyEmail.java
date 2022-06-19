@@ -6,7 +6,7 @@ import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import java.lang.annotation.*;
 
 /**
- * 手机号脱敏注解
+ * 邮箱脱敏注解
  * @author binbin.hou
  * date 2019/1/9
  * @since 0.0.2

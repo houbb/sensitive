@@ -29,6 +29,10 @@ public final class SensitiveStrategyUtil {
      * @return 结果
      */
     public static String phone(final String phone) {
+        if(StringUtil.isEmpty(phone)) {
+            return phone;
+        }
+
         final int prefixLength = 3;
         final String middle = "****";
         return StringUtil.buildString(phone, middle, prefixLength);
@@ -90,9 +94,33 @@ public final class SensitiveStrategyUtil {
      * @return 脱敏结果
      */
     public static String cardId(final String cardId) {
+        if(StringUtil.isEmpty(cardId)) {
+            return cardId;
+        }
+
         final int prefixLength = 6;
         final String middle = "**********";
         return StringUtil.buildString(cardId, middle, prefixLength);
+    }
+
+    /**
+     * 脱敏身份证（兼容15位和18位）
+     * @param idNo 身份证
+     * @return 脱敏结果
+     * @since 0.0.15
+     */
+    public static String idNo(final String idNo) {
+        if(StringUtil.isEmpty(idNo)) {
+            return idNo;
+        }
+
+        final int prefixLength = 3;
+        String middle = "*************";
+        //兼容 15 位身份证
+        if(idNo.length() == 15) {
+            middle = "**********";
+        }
+        return StringUtil.buildString(idNo, middle, prefixLength);
     }
 
 }

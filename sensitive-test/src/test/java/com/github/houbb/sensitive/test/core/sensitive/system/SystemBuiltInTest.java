@@ -4,6 +4,7 @@ import com.github.houbb.sensitive.core.api.SensitiveUtil;
 import com.github.houbb.sensitive.test.core.DataPrepareTest;
 import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAt;
 import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAtEntry;
+import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAtIdNo;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -74,6 +75,25 @@ public class SystemBuiltInTest {
 
         Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(entry));
         Assert.assertEquals(originalStr, entry.toString());
+    }
+
+    /**
+     * 普通属性脱敏测试
+     * @since 0.0.15
+     */
+    @Test
+    public void sensitiveTest2() {
+        final String expectOriginalStr = "SystemBuiltInAtIdNo{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234', idNo='130701199310308888'}";
+        final String expectSensitiveStr = "SystemBuiltInAtIdNo{phone='188****8888', password='null', name='脱*君', email='123**@qq.com', cardId='123456**********34', idNo='130*************88'}";
+        final String expectSensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"idNo\":\"130*************88\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}";
+
+        SystemBuiltInAtIdNo original = DataPrepareTest.buildSystemBuiltInAtIdNo();
+        SystemBuiltInAtIdNo sensitive = SensitiveUtil.desCopy(original);
+        Assert.assertEquals(expectOriginalStr, original.toString());
+        Assert.assertEquals(expectSensitiveStr, sensitive.toString());
+
+        String sensitiveJson = SensitiveUtil.desJson(original);
+        Assert.assertEquals(expectSensitiveJson, sensitiveJson);
     }
 
 }

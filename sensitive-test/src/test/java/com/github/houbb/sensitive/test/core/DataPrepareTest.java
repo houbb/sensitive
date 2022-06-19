@@ -2,9 +2,11 @@ package com.github.houbb.sensitive.test.core;
 
 
 import com.github.houbb.sensitive.test.model.sensitive.User;
+import com.github.houbb.sensitive.test.model.sensitive.UserIdNo;
 import com.github.houbb.sensitive.test.model.sensitive.entry.*;
 import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAt;
 import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAtEntry;
+import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInAtIdNo;
 import com.github.houbb.sensitive.test.model.sensitive.system.SystemBuiltInMixed;
 
 import java.util.*;
@@ -233,6 +235,40 @@ public final class DataPrepareTest {
         user2.setUsername("集合测试");
         userList.add(user2);
         return userList;
+    }
+
+    /**
+     * 构建测试用户对象
+     *
+     * @return 创建后的对象
+     * @since 0.0.15
+     */
+    public static UserIdNo buildUserIdNo() {
+        UserIdNo user = new UserIdNo();
+        user.setUsername("脱敏君");
+        user.setPassword("1234567");
+        user.setEmail("12345@qq.com");
+        user.setIdCard("123456190001011234");
+        user.setPhone("18888888888");
+        user.setIdNo("130701199310308888");
+        return user;
+    }
+
+    /**
+     * 构建系统内置对象
+     *
+     * @return 构建后的对象
+     * @since 0.0.15
+     */
+    public static SystemBuiltInAtIdNo buildSystemBuiltInAtIdNo() {
+        SystemBuiltInAtIdNo dto = new SystemBuiltInAtIdNo();
+        dto.setName("脱敏君");
+        dto.setPassword("1234567");
+        dto.setEmail("12345@qq.com");
+        dto.setCardId("123456190001011234");
+        dto.setPhone("18888888888");
+        dto.setIdNo("130701199310308888");
+        return dto;
     }
 
 }

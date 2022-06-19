@@ -46,4 +46,15 @@ public class SensitiveStrategyUtilTest {
         Assert.assertEquals("123488**********884321", sensitive);
     }
 
+    /**
+     * 身份证
+     * @since 0.0.15
+     */
+    @Test
+    public void idNoTest() {
+        final String cardId = "130701199310308888";
+        final String sensitive = SensitiveStrategyUtil.idNo(cardId);
+        Assert.assertEquals("130*************88", sensitive);
+    }
+
 }
