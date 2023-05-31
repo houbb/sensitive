@@ -47,7 +47,7 @@
 
 ## 变更日志
 
-> [变更日志](CHANGE_LOG.md)
+> [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
 
 # 快速开始
 
