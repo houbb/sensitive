@@ -25,7 +25,7 @@ public class SensitiveUtilCollectionTest {
         List<User> userList = DataPrepareTest.buildUserList();
 
         List<User> sensitiveList = SensitiveUtil.desCopyCollection(userList);
-        Assert.assertEquals("[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, User{username='集**试', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]", sensitiveList.toString());
+        Assert.assertEquals("[User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}, User{username='集***', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}]", sensitiveList.toString());
     }
 
     /**
@@ -50,7 +50,7 @@ public class SensitiveUtilCollectionTest {
         List<User> userList = DataPrepareTest.buildUserList();
 
         List<String> sensitiveJsonList = SensitiveUtil.desJsonCollection(userList);
-        Assert.assertEquals("[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}, {\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"集**试\"}]", sensitiveJsonList.toString());
+        Assert.assertEquals("[{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"}, {\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"集***\"}]", sensitiveJsonList.toString());
     }
 
     /**

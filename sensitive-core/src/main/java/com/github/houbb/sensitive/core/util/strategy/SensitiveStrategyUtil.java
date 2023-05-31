@@ -7,9 +7,13 @@ import com.github.houbb.heaven.util.lang.StringUtil;
  * 脱敏策略工具类
  * （1）提供常见的脱敏策略
  * （2）主要供单独的字符串处理使用
+ *
+ * 不利于后续拓展，避免直接使用工具类
+ *
  * @author binbin.hou
  * @since 0.0.6
  */
+@Deprecated
 public final class SensitiveStrategyUtil {
 
     private SensitiveStrategyUtil(){}

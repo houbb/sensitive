@@ -1,20 +1,22 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
-import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
-import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 身份证号脱敏
  * @author binbin.hou
  * @since 0.0.15
  */
-public class StrategyIdNo implements IStrategy {
+public class StrategyIdNo extends AbstractStringStrategy {
 
     @Override
-    public Object des(Object original, IContext context) {
-        return SensitiveStrategyUtil.idNo(ObjectUtil.objectToString(original));
+    protected int getBeforeMaskLen(Object original, IContext context, char[] chars) {
+        return 1;
+    }
+
+    @Override
+    protected int getAfterMaskLen(Object original, IContext context, char[] chars) {
+        return 1;
     }
 
 }

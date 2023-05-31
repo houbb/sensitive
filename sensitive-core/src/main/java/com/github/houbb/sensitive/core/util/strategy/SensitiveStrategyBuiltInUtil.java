@@ -37,6 +37,14 @@ public final class SensitiveStrategyBuiltInUtil {
         MAP.put(SensitiveStrategyChineseName.class, new StrategyChineseName());
         MAP.put(SensitiveStrategyEmail.class, new StrategyEmail());
         MAP.put(SensitiveStrategyIdNo.class, new StrategyIdNo());
+        MAP.put(SensitiveStrategyAddress.class, new StrategyAddress());
+        MAP.put(SensitiveStrategyBirthday.class, new StrategyBirthday());
+        MAP.put(SensitiveStrategyGps.class, new StrategyGps());
+        MAP.put(SensitiveStrategyIp.class, new StrategyIp());
+        MAP.put(SensitiveStrategyMaskAll.class, new StrategyMaskAll());
+        MAP.put(SensitiveStrategyMaskHalf.class, new StrategyMaskHalf());
+        MAP.put(SensitiveStrategyMaskRange.class, new StrategyMaskRange());
+        MAP.put(SensitiveStrategyPassport.class, new StrategyPassport());
     }
 
     /**

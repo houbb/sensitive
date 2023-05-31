@@ -7,7 +7,7 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.15</version>
+    <version>1.0.0</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
@@ -35,7 +35,7 @@
         <project.compiler.level>1.7</project.compiler.level>
 
         <!--============================== INTER ==============================-->
-        <heaven.version>0.1.162</heaven.version>
+        <heaven.version>0.2.7</heaven.version>
         <deep-copy.version>0.0.1</deep-copy.version>
 
         <!--============================== OTHER ==============================-->

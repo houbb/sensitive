@@ -1,17 +1,13 @@
 # 项目介绍
 
-日志脱敏是常见的安全需求。普通的基于工具类方法的方式，对代码的入侵性太强。编写起来又特别麻烦。
+日志脱敏是常见的安全需求。普通的基于工具类方法的方式，对代码的入侵性太强，编写起来又特别麻烦。
 
 本项目提供基于注解的方式，并且内置了常见的脱敏方式，便于开发。
-
-用户也可以基于自己的实际需要，自定义注解。
 
 [![Build Status](https://travis-ci.com/houbb/sensitive.svg?branch=master)](https://travis-ci.com/houbb/sensitive)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/sensitive/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/sensitive)
 [![](https://img.shields.io/badge/license-Apache2-FF0080.svg)](https://github.com/houbb/sensitive/blob/master/LICENSE.txt)
 [![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/houbb/sensitive)
-
-> [变更日志](CHANGE_LOG.md)
 
 ## 日志脱敏
 
@@ -41,7 +37,7 @@
 
 2. 可以自定义策略实现，策略生效条件。
 
-3. 常见的脱敏内置方案。
+3. 内置常见的十几种脱敏内置方案。
 
 4. java 深拷贝，且原始对象不用实现任何接口。
 
@@ -49,9 +45,9 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
-## v0.0.15 变更
+## 变更日志
 
-1. 内置身份证号脱敏脱敏策略
+> [变更日志](CHANGE_LOG.md)
 
 # 快速开始
 
@@ -67,24 +63,9 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>0.0.15</version>
+    <version>1.0.0</version>
 </dependency>
 ```
-
-## 基本工具类
-
-v0.0.15 放开基本工具类，可以只使用用工具方法。满足更灵活的场景，比如重写 toString() 等。
-
-`SensitiveStrategyUtil` 中内置了几种脱敏工具方法，如下：
-
-| 序号 | 方法 | 说明 | 入参例子 | 出参例子 |
-|:---|:---|:---|:---|:---|
-| 1 | password | 密码 | 123456 | `null` |
-| 2 | chineseName | 中文姓名 | 张三丰 | `张*丰` |
-| 3 | phone | 手机号 | 13012347894 | `130****7894` |
-| 4 | email | 邮箱 | 123456@gmail.com | `123***@gmail.com` |
-| 5 | cardId | 卡号 | 1234888888888888884321 | `123488**********884321` |
-| 6 | idNo | 身份证号 | 130701199310308888 | `130*************88` |
 
 ## 核心 api 简介
 
@@ -99,30 +80,55 @@ v0.0.15 放开基本工具类，可以只使用用工具方法。满足更灵活
 
 ## 定义对象
 
-- UserIdNo.java
+- UserAnnotationBean.java
 
-我们对 password 使用脱敏，指定脱敏策略为 StrategyPassword。(直接返回 null)
+通过注解，指定每一个字段的脱敏策略。
 
 ```java
-public class UserIdNo {
+public class UserAnnotationBean {
 
-    @Sensitive(strategy = StrategyChineseName.class)
+    @SensitiveStrategyChineseName
     private String username;
-    
-    @Sensitive(strategy = StrategyCardId.class)
-    private String idCard;
-    
-    @Sensitive(strategy = StrategyPassword.class)
+
+    @SensitiveStrategyPassword
     private String password;
-    
-    @Sensitive(strategy = StrategyEmail.class)
-    private String email;
-    
-    @Sensitive(strategy = StrategyPhone.class)
-    private String phone;
-    
-    @Sensitive(strategy = StrategyIdNo.class)
+
+    @SensitiveStrategyPassport
+    private String passport;
+
+    @SensitiveStrategyIdNo
     private String idNo;
+
+    @SensitiveStrategyCardId
+    private String bandCardId;
+
+    @SensitiveStrategyPhone
+    private String phone;
+
+    @SensitiveStrategyEmail
+    private String email;
+
+    @SensitiveStrategyAddress
+    private String address;
+
+    @SensitiveStrategyBirthday
+    private String birthday;
+
+    @SensitiveStrategyGps
+    private String gps;
+
+    @SensitiveStrategyIp
+    private String ip;
+
+    @SensitiveStrategyMaskAll
+    private String maskAll;
+
+    @SensitiveStrategyMaskHalf
+    private String maskHalf;
+
+    @SensitiveStrategyMaskRange
+    private String maskRange;
+
     //Getter & Setter
     //toString()
 }
@@ -133,38 +139,113 @@ public class UserIdNo {
 构建一个最简单的测试对象：
 
 ```java
-public static UserIdNo buildUserIdNo() {
-    UserIdNo user = new UserIdNo();
-    user.setUsername("脱敏君");
-    user.setPassword("1234567");
-    user.setEmail("12345@qq.com");
-    user.setIdCard("123456190001011234");
-    user.setPhone("18888888888");
-    user.setIdNo("130701199310308888");
-    return user;
-}
+UserAnnotationBean bean  = new UserAnnotationBean();
+bean.setUsername("张三");
+bean.setPassword("123456");
+bean.setPassport("CN1234567");
+bean.setPhone("13066668888");
+bean.setAddress("中国上海市浦东新区外滩18号");
+bean.setEmail("whatanice@code.com");
+bean.setBirthday("20220831");
+bean.setGps("66.888888");
+bean.setIp("127.0.0.1");
+bean.setMaskAll("可恶啊我会被全部掩盖");
+bean.setMaskHalf("还好我只会被掩盖一半");
+bean.setMaskRange("我比较灵活指定掩盖范围");
+bean.setBandCardId("666123456789066");
+bean.setIdNo("360123202306018888");
 ```
 
 - 测试代码
 
 ```
-final String originalStr = "UserIdNo{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888', idNo='130701199310308888'}";
-final String sensitiveStr = "UserIdNo{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888', idNo='130*************88'}";
-final String expectSensitiveJson = "{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"idNo\":\"130*************88\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}";
+final String originalStr = "UserAnnotationBean{username='张三', password='123456', passport='CN1234567', idNo='360123202306018888', bandCardId='666123456789066', phone='13066668888', email='whatanice@code.com', address='中国上海市浦东新区外滩18号', birthday='20220831', gps='66.888888', ip='127.0.0.1', maskAll='可恶啊我会被全部掩盖', maskHalf='还好我只会被掩盖一半', maskRange='我比较灵活指定掩盖范围'}";
+final String sensitiveStr = "UserAnnotationBean{username='张*', password='null', passport='CN*****67', idNo='3****************8', bandCardId='666123*******66', phone='1306****888', email='wh************.com', address='中国上海********8号', birthday='20*****1', gps='66*****88', ip='127***0.1', maskAll='**********', maskHalf='还好我只会*****', maskRange='我*********围'}";
+final String expectSensitiveJson = "{\"address\":\"中国上海********8号\",\"bandCardId\":\"666123*******66\",\"birthday\":\"20*****1\",\"email\":\"wh************.com\",\"gps\":\"66*****88\",\"idNo\":\"3****************8\",\"ip\":\"127***0.1\",\"maskAll\":\"**********\",\"maskHalf\":\"还好我只会*****\",\"maskRange\":\"我*********围\",\"passport\":\"CN*****67\",\"phone\":\"1306****888\",\"username\":\"张*\"}";
 
-UserIdNo user = DataPrepareTest.buildUserIdNo();
-
-UserIdNo sensitiveUser = SensitiveUtil.desCopy(user);
+UserAnnotationBean sensitiveUser = SensitiveUtil.desCopy(bean);
 Assert.assertEquals(sensitiveStr, sensitiveUser.toString());
-Assert.assertEquals(originalStr, user.toString());
+Assert.assertEquals(originalStr, bean.toString());
 
-String sensitiveJson = SensitiveUtil.desJson(user);
+String sensitiveJson = SensitiveUtil.desJson(bean);
 Assert.assertEquals(expectSensitiveJson, sensitiveJson);
 ```
 
 我们可以直接利用 `sensitiveUser` 去打印日志信息，而这个对象对于代码其他流程不影响，我们依然可以使用原来的 `user` 对象。
 
 当然，也可以使用 `sensitiveJson` 打印日志信息。
+
+# @Sensitive 注解
+
+## 说明
+
+`@SensitiveStrategyChineseName` 这种注解是为了便于用户使用，本质上等价于 `@Sensitive(strategy = StrategyChineseName.class)`。
+
+`@Sensitive` 注解可以指定对应的脱敏策略。
+
+## 内置注解与映射
+
+| 编号 | 注解                              | 等价 @Sensitive                                      | 备注       |
+|:---|:--------------------------------|:---------------------------------------------------|:---------|
+| 1  | `@SensitiveStrategyChineseName` | `@Sensitive(strategy = StrategyChineseName.class)` | 中文名称脱敏   |
+| 2  | `@SensitiveStrategyPassword`    | `@Sensitive(strategy = StrategyPassword.class)`    | 密码脱敏     |
+| 3  | `@SensitiveStrategyEmail`       | `@Sensitive(strategy = StrategyEmail.class)`       | email 脱敏 |
+| 4  | `@SensitiveStrategyCardId`      | `@Sensitive(strategy = StrategyCardId.class)`      | 卡号脱敏     |
+| 5  | `@SensitiveStrategyPhone`       | `@Sensitive(strategy = StrategyPhone.class)`       | 手机号脱敏    |
+| 6  | `@SensitiveStrategyIdNo`        | `@Sensitive(strategy = StrategyIdNo.class)`        | 身份证脱敏    |
+| 6  | `@SensitiveStrategyAddress`     | `@Sensitive(strategy = StrategyAddress.class)`     | 地址脱敏     |
+| 7  | `@SensitiveStrategyGps`         | `@Sensitive(strategy = StrategyGps.class)`     | GPS 脱敏   |
+| 8  | `@SensitiveStrategyIp`          | `@Sensitive(strategy = StrategyIp.class)`     | IP 脱敏    |
+| 9  | `@SensitiveStrategyBirthday`    | `@Sensitive(strategy = StrategyBirthday.class)`     | 生日脱敏     |
+| 10 | `@SensitiveStrategyPassport`    | `@Sensitive(strategy = StrategyPassport.class)`     | 护照脱敏     |
+| 11 | `@SensitiveStrategyMaskAll`     | `@Sensitive(strategy = StrategyMaskAll.class)`     | 全部脱敏     |
+| 12 | `@SensitiveStrategyMaskHalf`    | `@Sensitive(strategy = StrategyMaskHalf.class)`     | 一半脱敏     |
+| 13 | `@SensitiveStrategyMaskRange`   | `@Sensitive(strategy = StrategyMaskRange.class)`     | 指定范围脱敏   |
+
+## @Sensitive 定义
+
+```java
+@Inherited
+@Documented
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Sensitive {
+
+    /**
+     * 注解生效的条件
+     * @return 条件对应的实现类
+     */
+    Class<? extends ICondition> condition() default ConditionAlwaysTrue.class;
+
+    /**
+     * 执行的策略
+     * @return 策略对应的类型
+     */
+    Class<? extends IStrategy> strategy();
+
+}
+```
+
+## 与 @Sensitive 混合使用
+
+如果你将新增的注解 `@SensitiveStrategyChineseName` 与 `@Sensitive` 同时在一个字段上使用。
+
+为了简化逻辑，优先选择执行 `@Sensitive`，如果 `@Sensitive` 执行脱敏，
+那么 `@SensitiveStrategyChineseName` 将不会生效。
+
+如：
+
+```java
+/**
+ * 测试字段
+ * 1.当多种注解混合的时候，为了简化逻辑，优先选择 @Sensitive 注解。
+ */
+@SensitiveStrategyChineseName
+@Sensitive(strategy = StrategyPassword.class)
+private String testField;
+```
+
+# 更多特性
 
 ## 自定义脱敏策略生效的场景
 
@@ -200,28 +281,6 @@ public class ConditionFooPassword implements ICondition {
 ```
 
 也就是只有当密码不是 123456 时密码脱敏策略才会生效。
-
-## 针对单个字段
-
-上面的例子是基于注解式的编程，如果你只是单个字段。比如 
-
-- singleSensitiveTest
-
-```java
-@Test
-public void singleSensitiveTest() {
-    final String email = "123456@qq.com";
-    IStrategy strategy = new StrategyEmail();
-    final String emailSensitive = (String) strategy.des(email, null);
-    System.out.println("脱敏后的邮箱：" + emailSensitive);
-}
-```
-
-- 日志信息
-
-```
-脱敏后的邮箱：123***@qq.com
-```
 
 ## 属性为集合或者对象
 
@@ -260,53 +319,9 @@ public class UserEntryBaseType {
 }
 ```
 
-- 构建对象
-
-```java
-/**
- * 构建用户-属性为列表，列表中为基础属性
- * @return 构建嵌套信息
- * @since 0.0.2
- */
-public static UserEntryBaseType buildUserEntryBaseType() {
-    UserEntryBaseType userEntryBaseType = new UserEntryBaseType();
-    userEntryBaseType.setChineseNameList(Arrays.asList("盘古", "女娲", "伏羲"));
-    userEntryBaseType.setChineseNameArray(new String[]{"盘古", "女娲", "伏羲"});
-    return userEntryBaseType;
-}
-```
-
-- 测试演示
-
-```java
-/**
- * 用户属性中有集合或者map，集合中属性是基础类型-脱敏测试
- * @since 0.0.2
- */
-@Test
-public void sensitiveEntryBaseTypeTest() {
-    UserEntryBaseType userEntryBaseType = DataPrepareTest.buildUserEntryBaseType();
-    System.out.println("脱敏前原始： " + userEntryBaseType);
-    UserEntryBaseType sensitive = SensitiveUtil.desCopy(userEntryBaseType);
-    System.out.println("脱敏对象： " + sensitive);
-    System.out.println("脱敏后原始： " + userEntryBaseType);
-}
-```
-
-- 日志信息
-
-```
-脱敏前原始： UserEntryBaseType{chineseNameList=[盘古, 女娲, 伏羲], chineseNameArray=[盘古, 女娲, 伏羲]}
-脱敏对象： UserEntryBaseType{chineseNameList=[*古, *娲, *羲], chineseNameArray=[*古, *娲, *羲]}
-脱敏后原始： UserEntryBaseType{chineseNameList=[盘古, 女娲, 伏羲], chineseNameArray=[盘古, 女娲, 伏羲]}
-```
-
 ### 放在对象属性上
 
-- 演示对象
-
-这里的 User 和上面的 User 对象一致。
-
+例子如下：
 
 ```java
 public class UserEntryObject {
@@ -322,168 +337,6 @@ public class UserEntryObject {
     
     //...
 }
-```
-
-- 对象构建
-
-```java
-/**
- * 构建用户-属性为列表，数组。列表中为对象。
- * @return 构建嵌套信息
- * @since 0.0.2
- */
-public static UserEntryObject buildUserEntryObject() {
-    UserEntryObject userEntryObject = new UserEntryObject();
-    User user = buildUser();
-    User user2 = buildUser();
-    User user3 = buildUser();
-    userEntryObject.setUser(user);
-    userEntryObject.setUserList(Arrays.asList(user2));
-    userEntryObject.setUserArray(new User[]{user3});
-    return userEntryObject;
-}
-```
-
-- 测试演示
-
-```java
-/**
- * 用户属性中有集合或者对象，集合中属性是对象-脱敏测试
- * @since 0.0.2
- */
-@Test
-public void sensitiveEntryObjectTest() {
-    UserEntryObject userEntryObject = DataPrepareTest.buildUserEntryObject();
-    System.out.println("脱敏前原始： " + userEntryObject);
-    UserEntryObject sensitiveUserEntryObject = SensitiveUtil.desCopy(userEntryObject);
-    System.out.println("脱敏对象： " + sensitiveUserEntryObject);
-    System.out.println("脱敏后原始： " + userEntryObject);
-}
-```
-
-- 测试结果
-
-```java
-脱敏前原始： UserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}
-脱敏对象： UserEntryObject{user=User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, userList=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userArray=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]}
-脱敏后原始： UserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}
-```
-
-# 系统内置脱敏策略
-
-## 引入原因
-
-如果你看了前面的内容，会看到这样的代码：
-
-```java
-@Sensitive(strategy = StrategyChineseName.class)
-private String username;
-```
-
-但是这种需求很常见，就引入更简单的写法，如下：
-
-```java
-@SensitiveStrategyChineseName
-private String name;
-```
-
-和上面效果是一致的。
-
-不足：无法灵活指定生效条件，下个版本准备解决这个问题。
-
-## 系统内置注解
-
-| 注解 | 等价 @Sensitive | 备注 |
-|:-------|:------|:------|
-| `@SensitiveStrategyChineseName` | `@Sensitive(strategy = StrategyChineseName.class)` | 中文名称脱敏 |
-| `@SensitiveStrategyPassword` | `@Sensitive(strategy = StrategyPassword.class)` |  密码脱敏 |
-| `@SensitiveStrategyEmail` | `@Sensitive(strategy = StrategyEmail.class)` | email 脱敏 |
-| `@SensitiveStrategyCardId` | `@Sensitive(strategy = StrategyCardId.class)` | 卡号脱敏 |
-| `@SensitiveStrategyPhone` | `@Sensitive(strategy = StrategyPhone.class)` | 手机号脱敏 |
-| `@SensitiveStrategyIdNo` | `@Sensitive(strategy = StrategyIdNo.class)` | 身份证脱敏 |
-
-## 使用案例
-
-使用的方式和 `@Sensitive` 是一样的，只是一种简化，方便日常使用。
-
-与 `@SensitiveEntry` 的结合和 `@Sensitive` 完全一致，此处不再演示。
-
-- SystemBuiltInAtIdNo.java
-
-定义测试对象
-
-```java
-@SensitiveStrategyPhone
-private String phone;
-
-@SensitiveStrategyPassword
-private String password;
-
-@SensitiveStrategyChineseName
-private String name;
-
-@SensitiveStrategyEmail
-private String email;
-
-@SensitiveStrategyCardId
-private String cardId;
-
-@SensitiveStrategyIdNo
-private String idNo;
-```
-
-- 对象构建
-
-```java
-public static SystemBuiltInAtIdNo buildSystemBuiltInAtIdNo() {
-    SystemBuiltInAtIdNo dto = new SystemBuiltInAtIdNo();
-    dto.setName("脱敏君");
-    dto.setPassword("1234567");
-    dto.setEmail("12345@qq.com");
-    dto.setCardId("123456190001011234");
-    dto.setPhone("18888888888");
-    dto.setIdNo("130701199310308888");
-    return dto;
-}
-```
-
-- 测试方法
-
-测试方法断言如下。
-
-```java
-final String expectOriginalStr = "SystemBuiltInAtIdNo{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234', idNo='130701199310308888'}";
-final String expectSensitiveStr = "SystemBuiltInAtIdNo{phone='188****8888', password='null', name='脱*君', email='123**@qq.com', cardId='123456**********34', idNo='130*************88'}";
-final String expectSensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"idNo\":\"130*************88\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}";
-
-SystemBuiltInAtIdNo original = DataPrepareTest.buildSystemBuiltInAtIdNo();
-SystemBuiltInAtIdNo sensitive = SensitiveUtil.desCopy(original);
-Assert.assertEquals(expectOriginalStr, original.toString());
-Assert.assertEquals(expectSensitiveStr, sensitive.toString());
-
-String sensitiveJson = SensitiveUtil.desJson(original);
-Assert.assertEquals(expectSensitiveJson, sensitiveJson);
-```
-
-和上面使用方式类似。`original` 的属性不受任何影响，可以使用 `sensitive` 或者 `sensitiveJson` 输出日志。
-
-## 与 @Sensitive 混合使用
-
-如果你将新增的注解 `@SensitiveStrategyChineseName` 与 `@Sensitive` 同时在一个字段上使用。
-
-为了简化逻辑，优先选择执行 `@Sensitive`，如果 `@Sensitive` 执行脱敏，
-那么 `@SensitiveStrategyChineseName` 将不会生效。  
-
-如：
-
-```java
-/**
- * 测试字段
- * 1.当多种注解混合的时候，为了简化逻辑，优先选择 @Sensitive 注解。
- */
-@SensitiveStrategyChineseName
-@Sensitive(strategy = StrategyPassword.class)
-private String testField;
 ```
 
 # 自定义注解
@@ -657,9 +510,6 @@ private CustomPasswordModel buildCustomPasswordModel(){
  * 1. 如果属性为 Iterable 的子类集合，则当做列表处理，遍历其中的对象
  * 2. 如果是普通对象，则处理对象中的脱敏信息
  * 3. 如果是普通字段/MAP，则不做处理
- *
- * @author dev-sxl
- * date 2020-09-14
  * @since 0.0.11
  */
 @Inherited
@@ -691,64 +541,6 @@ public class CustomUserEntryObject {
 }
 ```
 
-### 测试
-
-```java
-/**
- * 用户属性中有集合或者对象，集合中属性是对象-脱敏测试
- * @since 0.0.11
- */
-@Test
-public void customSensitiveEntryObjectTest() {
-    final String originalStr = "CustomUserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}";
-    final String sensitiveStr = "CustomUserEntryObject{user=User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, userList=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userArray=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]}";
-
-    CustomUserEntryObject userEntryObject = DataPrepareTest.buildCustomUserEntryObject();
-    Assert.assertEquals(originalStr, userEntryObject.toString());
-
-    CustomUserEntryObject sensitiveUserEntryObject = SensitiveUtil.desCopy(userEntryObject);
-    Assert.assertEquals(sensitiveStr, sensitiveUserEntryObject.toString());
-    Assert.assertEquals(originalStr, userEntryObject.toString());
-}
-```
-
-构建对象的方法如下：
-
-```java
-/**
- * 构建用户-属性为列表，数组。列表中为对象。
- *
- * @return 构建嵌套信息
- * @since 0.0.11
- */
-public static CustomUserEntryObject buildCustomUserEntryObject() {
-    CustomUserEntryObject userEntryObject = new CustomUserEntryObject();
-    User user = buildUser();
-    User user2 = buildUser();
-    User user3 = buildUser();
-    userEntryObject.setUser(user);
-    userEntryObject.setUserList(Arrays.asList(user2));
-    userEntryObject.setUserArray(new User[]{user3});
-    return userEntryObject;
-}
-
-/**
- * 构建测试用户对象
- *
- * @return 创建后的对象
- * @since 0.0.1
- */
-public static User buildUser() {
-    User user = new User();
-    user.setUsername("脱敏君");
-    user.setPassword("1234567");
-    user.setEmail("12345@qq.com");
-    user.setIdCard("123456190001011234");
-    user.setPhone("18888888888");
-    return user;
-}
-```
-
 # 生成脱敏后的 JSON
 
 ## 说明
@@ -776,15 +568,12 @@ public static String desJson(Object object)
 此处只展示最基本的使用。
 
 ```java
-@Test
-public void sensitiveJsonTest() {
-    final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
-    final String sensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"123**@qq.com\",\"name\":\"脱*君\",\"phone\":\"188****8888\"}";
+final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
+final String sensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"name\":\"脱**\",\"phone\":\"1888****888\"}";
 
-    SystemBuiltInAt systemBuiltInAt = DataPrepareTest.buildSystemBuiltInAt();
-    Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(systemBuiltInAt));
-    Assert.assertEquals(originalStr, systemBuiltInAt.toString());
-}
+SystemBuiltInAt systemBuiltInAt = DataPrepareTest.buildSystemBuiltInAt();
+Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(systemBuiltInAt));
+Assert.assertEquals(originalStr, systemBuiltInAt.toString());
 ```
 
 ## 注意
@@ -798,56 +587,20 @@ FastJSON 在序列化本身存在一定限制。当对象中有集合，集合�
 本测试案例可见测试代码。
 
 ```java
-@Test
-public void sensitiveUserCollectionJsonTest() {
-    final String originalStr = "UserCollection{userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userSet=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userCollection=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
-    final String commonJson = "{\"userArray\":[{\"email\":\"12345@qq.com\",\"idCard\":\"123456190001011234\",\"password\":\"1234567\",\"phone\":\"18888888888\",\"username\":\"脱敏君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
-    final String sensitiveJson = "{\"userArray\":[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
+final String originalStr = "UserCollection{userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userSet=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userCollection=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
+final String commonJson = "{\"userArray\":[{\"email\":\"12345@qq.com\",\"idCard\":\"123456190001011234\",\"password\":\"1234567\",\"phone\":\"18888888888\",\"username\":\"脱敏君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
+final String sensitiveJson = "{\"userArray\":[{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
 
-    UserCollection userCollection = DataPrepareTest.buildUserCollection();
+UserCollection userCollection = DataPrepareTest.buildUserCollection();
 
-    Assert.assertEquals(commonJson, JSON.toJSONString(userCollection));
-    Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(userCollection));
-    Assert.assertEquals(originalStr, userCollection.toString());
-}
+Assert.assertEquals(commonJson, JSON.toJSONString(userCollection));
+Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(userCollection));
+Assert.assertEquals(originalStr, userCollection.toString());
 ```
 
 ### 解决方案
 
 如果有这种需求，建议使用原来的 `desCopy(Object)`。
-
-# 针对集合的处理
-
-`v0.0.7` 支持的新特性，便于用户处理集合相关的脱敏。
-
-如果列表为空，则直接返回空列表。
-
-更多测试代码参见 [SensitiveUtilCollectionTest.java](https://github.com/houbb/sensitive/blob/release_0.0.7/sensitive-test/src/test/java/com/github/houbb/sensitive/test/core/sensitive/collection/SensitiveUtilCollectionTest.java)
-
-## 集合脱敏-对象拷贝
-
-- List<T> desCopyCollection(Collection<T> collection)
-
-返回脱敏后的对象集合
-
-```java
-List<User> userList = DataPrepareTest.buildUserList();
-List<User> sensitiveList = SensitiveUtil.desCopyCollection(userList);
-Assert.assertEquals("[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, User{username='集**试', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]", sensitiveList.toString());
-```
-
-## 集合脱敏-json
-
-- List<String> desJsonCollection(Collection<?> collection)
-
-返回脱敏后的 json 列表
-
-```java
-List<User> userList = DataPrepareTest.buildUserList();
-
-List<String> sensitiveJsonList = SensitiveUtil.desJsonCollection(userList);
-Assert.assertEquals("[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}, {\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"集**试\"}]", sensitiveJsonList.toString());
-```
 
 # 脱敏引导类
 
@@ -908,16 +661,6 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
 > [自定义深度复制](https://github.com/houbb/deep-copy#%E8%87%AA%E5%AE%9A%E4%B9%89)
 
-# 需求 & BUGS
-
-> [issues](https://github.com/houbb/sensitive/issues)
-
-# 欢迎加入开发
-
-如果你对本项目有兴趣，并且对代码有一定追求，可以申请加入本项目开发。
-
-如果你善于写文档，或者愿意补全测试案例，也非常欢迎加入。
-
 # ROAD-MAP
 
 - [x] 针对身份证的默认脱敏策略
@@ -927,3 +670,5 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 喜欢重载 toString()，或特殊的场景
 
 - [ ] 考虑添加针对 MAP 的脱敏支持
+
+- [ ] log4j2 等日志组件的脱敏策略

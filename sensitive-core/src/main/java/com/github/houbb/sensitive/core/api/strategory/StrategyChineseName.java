@@ -1,9 +1,6 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
-import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
-import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 中文名称脱敏策略：
@@ -14,11 +11,16 @@ import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
  * @author binbin.hou
  * date 2019/1/2
  */
-public class StrategyChineseName implements IStrategy {
+public class StrategyChineseName extends AbstractStringStrategy {
 
     @Override
-    public Object des(Object original, IContext context) {
-        return SensitiveStrategyUtil.chineseName(ObjectUtil.objectToString(original));
+    protected int getBeforeMaskLen(Object original, IContext context, char[] chars) {
+        return 1;
+    }
+
+    @Override
+    protected int getAfterMaskLen(Object original, IContext context, char[] chars) {
+        return 0;
     }
 
 }

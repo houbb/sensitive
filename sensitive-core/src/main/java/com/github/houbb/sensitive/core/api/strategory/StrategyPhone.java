@@ -1,9 +1,6 @@
 package com.github.houbb.sensitive.core.api.strategory;
 
-import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.sensitive.api.IContext;
-import com.github.houbb.sensitive.api.IStrategy;
-import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
 
 /**
  * 手机号脱敏
@@ -12,11 +9,16 @@ import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyUtil;
  * @author binbin.hou
  * date 2019/1/2
  */
-public class StrategyPhone implements IStrategy {
+public class StrategyPhone extends AbstractStringStrategy {
 
     @Override
-    public Object des(Object original, IContext context) {
-        return SensitiveStrategyUtil.phone(ObjectUtil.objectToString(original));
+    protected int getBeforeMaskLen(Object original, IContext context, char[] chars) {
+        return 4;
+    }
+
+    @Override
+    protected int getAfterMaskLen(Object original, IContext context, char[] chars) {
+        return 3;
     }
 
 }

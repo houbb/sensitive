@@ -22,7 +22,7 @@ public class CustomSensitiveEntryTest {
     @Test
     public void sensitiveEntryBaseTypeTest() {
         final String originalStr = "CustomUserEntryBaseType{chineseNameList=[盘古, 女娲, 伏羲], chineseNameArray=[盘古, 女娲, 伏羲]}";
-        final String sensitiveStr = "CustomUserEntryBaseType{chineseNameList=[*古, *娲, *羲], chineseNameArray=[*古, *娲, *羲]}";
+        final String sensitiveStr = "CustomUserEntryBaseType{chineseNameList=[盘*, 女*, 伏*], chineseNameArray=[盘*, 女*, 伏*]}";
 
         CustomUserEntryBaseType userEntryBaseType = DataPrepareTest.buildCustomUserEntryBaseType();
         Assert.assertEquals(originalStr, userEntryBaseType.toString());
@@ -39,12 +39,13 @@ public class CustomSensitiveEntryTest {
     @Test
     public void sensitiveEntryObjectTest() {
         final String originalStr = "CustomUserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}";
-        final String sensitiveStr = "CustomUserEntryObject{user=User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, userList=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userArray=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}]}";
+        final String sensitiveStr = "CustomUserEntryObject{user=User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}, userList=[User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}], userArray=[User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}]}";
 
         CustomUserEntryObject userEntryObject = DataPrepareTest.buildCustomUserEntryObject();
         Assert.assertEquals(originalStr, userEntryObject.toString());
 
         CustomUserEntryObject sensitiveUserEntryObject = SensitiveUtil.desCopy(userEntryObject);
+//        System.out.println(sensitiveUserEntryObject.toString());
         Assert.assertEquals(sensitiveStr, sensitiveUserEntryObject.toString());
         Assert.assertEquals(originalStr, userEntryObject.toString());
     }
@@ -56,12 +57,13 @@ public class CustomSensitiveEntryTest {
     @Test
     public void sensitiveUserGroupTest() {
         final String originalStr = "CustomUserGroup{coolUser=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userSet=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userCollection=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], password='123456', userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
-        final String sensitiveStr = "CustomUserGroup{coolUser=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, user=User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}, userList=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userSet=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], userCollection=[User{username='脱*君', idCard='123456**********34', password='null', email='123**@qq.com', phone='188****8888'}], password='123456', userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
+        final String sensitiveStr = "CustomUserGroup{coolUser=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, user=User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}, userList=[User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}], userSet=[User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}], userCollection=[User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}], password='123456', userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
 
         CustomUserGroup userGroup = DataPrepareTest.buildCustomUserGroup();
         Assert.assertEquals(originalStr, userGroup.toString());
 
         CustomUserGroup sensitiveUserGroup = SensitiveUtil.desCopy(userGroup);
+//        System.out.println(sensitiveUserGroup.toString());
         Assert.assertEquals(sensitiveStr, sensitiveUserGroup.toString());
         Assert.assertEquals(originalStr, userGroup.toString());
     }
@@ -73,7 +75,7 @@ public class CustomSensitiveEntryTest {
     @Test
     public void sensitiveEntryBaseTypeJsonTest() {
         final String originalStr = "CustomUserEntryBaseType{chineseNameList=[盘古, 女娲, 伏羲], chineseNameArray=[盘古, 女娲, 伏羲]}";
-        final String sensitiveJson = "{\"chineseNameArray\":[\"*古\",\"*娲\",\"*羲\"],\"chineseNameList\":[\"*古\",\"*娲\",\"*羲\"]}";
+        final String sensitiveJson = "{\"chineseNameArray\":[\"盘*\",\"女*\",\"伏*\"],\"chineseNameList\":[\"盘*\",\"女*\",\"伏*\"]}";
 
         CustomUserEntryBaseType userEntryBaseType = DataPrepareTest.buildCustomUserEntryBaseType();
 
@@ -88,10 +90,11 @@ public class CustomSensitiveEntryTest {
     @Test
     public void sensitiveEntryObjectJsonTest() {
         final String originalStr = "CustomUserEntryObject{user=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}, userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userArray=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}]}";
-        final String sensitiveJson = "{\"user\":{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"},\"userArray\":[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}],\"userList\":[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}]}";
+        final String sensitiveJson = "{\"user\":{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"},\"userArray\":[{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"}],\"userList\":[{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"}]}";
 
         CustomUserEntryObject userEntryObject = DataPrepareTest.buildCustomUserEntryObject();
 
+//        System.out.println(SensitiveUtil.desJson(userEntryObject));
         Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(userEntryObject));
         Assert.assertEquals(originalStr, userEntryObject.toString());
     }
@@ -105,11 +108,12 @@ public class CustomSensitiveEntryTest {
     public void sensitiveUserCollectionJsonTest() {
         final String originalStr = "CustomUserCollection{userList=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userSet=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userCollection=[User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}], userMap={map=User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}}}";
         final String commonJson = "{\"userArray\":[{\"email\":\"12345@qq.com\",\"idCard\":\"123456190001011234\",\"password\":\"1234567\",\"phone\":\"18888888888\",\"username\":\"脱敏君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
-        final String sensitiveJson = "{\"userArray\":[{\"email\":\"123**@qq.com\",\"idCard\":\"123456**********34\",\"phone\":\"188****8888\",\"username\":\"脱*君\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
+        final String sensitiveJson = "{\"userArray\":[{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"}],\"userCollection\":[{\"$ref\":\"$.userArray[0]\"}],\"userList\":[{\"$ref\":\"$.userArray[0]\"}],\"userMap\":{\"map\":{\"$ref\":\"$.userArray[0]\"}},\"userSet\":[{\"$ref\":\"$.userArray[0]\"}]}";
 
         CustomUserCollection userCollection = DataPrepareTest.buildCustomUserCollection();
 
         Assert.assertEquals(commonJson, JSON.toJSONString(userCollection));
+//        System.out.println(SensitiveUtil.desJson(userCollection));
         Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(userCollection));
         Assert.assertEquals(originalStr, userCollection.toString());
     }
