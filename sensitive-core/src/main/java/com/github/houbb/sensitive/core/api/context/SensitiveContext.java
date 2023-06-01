@@ -2,6 +2,7 @@ package com.github.houbb.sensitive.core.api.context;
 
 import com.github.houbb.heaven.annotation.NotThreadSafe;
 import com.github.houbb.sensitive.api.IContext;
+import com.github.houbb.sensitive.api.ISensitiveConfig;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
 
 import java.lang.reflect.Field;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 @NotThreadSafe
 public class SensitiveContext implements IContext {
+
+    private SensitiveContext(){}
 
     /**
      * 当前对象
@@ -46,6 +49,11 @@ public class SensitiveContext implements IContext {
      * @since 0.0.6
      */
     private Object entry;
+
+    /**
+     * 脱敏配置
+     */
+    private ISensitiveConfig sensitiveConfig;
 
     /**
      * 新建一个对象实例
@@ -138,6 +146,15 @@ public class SensitiveContext implements IContext {
 
     public void setEntry(Object entry) {
         this.entry = entry;
+    }
+
+    @Override
+    public ISensitiveConfig getSensitiveConfig() {
+        return sensitiveConfig;
+    }
+
+    public void setSensitiveConfig(ISensitiveConfig sensitiveConfig) {
+        this.sensitiveConfig = sensitiveConfig;
     }
 
 }

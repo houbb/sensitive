@@ -65,4 +65,11 @@ public interface IContext {
      */
     Object getEntry();
 
+    /**
+     * 脱敏配置
+     * @return 配置
+     * @since 1.1.0
+     */
+    ISensitiveConfig getSensitiveConfig();
+
 }

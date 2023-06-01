@@ -32,6 +32,10 @@ public abstract class AbstractStringStrategy extends AbstractStrategy {
 
     @Override
     protected Object doDes(Object original, IContext context) {
+        if(original == null) {
+            return null;
+        }
+
         String strValue = ObjectUtil.objectToString(original);
         char[] chars = strValue.toCharArray();
 

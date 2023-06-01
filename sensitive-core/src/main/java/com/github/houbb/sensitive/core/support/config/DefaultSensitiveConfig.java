@@ -1,6 +1,7 @@
 package com.github.houbb.sensitive.core.support.config;
 
 import com.github.houbb.deep.copy.api.IDeepCopy;
+import com.github.houbb.hash.api.IHash;
 import com.github.houbb.sensitive.api.ISensitiveConfig;
 
 /**
@@ -15,6 +16,11 @@ public class DefaultSensitiveConfig implements ISensitiveConfig {
      * @since 0.0.9
      */
     private IDeepCopy deepCopy;
+
+    /**
+     * 哈希策略
+     */
+    private IHash hash;
 
     /**
      * 新建对象实例
@@ -33,6 +39,16 @@ public class DefaultSensitiveConfig implements ISensitiveConfig {
     @Override
     public IDeepCopy deepCopy() {
         return deepCopy;
+    }
+
+    @Override
+    public IHash hash() {
+        return hash;
+    }
+
+    public DefaultSensitiveConfig hash(IHash hash) {
+        this.hash = hash;
+        return this;
     }
 
 }

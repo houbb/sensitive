@@ -2,6 +2,8 @@ package com.github.houbb.sensitive.core.bs;
 
 import com.github.houbb.deep.copy.api.IDeepCopy;
 import com.github.houbb.deep.copy.fastjson.FastJsonDeepCopy;
+import com.github.houbb.hash.api.IHash;
+import com.github.houbb.hash.core.core.hash.Hashes;
 import com.github.houbb.heaven.support.instance.impl.Instances;
 import com.github.houbb.heaven.util.common.ArgUtil;
 import com.github.houbb.sensitive.api.ISensitive;
@@ -28,7 +30,13 @@ public final class SensitiveBs {
      * 脱敏实现
      * @since 0.0.9
      */
-    private ISensitive sensitive = Instances.singleton(SensitiveService.class);
+    private final ISensitive sensitive = new SensitiveService();
+
+    /**
+     * 哈希策略
+     * @since 1.1.0
+     */
+    private IHash hash = Hashes.empty();
 
     /**
      * 新建实例
@@ -37,6 +45,13 @@ public final class SensitiveBs {
      */
     public static SensitiveBs newInstance() {
        return new SensitiveBs();
+    }
+
+    public SensitiveBs hash(IHash hash) {
+        ArgUtil.notNull(hash, "hash");
+
+        this.hash = hash;
+        return this;
     }
 
     /**
@@ -88,7 +103,8 @@ public final class SensitiveBs {
      */
     private ISensitiveConfig buildConfig() {
         return DefaultSensitiveConfig.newInstance()
-                .deepCopy(deepCopy);
+                .deepCopy(deepCopy)
+                .hash(hash);
     }
 
 }

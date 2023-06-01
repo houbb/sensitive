@@ -45,6 +45,8 @@
 
 6. 支持基于 FastJSON 直接生成脱敏后的 json
 
+7. 支持自定义哈希策略，更加方便定位日志问题
+
 ## 变更日志
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
@@ -606,6 +608,16 @@ Assert.assertEquals(originalStr, userCollection.toString());
 
 为了配置的灵活性，引入了引导类。
 
+## 配置属性
+
+引导类 SensitiveBs 的默认配置属性如下：
+
+```java
+SensitiveBs.newInstance()
+.deepCopy(FastJsonDeepCopy.getInstance())
+.hash(Hashes.empty())
+```
+
 ## 核心 api 简介
 
 `SensitiveBs` 引导类的核心方法列表如下：
@@ -621,6 +633,23 @@ Assert.assertEquals(originalStr, userCollection.toString());
 
 ```java
 SensitiveBs.newInstance().desCopy(user);
+```
+
+## 配置哈希策略
+
+直接指定哈希策略即可，比如下面以 md5 作为值的哈希策略。
+
+```java
+// 指定哈希策略
+final SensitiveBs sensitiveBs = SensitiveBs.newInstance().hash(Hashes.md5());
+```
+
+效果如下：
+
+```
+final String originalStr = "User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}";
+final String sensitiveStr = "User{username='脱**|00871641C1724BB717DD01E7E5F7D98A', idCard='123456**********34|1421E4C0F5BF57D3CC557CFC3D667C4E', password='null', email='12******.com|6EAA6A25C8D832B63429C1BEF149109C', phone='1888****888|5425DE6EC14A0722EC09A6C2E72AAE18'}";
+final String expectJson = "{\"email\":\"12******.com|6EAA6A25C8D832B63429C1BEF149109C\",\"idCard\":\"123456**********34|1421E4C0F5BF57D3CC557CFC3D667C4E\",\"phone\":\"1888****888|5425DE6EC14A0722EC09A6C2E72AAE18\",\"username\":\"脱**|00871641C1724BB717DD01E7E5F7D98A\"}";
 ```
 
 ## 配置深度拷贝实现
