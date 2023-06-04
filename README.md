@@ -41,13 +41,13 @@
 
 4. java 深拷贝，且原始对象不用实现任何接口。
 
-5. 支持用户自定义注解。
+[5. 支持用户自定义注解。](https://github.com/houbb/sensitive#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3)
 
-6. 支持基于 FastJSON 直接生成脱敏后的 json
+[6. 支持基于 FastJSON 直接生成脱敏后的 json](https://github.com/houbb/sensitive#%E7%94%9F%E6%88%90%E8%84%B1%E6%95%8F%E5%90%8E%E7%9A%84-json)
 
-7. 支持自定义哈希策略，更加方便定位日志问题
+[7. 支持自定义哈希策略，更加方便定位日志问题](https://github.com/houbb/sensitive#%E9%85%8D%E7%BD%AE%E5%93%88%E5%B8%8C%E7%AD%96%E7%95%A5)
 
-8. 支持基于 log4j2 的统一脱敏策略
+[8. 支持基于 log4j2 的统一脱敏策略](https://github.com/houbb/sensitive#log4j2-%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F)
 
 ## 变更日志
 
@@ -743,7 +743,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 </dependency>
 ```
 
-### log4j.xml 配置
+### log4j2.xml 配置
 
 例子如下:
 
