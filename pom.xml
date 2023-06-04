@@ -7,12 +7,13 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.0</version>
+    <version>1.2.0-SNAPSHOT</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
         <module>sensitive-core</module>
         <module>sensitive-test</module>
+        <module>sensitive-log4j2</module>
     </modules>
 
     <properties>
@@ -38,10 +39,12 @@
         <heaven.version>0.2.7</heaven.version>
         <deep-copy.version>0.0.1</deep-copy.version>
         <hash.version>0.0.7</hash.version>
+        <chars-scan.version>1.12.0</chars-scan.version>
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.13.1</junit.version>
         <fastjson.version>1.2.83</fastjson.version>
+        <log4j2.version>2.17.0</log4j2.version>
     </properties>
 
     <dependencyManagement>
@@ -62,6 +65,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sensitive-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sensitive-log4j2</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -93,6 +102,12 @@
                 <artifactId>hash-core</artifactId>
                 <version>${hash.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.github.houbb</groupId>
+                <artifactId>chars-scan</artifactId>
+                <version>${chars-scan.version}</version>
+            </dependency>
             <!--========================= OTHER =========================-->
             <dependency>
                 <groupId>junit</groupId>
@@ -105,6 +120,19 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j2.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j2.version}</version>
+                <optional>true</optional>
             </dependency>
 
         </dependencies>

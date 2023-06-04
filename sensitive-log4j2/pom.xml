@@ -9,17 +9,25 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sensitive-api</artifactId>
+    <artifactId>sensitive-log4j2</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.github.houbb</groupId>
-            <artifactId>deep-copy-api</artifactId>
+            <artifactId>heaven</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>chars-scan</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.github.houbb</groupId>
-            <artifactId>hash-api</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
         </dependency>
     </dependencies>
 
