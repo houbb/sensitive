@@ -47,6 +47,8 @@
 
 7. 支持自定义哈希策略，更加方便定位日志问题
 
+8. 支持基于 log4j2 的统一脱敏策略
+
 ## 变更日志
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
@@ -695,6 +697,96 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 为满足不同场景的需求，深度复制策略支持用户自定义。
 
 > [自定义深度复制](https://github.com/houbb/deep-copy#%E8%87%AA%E5%AE%9A%E4%B9%89)
+
+# log4j2 统一脱敏
+
+## 说明
+
+上面的方法非常适用于新的项目，按照响应的规范进行推广。
+
+但是很多金融公司都有很多历史遗留项目，或者使用不规范，比如使用 map 等，导致上面的方法在脱敏技改时需要耗费大量的时间，而且回溯成本很高。
+
+有没有什么方法，可以直接在日志层统一处理呢？
+
+## log4j2 Rewrite
+
+我们可以基于 log4j2 RewritePolicy 统一使用脱敏策略。
+
+本项目自 V1.2.0 添加对应支持，后续将提升对应的可拓展性。
+
+## 使用入门
+
+### maven 引入
+
+引入核心脱敏包。
+
+```xml
+<dependency>
+    <groupId>com.github.houbb</groupId>
+    <artifactId>sensitive-log4j2</artifactId>
+    <version>1.2.0</version>
+</dependency>
+```
+
+其他的一般项目中也有，如 log4j2 包：
+
+```xml
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-api</artifactId>
+    <version>${log4j2.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>${log4j2.version}</version>
+</dependency>
+```
+
+### log4j.xml 配置
+
+例子如下:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages = "com.github.houbb.sensitive.log4j2.rewrite">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+        </Console>
+        <Rewrite name="rewrite">
+            <AppenderRef ref="Console"/>
+            <SensitiveRewritePolicy/>
+        </Rewrite>
+    </Appenders>
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="rewrite" />
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+几个步骤：
+
+1. 指定 package 为 `packages = "com.github.houbb.sensitive.log4j2.rewrite"`
+
+2. 按照 log4j2 Rewrite 规范，指定重写策略为 `SensitiveRewritePolicy`
+
+3. 输出时，直接指定为对应的重写之后的结果 `<AppenderRef ref="rewrite" />`
+
+### 测试
+
+正常的日志打印：
+
+```java
+logger.info("my phone:{}", "13077779999");
+```
+
+效果会被自动脱敏如下：
+
+```
+my phone:130****9999|BEFD48AF8AB1D580C818C51A29FE5370
+```
 
 # ROAD-MAP
 

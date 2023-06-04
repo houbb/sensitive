@@ -13,9 +13,22 @@ public class Log4j2RewriteTest {
 
 
   @Test
-  public void testRewrite() {
-    logger.info("my phone: {}", "13077779999");
-    logger.info("my phone is 13077779999");
+  public void simpleTest() {
+    logger.info("my phone is :13077779999");
+  }
+
+  @Test
+  public void formatTest() {
+    logger.info("my phone:{}", "13077779999");
+  }
+
+  @Test
+  public void errorTest() {
+    try {
+      throw new RuntimeException("异常");
+    } catch (Exception exception) {
+      logger.error("my phone:{}", "13077779999", exception);
+    }
   }
 
 }
