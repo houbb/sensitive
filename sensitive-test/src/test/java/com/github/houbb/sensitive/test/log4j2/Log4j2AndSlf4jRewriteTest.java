@@ -14,7 +14,7 @@ public class Log4j2AndSlf4jRewriteTest {
 
   @Test
   public void simpleTest() {
-    logger.info("my phone is :13077779999");
+    logger.info("my phone:13077779999");
   }
 
   @Test

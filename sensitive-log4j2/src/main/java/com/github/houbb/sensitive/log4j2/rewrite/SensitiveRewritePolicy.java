@@ -2,8 +2,8 @@ package com.github.houbb.sensitive.log4j2.rewrite;
 
 import com.github.houbb.chars.scan.bs.CharsScanBs;
 import com.github.houbb.chars.scan.support.core.CharsCores;
-import com.github.houbb.chars.scan.support.hash.CharReplaceHashes;
-import com.github.houbb.chars.scan.support.prefix.CharPrefixes;
+import com.github.houbb.chars.scan.support.hash.CharsReplaceHashes;
+import com.github.houbb.chars.scan.support.prefix.CharsPrefixes;
 import com.github.houbb.chars.scan.support.replace.CharsReplaces;
 import com.github.houbb.chars.scan.support.scan.CharsScans;
 import org.apache.logging.log4j.core.LogEvent;
@@ -34,17 +34,15 @@ public class SensitiveRewritePolicy implements RewritePolicy {
     public SensitiveRewritePolicy() {
         charsScanBs = CharsScanBs.newInstance()
                 // 核心实现策略
-                .setCharsCore(CharsCores.sequence())
+                .charsCore(CharsCores.defaults())
                 // 前缀处理策略
-                .setCharsPrefix(CharPrefixes.simple())
+                .charsPrefix(CharsPrefixes.defaults())
                 // 扫描策略，每一种对应唯一的 scanType
-                .setScanList(CharsScans.defaultCharScanList())
+                .charsScanFactory(CharsScans.defaults())
                 // 替换策略
-                .setReplaceMap(CharsReplaces.defaultReplaceMap())
-                // 没有匹配时的默认替换策略
-                .setDefaultReplace(CharsReplaces.defaultReplace())
+                .charsReplaceFactory(CharsReplaces.defaults())
                 // 替换对应的哈希策略
-                .setCharsReplaceHash(CharReplaceHashes.getMd5())
+                .charsReplaceHash(CharsReplaceHashes.defaults())
                 .init();
     }
 
