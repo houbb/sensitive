@@ -63,7 +63,7 @@
 
 ## 环境准备
 
-JDK 7+
+JDK 1.8+
 
 Maven 3.x
 
@@ -73,7 +73,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 
@@ -724,7 +724,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 
@@ -779,25 +779,85 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 正常的日志打印：
 
 ```java
-logger.info("my phone:{}", "13077779999");
+private static final String TEST_LOG = "mobile:13088887777; bankCard:6217004470007335024, email:mahuateng@qq.com, amount:123.00, " +
+        "IdNo:340110199801016666, name1:李明, name2:李晓明, name3:李泽明天, name4:山东小栗旬" +
+        ", birthday:20220517, GPS:120.882222, IPV4:127.0.0.1, address:中国上海市徐汇区888号;";
+
+logger.info(TEST_LOG);
 ```
 
-效果会被自动脱敏如下：
+自动脱敏效果如下：
 
 ```
-my phone:130****9999|BEFD48AF8AB1D580C818C51A29FE5370
+mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2; bankCard:6217***********5024|444F49289B30944AB8C6C856AEA21180, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C, amount:123.00, IdNo:3****************6|F9F05E4ABB3591FC8EA481E8DE1FA4D6, name1:李*|15095D14367F7F02655030D498A4BA03, name2:李**|035E3C0D1A0410367FE6EB8335B2BFDE, name3:李泽**|B87138E5E80AEC87D2581A25CAA3809D, name4:山东***|6F2178D34BC7DD0A07936B5AFF39A16F, birthday:********|1F88D983FAFC50022651122B42F084A0, GPS:**********|E281A9A52DE915154285148D68872CA2, IPV4:127******|F528764D624DB129B32C21FBCA0CB8D6, address:中国上海市徐******|821A601949B1BD18DCBAAE27F2E27147;
 ```
+
+ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4 这几种策略。 
+
+## log4j2 配置定制化
+
+为了满足各种用户的场景，在 V1.2.1 引入了 SensitiveRewritePolicy 策略的可配置化。
+
+### 默认配置
+
+log4j2 配置中，`SensitiveRewritePolicy` 配置默认等价于
+
+```xml
+<SensitiveRewritePolicy
+        prefix=":=&apos;&quot;"
+        scanList = "1,2,3,4"
+        replaceList = "1,2,3,4"
+        defaultReplace = "12"
+        replaceHash = "md5"
+/>
+```
+
+### 属性说明
+
+SensitiveRewritePolicy 策略的属性说明。
+
+| 属性 | 说明          | 默认值                    | 备注                                       |
+|:---|:------------|:-----------------------|:-----------------------------------------|
+|  prefix  | 需要脱敏信息的匹配前缀 | `:='"`                 | 降低误判率                                    |
+|  replaceHash  | 哈希策略模式      | `md5`                  | 支持 md5/none 两种模式                         |
+|  scanList  | 敏感扫描策略列表    | `1,2,3,4` | 1~10 内置的10种敏感信息扫描策略，多个用逗号隔开              |
+|  replaceList  | 敏感替换策略列表    | `1,2,3,4` | 1~10 内置的10种敏感信息替换策略，多个用逗号隔开              |
+|  defaultReplace  | 敏感替换默认策略  | `12`                   | 1~13 内置的13种敏感信息替换策略，指定一个。当列表没有匹配时，默认使用这个 |
+
+其中 1-13 的内置策略说明如下：
+
+| 策略标识 | 说明 |
+|:----|:----|
+| 1 | 手机号 |
+| 2 | 身份证 |
+| 3 | 银行卡 |
+| 4 | 邮箱 |
+| 5 | 中国人名 |
+| 6 | 出生日期 |
+| 7 | GPS |
+| 8 | IPV4 |
+| 9 | 地址 |
+| 10 | 护照 |
+| 11 | 匹配任意不掩盖 |
+| 12 | 匹配任意半掩盖 |
+| 13 | 匹配任意全掩盖 |
+
+### 不足之处
+
+这里的策略自定义和 log4j2 的插件化比起来，确实算不上强大，但是可以满足 99% 的脱敏场景。
+
+后续有时间考虑类似 log4j2 的 plugins 思想，实现更加灵活的自定义策略。
 
 # ROAD-MAP
 
-- [x] 针对身份证的默认脱敏策略
-
-- [x] 脱敏实现独立为工具方法，便于直接使用。
+- [ ] 添加统一的工具类方法，便于开发单独使用
 
 喜欢重载 toString()，或特殊的场景
 
 - [ ] 考虑添加针对 MAP 的脱敏支持
 
-- [ ] log4j2 等日志组件的脱敏策略
+- [x] 针对身份证的默认脱敏策略
+
+- [x] log4j2 等日志组件的脱敏策略
 
 提升可拓展性
