@@ -85,6 +85,7 @@ public class SensitiveRewritePolicy implements RewritePolicy {
      * @param replaceHash 替换的哈希
      * @param scanList 扫描策略列表
      * @param replaceList 替换策略列表
+     * @param defaultReplace 默认策略
      * @return 结果
      */
     @PluginFactory
