@@ -47,7 +47,7 @@
 
 [7. 支持自定义哈希策略，更加方便定位日志问题](https://github.com/houbb/sensitive#%E9%85%8D%E7%BD%AE%E5%93%88%E5%B8%8C%E7%AD%96%E7%95%A5)
 
-[8. 支持基于 log4j2 的统一脱敏策略](https://github.com/houbb/sensitive#log4j2-%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F)
+[8. 支持基于 log4j2 的统一脱敏策略]([https://github.com/houbb/sensitive#log4j2-%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F](https://github.com/houbb/sensitive#log4j2-%E6%8F%92%E4%BB%B6%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F))
 
 ## 变更日志
 
