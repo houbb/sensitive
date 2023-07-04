@@ -73,7 +73,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 
@@ -726,7 +726,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 
