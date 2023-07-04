@@ -16,6 +16,7 @@ import org.apache.logging.log4j.core.appender.rewrite.RewritePolicy;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.Node;
 import org.apache.logging.log4j.core.config.plugins.*;
+import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.core.impl.MutableLogEvent;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.SimpleMessage;
@@ -45,22 +46,47 @@ public class SensitiveRewritePolicy implements RewritePolicy {
 
     @Override
     public LogEvent rewrite(LogEvent source) {
-        MutableLogEvent log4jLogEvent = (MutableLogEvent) source;
-        Message message = log4jLogEvent.getMessage();
+        if(source instanceof Log4jLogEvent) {
+            Log4jLogEvent log4jLogEvent = (Log4jLogEvent) source;
+            Message message =  log4jLogEvent.getMessage();
 
-        //TODO: 这里测试，暂时都是这种类别，有没有特殊的？
-        if(message instanceof MutableLogEvent) {
+            // mutableLogEvent.getFormat() 这里返回的竟然是 null，而不是 format 格式...
+            String rawMessage = message.getFormattedMessage();
+
+            // 所有基于参数，看起来只在 param 中有意义。
+            String newMessage = charsScanBs.scanAndReplace(rawMessage);
+
+            //builder
+            Log4jLogEvent.Builder newEventBuilder = new Log4jLogEvent.Builder(log4jLogEvent);
+            newEventBuilder.setMessage(new SimpleMessage(newMessage));
+            return newEventBuilder.build();
+        } else if(source instanceof MutableLogEvent) {
+            MutableLogEvent log4jLogEvent = (MutableLogEvent) source;
+            Message message = log4jLogEvent.getMessage();
             // mutableLogEvent.getFormat() 这里返回的竟然是 null，而不是 format 格式...
             String rawMessage = message.getFormattedMessage();
 
             // 所有基于参数，看起来只在 param 中有意义。
             String newMessage = charsScanBs.scanAndReplace(rawMessage);
             log4jLogEvent.setMessage(new SimpleMessage(newMessage));
-            return log4jLogEvent;
+            return source;
         }
 
         // 直接返回原始的。
         return source;
+    }
+
+    private Message getMessage(LogEvent source) {
+        if(source instanceof Log4jLogEvent) {
+            Log4jLogEvent log4jLogEvent = (Log4jLogEvent) source;
+            return log4jLogEvent.getMessage();
+        } else if(source instanceof MutableLogEvent) {
+            MutableLogEvent log4jLogEvent = (MutableLogEvent) source;
+            Message message = log4jLogEvent.getMessage();
+            return message;
+        }
+
+        return source.getMessage();
     }
 
     // 指定对应的 factory

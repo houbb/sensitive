@@ -168,6 +168,12 @@ SensitiveRewritePolicy 策略的属性说明。
 
 后续将添加对应的 benchmark。
 
+# 开源地址
+
+为了便于大家学习，项目已开源
+
+> [https://github.com/houbb/sensitive](https://github.com/houbb/sensitive)
+
 # 小结
 
 实际项目中，建议二者结合使用。
