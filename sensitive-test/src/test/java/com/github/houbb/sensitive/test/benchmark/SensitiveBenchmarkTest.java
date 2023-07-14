@@ -18,6 +18,9 @@ public class SensitiveBenchmarkTest {
 
     private static final int COUNT = 1000000;
 
+    /**
+     * fast json 304ms
+     */
     @Test
     public void toJsonTest() {
         User user = DataPrepareTest.buildUser();
@@ -31,6 +34,9 @@ public class SensitiveBenchmarkTest {
         System.out.println("fast json " + (endTime-startTime));
     }
 
+    /**
+     * handle set 122ms
+     */
     @Test
     public void handleSetterTest() {
         User user = DataPrepareTest.buildUser();
@@ -49,6 +55,9 @@ public class SensitiveBenchmarkTest {
         System.out.println("handle set " + (endTime-startTime));
     }
 
+    /**
+     * des json 1541ms
+     */
     @Test
     public void desJsonTest() {
         User user = DataPrepareTest.buildUser();
