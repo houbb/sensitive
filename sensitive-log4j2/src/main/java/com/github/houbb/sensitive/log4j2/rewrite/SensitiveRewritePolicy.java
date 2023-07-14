@@ -1,16 +1,7 @@
 package com.github.houbb.sensitive.log4j2.rewrite;
 
-import com.github.houbb.chars.scan.api.ICharsPrefix;
-import com.github.houbb.chars.scan.api.ICharsReplaceFactory;
-import com.github.houbb.chars.scan.api.ICharsReplaceHash;
-import com.github.houbb.chars.scan.api.ICharsScanFactory;
 import com.github.houbb.chars.scan.bs.CharsScanBs;
-import com.github.houbb.chars.scan.support.core.CharsCores;
-import com.github.houbb.chars.scan.support.hash.CharsReplaceHashes;
-import com.github.houbb.chars.scan.support.prefix.CharsPrefixes;
-import com.github.houbb.chars.scan.support.replace.CharsReplaces;
-import com.github.houbb.chars.scan.support.scan.CharsScans;
-import com.github.houbb.heaven.util.lang.StringUtil;
+import com.github.houbb.sensitive.log4j2.support.chars.CharsScanBsUtils;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.rewrite.RewritePolicy;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -46,34 +37,38 @@ public class SensitiveRewritePolicy implements RewritePolicy {
 
     @Override
     public LogEvent rewrite(LogEvent source) {
-        if(source instanceof Log4jLogEvent) {
-            Log4jLogEvent log4jLogEvent = (Log4jLogEvent) source;
-            Message message =  log4jLogEvent.getMessage();
+        try {
+            if(source instanceof Log4jLogEvent) {
+                Log4jLogEvent log4jLogEvent = (Log4jLogEvent) source;
+                Message message =  log4jLogEvent.getMessage();
 
-            // mutableLogEvent.getFormat() 这里返回的竟然是 null，而不是 format 格式...
-            String rawMessage = message.getFormattedMessage();
+                // mutableLogEvent.getFormat() 这里返回的竟然是 null，而不是 format 格式...
+                String rawMessage = message.getFormattedMessage();
 
-            // 所有基于参数，看起来只在 param 中有意义。
-            String newMessage = charsScanBs.scanAndReplace(rawMessage);
+                // 所有基于参数，看起来只在 param 中有意义。
+                String newMessage = charsScanBs.scanAndReplace(rawMessage);
 
-            //builder
-            Log4jLogEvent.Builder newEventBuilder = new Log4jLogEvent.Builder(log4jLogEvent);
-            newEventBuilder.setMessage(new SimpleMessage(newMessage));
-            return newEventBuilder.build();
-        } else if(source instanceof MutableLogEvent) {
-            MutableLogEvent log4jLogEvent = (MutableLogEvent) source;
-            Message message = log4jLogEvent.getMessage();
-            // mutableLogEvent.getFormat() 这里返回的竟然是 null，而不是 format 格式...
-            String rawMessage = message.getFormattedMessage();
+                //builder
+                Log4jLogEvent.Builder newEventBuilder = new Log4jLogEvent.Builder(log4jLogEvent);
+                newEventBuilder.setMessage(new SimpleMessage(newMessage));
+                return newEventBuilder.build();
+            } else if(source instanceof MutableLogEvent) {
+                MutableLogEvent log4jLogEvent = (MutableLogEvent) source;
+                Message message = log4jLogEvent.getMessage();
+                // mutableLogEvent.getFormat() 这里返回的竟然是 null，而不是 format 格式...
+                String rawMessage = message.getFormattedMessage();
 
-            // 所有基于参数，看起来只在 param 中有意义。
-            String newMessage = charsScanBs.scanAndReplace(rawMessage);
-            log4jLogEvent.setMessage(new SimpleMessage(newMessage));
+                // 所有基于参数，看起来只在 param 中有意义。
+                String newMessage = charsScanBs.scanAndReplace(rawMessage);
+                log4jLogEvent.setMessage(new SimpleMessage(newMessage));
+                return source;
+            }
+
+            // 直接返回原始的。
+            return source;
+        } catch (Exception e) {
             return source;
         }
-
-        // 直接返回原始的。
-        return source;
     }
 
     private Message getMessage(LogEvent source) {
@@ -123,25 +118,8 @@ public class SensitiveRewritePolicy implements RewritePolicy {
                                                       @PluginAttribute(value = "defaultReplace", defaultString = "12") String defaultReplace,
                                                       @PluginAttribute(value = "replaceHash", defaultString = "md5") String replaceHash
                                                       ) {
-        // 初始化
-        final ICharsPrefix charsPrefix = CharsPrefixes.simple(prefix);
-        final ICharsScanFactory charsScanFactory = CharsScans.defaults(StringUtil.splitToList(scanList));
-        final ICharsReplaceFactory replaceFactory = CharsReplaces.defaultsReplaceFactory(StringUtil.splitToList(replaceList), defaultReplace);
-        final ICharsReplaceHash replaceHashStrategy = CharsReplaceHashes.newInstance(replaceHash);
-
         // 构建 bs
-        charsScanBs = CharsScanBs.newInstance()
-                // 核心实现策略
-                .charsCore(CharsCores.defaults())
-                // 前缀处理策略
-                .charsPrefix(charsPrefix)
-                // 扫描策略，每一种对应唯一的 scanType
-                .charsScanFactory(charsScanFactory)
-                // 替换策略
-                .charsReplaceFactory(replaceFactory)
-                // 替换对应的哈希策略
-                .charsReplaceHash(replaceHashStrategy)
-                .init();
+        charsScanBs = CharsScanBsUtils.buildCharsScanBs(prefix, scanList, replaceList, defaultReplace, replaceHash);
 
         //TODO 根据用户指定的参数初始化
         return new SensitiveRewritePolicy();

@@ -73,7 +73,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.2.2</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -726,7 +726,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.2.2</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -863,3 +863,5 @@ SensitiveRewritePolicy 策略的属性说明。
 - [x] log4j2 等日志组件的脱敏策略
 
 提升可拓展性
+
+- [ ] log4j2 layout 对应的脱敏策略
