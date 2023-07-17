@@ -877,3 +877,5 @@ SensitiveRewritePolicy 策略的属性说明。
 提升可拓展性
 
 - [ ] log4j2 layout 对应的脱敏策略
+
+- [ ] 优化代码实现，直接继承自 patternLayout
