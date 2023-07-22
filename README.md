@@ -751,30 +751,33 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages = "com.github.houbb.sensitive.log4j2.rewrite">
+<Configuration status="WARN" packages = "com.github.houbb.sensitive.log4j2.layout">
+
+    <Properties>
+        <Property name="DEFAULT_PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="DEFAULT_CHARSET">UTF-8</Property>
+    </Properties>
+
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
+            <SensitivePatternLayout/>
         </Console>
-        <Rewrite name="rewrite">
-            <AppenderRef ref="Console"/>
-            <SensitiveRewritePolicy/>
-        </Rewrite>
     </Appenders>
+
     <Loggers>
         <Root level="DEBUG">
-            <AppenderRef ref="rewrite" />
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
+
 </Configuration>
 ```
 
 几个步骤：
 
-1. 指定 package 为 `packages = "com.github.houbb.sensitive.log4j2.rewrite"`
+1. 指定 package 为 `packages = "com.github.houbb.sensitive.log4j2.layout"`
 
-2. 按照 log4j2 Rewrite 规范，指定重写策略为 `SensitiveRewritePolicy`
-
-3. 输出时，直接指定为对应的重写之后的结果 `<AppenderRef ref="rewrite" />`
+2. 按照 log4j2 layout 规范，指定 Layout 策略为 `SensitivePatternLayout`
 
 ### 测试
 
@@ -798,25 +801,26 @@ ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4 这几种�
 
 ## log4j2 配置定制化
 
-为了满足各种用户的场景，在 V1.2.1 引入了 SensitiveRewritePolicy 策略的可配置化。
+为了满足各种用户的场景，在 V1.3.0 引入了 SensitivePatternLayout 策略的可配置化。
 
 ### 默认配置
 
-log4j2 配置中，`SensitiveRewritePolicy` 配置默认等价于
+log4j2 配置中，`SensitivePatternLayout` 配置默认等价于
 
 ```xml
-<SensitiveRewritePolicy
-        prefix=":=&apos;&quot;"
-        scanList = "1,2,3,4"
-        replaceList = "1,2,3,4"
-        defaultReplace = "12"
-        replaceHash = "md5"
+<SensitivePatternLayout prefix=":=&apos;&quot;"
+                        scanList="1,2,3,4"
+                        replaceList="1,2,3,4"
+                        defaultReplace="12"
+                        replaceHash="md5"
+                        pattern="${DEFAULT_PATTERN}"
+                        charset="${DEFAULT_CHARSET}"
 />
 ```
 
 ### 属性说明
 
-SensitiveRewritePolicy 策略的属性说明。
+SensitivePatternLayout 策略的属性说明。
 
 | 属性 | 说明          | 默认值                    | 备注                                       |
 |:---|:------------|:-----------------------|:-----------------------------------------|
@@ -876,6 +880,6 @@ SensitiveRewritePolicy 策略的属性说明。
 
 提升可拓展性
 
-- [ ] log4j2 layout 对应的脱敏策略
+- [x] log4j2 layout 对应的脱敏策略
 
 - [ ] 优化代码实现，直接继承自 patternLayout

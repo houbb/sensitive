@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.github.houbb.sensitive.log4j2.layout">
+
+    <Properties>
+        <Property name="DEFAULT_PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="DEFAULT_CHARSET">UTF-8</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <SensitivePatternLayout prefix=":=&apos;&quot;"
+                                    scanList="1,2,3,4"
+                                    replaceList="1,2,3,4"
+                                    defaultReplace="12"
+                                    replaceHash="md5"
+                                    pattern="${DEFAULT_PATTERN}"
+                                    charset="${DEFAULT_CHARSET}"
+            />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
