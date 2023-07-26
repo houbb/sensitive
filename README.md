@@ -53,6 +53,10 @@
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
 
+### v-1.4.0 新特性
+
+- 优化姓名+银行卡+身份证 的匹配策略，使其更加精准。
+
 ## 拓展阅读
 
 [金融用户敏感数据如何优雅地实现脱敏？](https://mp.weixin.qq.com/s/ljChFiNLzV6GLaUDjehA0Q)
@@ -73,7 +77,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -726,7 +730,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -801,7 +805,7 @@ ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4 这几种�
 
 ## log4j2 配置定制化
 
-为了满足各种用户的场景，在 V1.3.0 引入了 SensitivePatternLayout 策略的可配置化。
+为了满足各种用户的场景，在 V1.4.0 引入了 SensitivePatternLayout 策略的可配置化。
 
 ### 默认配置
 
