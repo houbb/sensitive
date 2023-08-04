@@ -10,8 +10,8 @@
     <Appenders>
         <RollingRandomAccessFile name="COMMON-FILE-APPENDER"
                                  filePattern="${LOG_HOME}/$${date:yyyy-MM}/error-%d{MM-dd-yyyy}-%i.log.gz"
-                                 fileName = "${LOG_HOME}/common.log"
-                                 immediateFlush="true">
+                                 fileName = "${LOG_HOME}/error.log"
+                                 immediateFlush="false">
             <ThresholdFilter level="ERROR" onMatch="DENY" onMisMatch="ACCEPT"/>
             <PatternLayout>
                 <Pattern>${DEFAULT_PATTERN}</Pattern>
@@ -26,7 +26,7 @@
                                  filePattern="${LOG_HOME}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
                                  fileName = "${LOG_HOME}/error.log"
                                  immediateFlush="true">
-            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMisMatch="DENY"/>
+            <ThresholdFilter level="ERROR" onMatch="DENY" onMisMatch="ACCEPT"/>
             <PatternLayout>
                 <Pattern>${DEFAULT_PATTERN}</Pattern>
             </PatternLayout>
@@ -42,12 +42,6 @@
     </Appenders>
 
     <Loggers>
-
-        <AsyncLogger name="com.github.houbb.sensitive.test" level="INFO" additivity="false">
-            <AppenderRef ref="COMMON-FILE-APPENDER"/>
-            <AppenderRef ref="ERROR-FILE-APPENDER"/>
-        </AsyncLogger>
-
         <asyncRoot level="INFO">
             <AppenderRef ref="COMMON-FILE-APPENDER"/>
             <AppenderRef ref="ERROR-FILE-APPENDER"/>
