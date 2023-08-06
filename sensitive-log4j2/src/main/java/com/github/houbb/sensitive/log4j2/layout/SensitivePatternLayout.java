@@ -116,17 +116,18 @@ public class SensitivePatternLayout extends AbstractStringLayout {
     @PluginFactory
     public static SensitivePatternLayout createPolicy(@PluginConfiguration Configuration pluginConfig,
                                                       @PluginNode Node pluginNode,
-                                                      @PluginAttribute(value = "prefix", defaultString = ":\"'=") String prefix,
+                                                      @PluginAttribute(value = "prefix", defaultString = "：‘“，| ,:\"'=") String prefix,
                                                       @PluginAttribute(value = "scanList", defaultString = "1,2,3,4") String scanList,
                                                       @PluginAttribute(value = "replaceList", defaultString = "1,2,3,4") String replaceList,
                                                       @PluginAttribute(value = "defaultReplace", defaultString = "12") String defaultReplace,
                                                       @PluginAttribute(value = "replaceHash", defaultString = "md5") String replaceHash,
                                                       @PluginAttribute(value = "charset", defaultString = "UTF-8") String charset,
-                                                      @PluginAttribute(value = "pattern", defaultString = "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n") String pattern
+                                                      @PluginAttribute(value = "pattern", defaultString = "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n") String pattern,
+                                                      @PluginAttribute(value = "whiteList", defaultString = "") String whiteList
     ) {
         // 初始化
         SensitivePatternLayout sensitivePatternLayout = new SensitivePatternLayout(Charset.forName(charset));
-        sensitivePatternLayout.charsScanBs = CharsScanBsUtils.buildCharsScanBs(prefix, scanList, replaceList, defaultReplace, replaceHash);;
+        sensitivePatternLayout.charsScanBs = CharsScanBsUtils.buildCharsScanBs(prefix, scanList, replaceList, defaultReplace, replaceHash, whiteList);;
         sensitivePatternLayout.patternFormatterList = getPatternFormatList(pluginConfig, pattern);
 
         //TODO 根据用户指定的参数初始化

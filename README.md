@@ -53,7 +53,7 @@
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
 
-### v-1.4.0 新特性
+### v-1.5.0 新特性
 
 - 优化姓名+银行卡+身份证 的匹配策略，使其更加精准。
 
@@ -77,7 +77,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
@@ -730,7 +730,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
@@ -805,20 +805,21 @@ ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4 这几种�
 
 ## log4j2 配置定制化
 
-为了满足各种用户的场景，在 V1.4.0 引入了 SensitivePatternLayout 策略的可配置化。
+为了满足各种用户的场景，在 V1.5.0 引入了 SensitivePatternLayout 策略的可配置化。
 
 ### 默认配置
 
 log4j2 配置中，`SensitivePatternLayout` 配置默认等价于
 
 ```xml
-<SensitivePatternLayout prefix=":=&apos;&quot;"
+<SensitivePatternLayout prefix="：‘“，| ,:=&apos;&quot;"
                         scanList="1,2,3,4"
                         replaceList="1,2,3,4"
                         defaultReplace="12"
                         replaceHash="md5"
                         pattern="${DEFAULT_PATTERN}"
                         charset="${DEFAULT_CHARSET}"
+                        whiteList=""
 />
 ```
 
@@ -826,13 +827,14 @@ log4j2 配置中，`SensitivePatternLayout` 配置默认等价于
 
 SensitivePatternLayout 策略的属性说明。
 
-| 属性 | 说明          | 默认值                    | 备注                                       |
-|:---|:------------|:-----------------------|:-----------------------------------------|
-|  prefix  | 需要脱敏信息的匹配前缀 | `:='"`                 | 降低误判率                                    |
-|  replaceHash  | 哈希策略模式      | `md5`                  | 支持 md5/none 两种模式                         |
-|  scanList  | 敏感扫描策略列表    | `1,2,3,4` | 1~10 内置的10种敏感信息扫描策略，多个用逗号隔开              |
-|  replaceList  | 敏感替换策略列表    | `1,2,3,4` | 1~10 内置的10种敏感信息替换策略，多个用逗号隔开              |
-|  defaultReplace  | 敏感替换默认策略  | `12`                   | 1~13 内置的13种敏感信息替换策略，指定一个。当列表没有匹配时，默认使用这个 |
+| 属性 | 说明          | 默认值                | 备注                                       |
+|:---|:------------|:-------------------|:-----------------------------------------|
+|  prefix  | 需要脱敏信息的匹配前缀 | `：‘“， ,:"'=` 和英文竖线 | 降低误判率                                    |
+|  replaceHash  | 哈希策略模式      | `md5`              | 支持 md5/none 两种模式                         |
+|  scanList  | 敏感扫描策略列表    | `1,2,3,4`          | 1~10 内置的10种敏感信息扫描策略，多个用逗号隔开              |
+|  replaceList  | 敏感替换策略列表    | `1,2,3,4`          | 1~10 内置的10种敏感信息替换策略，多个用逗号隔开              |
+|  defaultReplace  | 敏感替换默认策略    | `12`               | 1~13 内置的13种敏感信息替换策略，指定一个。当列表没有匹配时，默认使用这个 |
+|  whiteList  | 白名单         | ``               | 希望跳过处理的白名单信息                             |
 
 其中 1-13 的内置策略说明如下：
 

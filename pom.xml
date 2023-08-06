@@ -7,7 +7,7 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
@@ -39,7 +39,7 @@
         <heaven.version>0.2.10</heaven.version>
         <deep-copy.version>0.0.1</deep-copy.version>
         <hash.version>0.0.7</hash.version>
-        <chars-scan.version>1.20.0</chars-scan.version>
+        <chars-scan.version>1.21.0</chars-scan.version>
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.13.1</junit.version>

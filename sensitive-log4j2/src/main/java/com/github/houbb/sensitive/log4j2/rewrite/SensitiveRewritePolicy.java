@@ -24,6 +24,7 @@ import org.apache.logging.log4j.message.SimpleMessage;
  * @author dh
  */
 @Plugin(name = "SensitiveRewritePolicy", category = Node.CATEGORY, elementType = "rewritePolicy", printObject = true)
+@Deprecated
 public class SensitiveRewritePolicy implements RewritePolicy {
 
     /**
@@ -112,14 +113,15 @@ public class SensitiveRewritePolicy implements RewritePolicy {
     @PluginFactory
     public static SensitiveRewritePolicy createPolicy(@PluginConfiguration Configuration pluginConfig,
                                                       @PluginNode Node pluginNode,
-                                                      @PluginAttribute(value = "prefix", defaultString = ":\"'=") String prefix,
+                                                      @PluginAttribute(value = "prefix", defaultString = "：‘“，| ,:\"'=") String prefix,
                                                       @PluginAttribute(value = "scanList", defaultString = "1,2,3,4") String scanList,
                                                       @PluginAttribute(value = "replaceList", defaultString = "1,2,3,4") String replaceList,
                                                       @PluginAttribute(value = "defaultReplace", defaultString = "12") String defaultReplace,
-                                                      @PluginAttribute(value = "replaceHash", defaultString = "md5") String replaceHash
+                                                      @PluginAttribute(value = "replaceHash", defaultString = "md5") String replaceHash,
+                                                      @PluginAttribute(value = "whiteList", defaultString = "") String whiteList
                                                       ) {
         // 构建 bs
-        charsScanBs = CharsScanBsUtils.buildCharsScanBs(prefix, scanList, replaceList, defaultReplace, replaceHash);
+        charsScanBs = CharsScanBsUtils.buildCharsScanBs(prefix, scanList, replaceList, defaultReplace, replaceHash, whiteList);
 
         //TODO 根据用户指定的参数初始化
         return new SensitiveRewritePolicy();
