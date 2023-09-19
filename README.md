@@ -889,3 +889,5 @@ SensitivePatternLayout 策略的属性说明。
 - [x] log4j2 layout 对应的脱敏策略
 
 - [ ] 优化代码实现，直接继承自 patternLayout
+
+- [ ] log4j2 脱敏配置添加指定配置文件，而不是放在 pattern 中
