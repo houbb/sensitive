@@ -51,6 +51,8 @@
 
 [8. 支持基于 log4j2 的统一脱敏策略](https://github.com/houbb/sensitive#log4j2-%E6%8F%92%E4%BB%B6%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F)
 
+[9. 支持基于 logback 的统一脱敏策略](https://github.com/houbb/sensitive#logback-%E8%84%B1%E6%95%8F%E6%8F%92%E4%BB%B6)
+
 ## 变更日志
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)

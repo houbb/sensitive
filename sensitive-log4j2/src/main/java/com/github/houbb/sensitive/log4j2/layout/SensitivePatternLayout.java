@@ -87,6 +87,8 @@ public class SensitivePatternLayout extends AbstractStringLayout {
      * 配置
      * @param pluginConfig 配置
      * @param pluginNode 节点
+     * @param pattern 格式
+     * @param charset 编码
      * @return 结果
      */
     @PluginFactory
