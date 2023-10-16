@@ -8,14 +8,7 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <SensitivePatternLayout prefix=":=&apos;&quot;"
-                                    scanList="1,2,3,4"
-                                    replaceList="1,2,3,4"
-                                    defaultReplace="12"
-                                    replaceHash="md5"
-                                    pattern="${DEFAULT_PATTERN}"
-                                    charset="${DEFAULT_CHARSET}"
-            />
+            <SensitivePatternLayout pattern="${DEFAULT_PATTERN}" charset="${DEFAULT_CHARSET}"/>
         </Console>
     </Appenders>
 

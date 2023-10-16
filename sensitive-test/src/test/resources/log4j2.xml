@@ -4,54 +4,20 @@
     <Properties>
         <Property name="DEFAULT_PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
         <Property name="DEFAULT_CHARSET">UTF-8</Property>
-        <Property name="LOG_HOME">/log4j2/logs/test</Property>
     </Properties>
 
     <Appenders>
-        <RollingRandomAccessFile name="COMMON-FILE-APPENDER"
-                                 filePattern="${LOG_HOME}/$${date:yyyy-MM}/error-%d{MM-dd-yyyy}-%i.log.gz"
-                                 fileName = "${LOG_HOME}/common.log"
-                                 immediateFlush="true">
-            <ThresholdFilter level="ERROR" onMatch="DENY" onMisMatch="ACCEPT"/>
-            <PatternLayout>
-                <Pattern>${DEFAULT_PATTERN}</Pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="250 MB"/>
-            </Policies>
-        </RollingRandomAccessFile>
-
-        <RollingRandomAccessFile name="ERROR-FILE-APPENDER"
-                                 filePattern="${LOG_HOME}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
-                                 fileName = "${LOG_HOME}/error.log"
-                                 immediateFlush="true">
-            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMisMatch="DENY"/>
-            <PatternLayout>
-                <Pattern>${DEFAULT_PATTERN}</Pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="250 MB"/>
-            </Policies>
-        </RollingRandomAccessFile>
-
-<!--        <Console name="Console" target="SYSTEM_OUT">-->
-<!--            <SensitivePatternLayout/>-->
-<!--        </Console>-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <SensitivePatternLayout pattern = "${DEFAULT_PATTERN}"
+                                    charset = "${DEFAULT_CHARSET}"
+            />
+        </Console>
     </Appenders>
 
     <Loggers>
-
-        <AsyncLogger name="com.github.houbb.sensitive.test" level="INFO" additivity="false">
-            <AppenderRef ref="COMMON-FILE-APPENDER"/>
-            <AppenderRef ref="ERROR-FILE-APPENDER"/>
-        </AsyncLogger>
-
-        <asyncRoot level="INFO">
-            <AppenderRef ref="COMMON-FILE-APPENDER"/>
-            <AppenderRef ref="ERROR-FILE-APPENDER"/>
-        </asyncRoot>
+        <Root level="DEBUG">
+            <AppenderRef ref="Console"/>
+        </Root>
     </Loggers>
 
 </Configuration>

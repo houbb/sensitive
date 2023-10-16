@@ -1,0 +1,23 @@
+<configuration>
+    <!-- 其他配置 -->
+    <conversionRule conversionWord="sensitive" converterClass="com.github.houbb.sensitive.logback.converter.SensitiveLogbackConverter" />
+
+    <!-- 其他配置 -->
+    <appender name="STDOUTConverter" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %sensitive%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUTLayout" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="com.github.houbb.sensitive.logback.layout.SensitiveLogbackLayout">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!-- 设置根日志级别为DEBUG，并将日志输出到控制台 -->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUTConverter"/>
+        <appender-ref ref="STDOUTLayout"/>
+    </root>
+</configuration>

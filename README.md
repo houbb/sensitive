@@ -4,6 +4,8 @@
 
 本项目提供基于注解的方式，并且内置了常见的脱敏方式，便于开发。
 
+支持 logback 和 log4j2 等常见的日志脱敏插件。
+
 [![Build Status](https://travis-ci.com/houbb/sensitive.svg?branch=master)](https://travis-ci.com/houbb/sensitive)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/sensitive/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/sensitive)
 [![](https://img.shields.io/badge/license-Apache2-FF0080.svg)](https://github.com/houbb/sensitive/blob/master/LICENSE.txt)
@@ -47,15 +49,15 @@
 
 [7. 支持自定义哈希策略，更加方便定位日志问题](https://github.com/houbb/sensitive#%E9%85%8D%E7%BD%AE%E5%93%88%E5%B8%8C%E7%AD%96%E7%95%A5)
 
-![8. 支持基于 log4j2 的统一脱敏策略](https://github.com/houbb/sensitive#log4j2-%E6%8F%92%E4%BB%B6%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F)
+[8. 支持基于 log4j2 的统一脱敏策略](https://github.com/houbb/sensitive#log4j2-%E6%8F%92%E4%BB%B6%E7%BB%9F%E4%B8%80%E8%84%B1%E6%95%8F)
 
 ## 变更日志
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
 
-### v-1.5.0 新特性
+### v-1.6.0 新特性
 
-- 优化姓名+银行卡+身份证 的匹配策略，使其更加精准。
+- 添加 logback 脱敏插件
 
 ## 拓展阅读
 
@@ -77,7 +79,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
 </dependency>
 ```
 
@@ -716,8 +718,6 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
 我们可以基于 log4j2 RewritePolicy 统一使用脱敏策略。
 
-本项目自 V1.2.0 添加对应支持，后续将提升对应的可拓展性。
-
 说明：如果使用 slf4j 接口，实现为 log4j2 时也是支持的。
 
 ## 使用入门
@@ -730,7 +730,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
 </dependency>
 ```
 
@@ -798,29 +798,28 @@ logger.info(TEST_LOG);
 自动脱敏效果如下：
 
 ```
-mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2; bankCard:6217***********5024|444F49289B30944AB8C6C856AEA21180, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C, amount:123.00, IdNo:3****************6|F9F05E4ABB3591FC8EA481E8DE1FA4D6, name1:李*|15095D14367F7F02655030D498A4BA03, name2:李**|035E3C0D1A0410367FE6EB8335B2BFDE, name3:李泽**|B87138E5E80AEC87D2581A25CAA3809D, name4:山东***|6F2178D34BC7DD0A07936B5AFF39A16F, birthday:********|1F88D983FAFC50022651122B42F084A0, GPS:**********|E281A9A52DE915154285148D68872CA2, IPV4:127******|F528764D624DB129B32C21FBCA0CB8D6, address:中国上海市徐******|821A601949B1BD18DCBAAE27F2E27147;
+01:37:28.010 [main] INFO  com.github.houbb.sensitive.test.log4j2.Log4j2AndSlf4jLayoutTest - mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2; bankCard:6217***********5024|444F49289B30944AB8C6C856AEA21180, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C, amount:123.00, IdNo:340110199801016666, name1:李明, name2:李晓明, name3:李泽明天, name4:山东小栗旬, birthday:20220517, GPS:120.882222, IPV4:127.0.0.1, address:中国上海市徐******|821A601949B1BD18DCBAAE27F2E27147;
 ```
 
-ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4 这几种策略。 
+ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4,9 这几种策略。 
 
 ## log4j2 配置定制化
 
-为了满足各种用户的场景，在 V1.5.0 引入了 SensitivePatternLayout 策略的可配置化。
+为了满足各种用户的场景，在 V1.6.0 引入了 SensitivePatternLayout 策略的可配置化。
+
+用户可以在应用 resources 下通过 `chars-scan-config.properties` 配置文件指定。
 
 ### 默认配置
 
-log4j2 配置中，`SensitivePatternLayout` 配置默认等价于
+log4j2 配置中，`SensitivePatternLayout` 配置默认为：
 
-```xml
-<SensitivePatternLayout prefix="：‘“，| ,:=&apos;&quot;"
-                        scanList="1,2,3,4"
-                        replaceList="1,2,3,4"
-                        defaultReplace="12"
-                        replaceHash="md5"
-                        pattern="${DEFAULT_PATTERN}"
-                        charset="${DEFAULT_CHARSET}"
-                        whiteList=""
-/>
+```properties
+chars.scan.prefix=:：,，'"‘“=| +()（）
+chars.scan.scanList=1,2,3,4,9
+chars.scan.replaceList=1,2,3,4,9
+chars.scan.defaultReplace=12
+chars.scan.replaceHash=md5
+chars.scan.whiteList=""
 ```
 
 ### 属性说明
@@ -859,6 +858,70 @@ SensitivePatternLayout 策略的属性说明。
 这里的策略自定义和 log4j2 的插件化比起来，确实算不上强大，但是可以满足 99% 的脱敏场景。
 
 后续有时间考虑类似 log4j2 的 plugins 思想，实现更加灵活的自定义策略。
+
+# logback 脱敏插件
+
+## 说明
+
+为了便于用户使用，v1.6.0 开始支持 logback 插件模式。
+
+## 使用入门
+
+### maven 引入
+
+引入 logback 依赖包
+
+```xml
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>${logback.version}</version>
+</dependency>
+```
+
+### 指定 logback.xml 配置
+
+```xml
+<configuration>
+    <!-- 基于 converter -->
+    <conversionRule conversionWord="sensitive" converterClass="com.github.houbb.sensitive.logback.converter.SensitiveLogbackConverter" />
+    <!-- 使用 converter -->
+    <appender name="STDOUTConverter" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %sensitive%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 使用 layout -->
+    <appender name="STDOUTLayout" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="com.github.houbb.sensitive.logback.layout.SensitiveLogbackLayout">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!-- 设置根日志级别为DEBUG，并将日志输出到控制台 -->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUTConverter"/>
+        <appender-ref ref="STDOUTLayout"/>
+    </root>
+</configuration>
+```
+
+这里共计支持 Converter 和 Layout 两种模式，任选一个即可。
+
+建议使用 SensitiveLogbackConverter，脱敏日志内容。
+
+## 日志效果
+
+脱密效果和 log4j2 类似，如下：
+
+```
+01:42:32.579 [main] INFO  c.g.h.sensitive.test2.LogbackMain - mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2; bankCard:6217***********5024|444F49289B30944AB8C6C856AEA21180, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C, amount:123.00, " + "IdNo:340110199801016666, name1:李明, name2:李晓明, name3:李泽明天, name4:山东小栗旬" + ", birthday:20220517, GPS:120.882222, IPV4:127.0.0.1, address:中国上海市徐******|821A601949B1BD18DCBAAE27F2E27147;
+```
+
+## 配置属性
+
+同 log4j2，此处不再赘述。
 
 # 性能耗时
 

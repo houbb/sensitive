@@ -1,1 +1,0 @@
-package com.github.houbb.sensitive.log4j2.support;

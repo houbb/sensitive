@@ -1,12 +1,14 @@
 package com.github.houbb.sensitive.log4j2.rewrite;
 
-import com.github.houbb.chars.scan.bs.CharsScanBs;
-import com.github.houbb.sensitive.log4j2.support.chars.CharsScanBsUtils;
+import com.github.houbb.chars.scan.util.CharsScanPropertyHelper;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.rewrite.RewritePolicy;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.Node;
-import org.apache.logging.log4j.core.config.plugins.*;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginConfiguration;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.config.plugins.PluginNode;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.core.impl.MutableLogEvent;
 import org.apache.logging.log4j.message.Message;
@@ -27,12 +29,6 @@ import org.apache.logging.log4j.message.SimpleMessage;
 @Deprecated
 public class SensitiveRewritePolicy implements RewritePolicy {
 
-    /**
-     * 引导类
-     * @since 1.2.0
-     */
-    private static CharsScanBs charsScanBs;
-
     public SensitiveRewritePolicy() {
     }
 
@@ -47,7 +43,7 @@ public class SensitiveRewritePolicy implements RewritePolicy {
                 String rawMessage = message.getFormattedMessage();
 
                 // 所有基于参数，看起来只在 param 中有意义。
-                String newMessage = charsScanBs.scanAndReplace(rawMessage);
+                String newMessage = CharsScanPropertyHelper.scanAndReplace(rawMessage);
 
                 //builder
                 Log4jLogEvent.Builder newEventBuilder = new Log4jLogEvent.Builder(log4jLogEvent);
@@ -60,7 +56,7 @@ public class SensitiveRewritePolicy implements RewritePolicy {
                 String rawMessage = message.getFormattedMessage();
 
                 // 所有基于参数，看起来只在 param 中有意义。
-                String newMessage = charsScanBs.scanAndReplace(rawMessage);
+                String newMessage = CharsScanPropertyHelper.scanAndReplace(rawMessage);
                 log4jLogEvent.setMessage(new SimpleMessage(newMessage));
                 return source;
             }
@@ -88,41 +84,14 @@ public class SensitiveRewritePolicy implements RewritePolicy {
     // 指定对应的 factory
 
     /**
-     * <pre>
-     *   // 核心实现策略
-     *   .charsCore(CharsCores.defaults())
-     *   // 前缀处理策略
-     *   .charsPrefix(CharsPrefixes.defaults())
-     *   // 扫描策略，每一种对应唯一的 scanType
-     *   .charsScanFactory(CharsScans.defaults())
-     *   // 替换策略
-     *   .charsReplaceFactory(CharsReplaces.defaults())
-     *   // 替换对应的哈希策略
-     *   .charsReplaceHash(CharsReplaceHashes.defaults())
-     *   .init();
-     * </pre>
      * @param pluginConfig 配置
      * @param pluginNode 节点
-     * @param prefix 前缀
-     * @param replaceHash 替换的哈希
-     * @param scanList 扫描策略列表
-     * @param replaceList 替换策略列表
-     * @param defaultReplace 默认策略
      * @return 结果
      */
     @PluginFactory
     public static SensitiveRewritePolicy createPolicy(@PluginConfiguration Configuration pluginConfig,
-                                                      @PluginNode Node pluginNode,
-                                                      @PluginAttribute(value = "prefix", defaultString = "：‘“，| ,:\"'=") String prefix,
-                                                      @PluginAttribute(value = "scanList", defaultString = "1,2,3,4") String scanList,
-                                                      @PluginAttribute(value = "replaceList", defaultString = "1,2,3,4") String replaceList,
-                                                      @PluginAttribute(value = "defaultReplace", defaultString = "12") String defaultReplace,
-                                                      @PluginAttribute(value = "replaceHash", defaultString = "md5") String replaceHash,
-                                                      @PluginAttribute(value = "whiteList", defaultString = "") String whiteList
+                                                      @PluginNode Node pluginNode
                                                       ) {
-        // 构建 bs
-        charsScanBs = CharsScanBsUtils.buildCharsScanBs(prefix, scanList, replaceList, defaultReplace, replaceHash, whiteList);
-
         //TODO 根据用户指定的参数初始化
         return new SensitiveRewritePolicy();
     }
