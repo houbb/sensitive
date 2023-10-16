@@ -939,11 +939,11 @@ SensitivePatternLayout 策略的属性说明。
 
 # ROAD-MAP
 
-- [ ] 添加统一的工具类方法，便于开发单独使用
+- [x] 添加统一的工具类方法，便于开发单独使用
 
 喜欢重载 toString()，或特殊的场景
 
-- [ ] 考虑添加针对 MAP 的脱敏支持
+- [x] 考虑添加针对 MAP 的脱敏支持
 
 - [x] 针对身份证的默认脱敏策略
 
@@ -953,6 +953,8 @@ SensitivePatternLayout 策略的属性说明。
 
 - [x] log4j2 layout 对应的脱敏策略
 
-- [ ] 优化代码实现，直接继承自 patternLayout
+- [x] 优化代码实现，直接继承自 patternLayout
 
-- [ ] log4j2 脱敏配置添加指定配置文件，而不是放在 pattern 中
+- [x] log4j2 脱敏配置添加指定配置文件，而不是放在 pattern 中
+
+- [ ] 日志插件脱敏的 benchmark 性能报告
