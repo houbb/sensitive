@@ -6,6 +6,8 @@
 
 支持 logback 和 log4j2 等常见的日志脱敏插件。
 
+**日志插件解决正则匹配长文本可能出现的回溯问题，性能远超正则**。
+
 [![Build Status](https://travis-ci.com/houbb/sensitive.svg?branch=master)](https://travis-ci.com/houbb/sensitive)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.houbb/sensitive/badge.svg)](http://mvnrepository.com/artifact/com.github.houbb/sensitive)
 [![](https://img.shields.io/badge/license-Apache2-FF0080.svg)](https://github.com/houbb/sensitive/blob/master/LICENSE.txt)
@@ -81,7 +83,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
 </dependency>
 ```
 
@@ -732,7 +734,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
 </dependency>
 ```
 
@@ -839,21 +841,23 @@ SensitivePatternLayout 策略的属性说明。
 
 其中 1-13 的内置策略说明如下：
 
-| 策略标识 | 说明 |
-|:----|:----|
-| 1 | 手机号 |
-| 2 | 身份证 |
-| 3 | 银行卡 |
-| 4 | 邮箱 |
-| 5 | 中国人名 |
-| 6 | 出生日期 |
-| 7 | GPS |
-| 8 | IPV4 |
-| 9 | 地址 |
-| 10 | 护照 |
-| 11 | 匹配任意不掩盖 |
-| 12 | 匹配任意半掩盖 |
-| 13 | 匹配任意全掩盖 |
+| 策略标识 | 说明                     |
+|:-----|:-----------------------|
+| 1    | 手机号                    |
+| 2    | 身份证                    |
+| 3    | 银行卡                    |
+| 4    | 邮箱                     |
+| 5    | 中国人名                   |
+| 6    | 出生日期                   |
+| 7    | GPS                    |
+| 8    | IPV4                   |
+| 9    | 地址                     |
+| 10   | 护照                     |
+| 11   | 匹配任意不掩盖                |
+| 12   | 匹配任意半掩盖                |
+| 13   | 匹配任意全掩盖                |
+| m1   | 数字类合并操作(m1:1&2&3) 性能更好 |
+| m3   | 拓展类合并操作(m3:4&5&9) 性能更好 |
 
 ### 不足之处
 
@@ -870,6 +874,16 @@ SensitivePatternLayout 策略的属性说明。
 ## 使用入门
 
 ### maven 引入
+
+引入核心脱敏包。
+
+```xml
+<dependency>
+    <groupId>com.github.houbb</groupId>
+    <artifactId>sensitive-logback</artifactId>
+    <version>1.7.0</version>
+</dependency>
+```
 
 引入 logback 依赖包
 
