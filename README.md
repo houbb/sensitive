@@ -65,9 +65,27 @@
 
 ## 拓展阅读
 
-[金融用户敏感数据如何优雅地实现脱敏？](https://mp.weixin.qq.com/s/ljChFiNLzV6GLaUDjehA0Q)
+[日志开源组件（一）java 注解结合 spring aop 实现自动输出日志](https://houbb.github.io/2023/08/06/auto-log-01-overview)
 
-[日志脱敏之后，无法根据信息快速定位怎么办？](https://mp.weixin.qq.com/s/tZqOH_8QTKrD1oaclNoewg)
+[日志开源组件（二）java 注解结合 spring aop 实现日志traceId唯一标识](https://houbb.github.io/2023/08/06/auto-log-02-trace-id)
+
+[日志开源组件（三）java 注解结合 spring aop 自动输出日志新增拦截器与过滤器](https://houbb.github.io/2023/08/06/auto-log-03-filter)
+
+[日志开源组件（四）如何动态修改 spring aop 切面信息？让自动日志输出框架更好用](https://houbb.github.io/2023/08/06/auto-log-04-dynamic-aop)
+
+[日志开源组件（五）如何将 dubbo filter 拦截器原理运用到日志拦截器中？](https://houbb.github.io/2023/08/06/auto-log-05-dubbo-interceptor)
+
+[日志开源组件（六）Adaptive Sampling 自适应采样](https://mp.weixin.qq.com/s/9JH3WfR6Y474LCbY2mZxZQ)
+
+[高性能日志脱敏组件（一）java 日志脱敏框架 sensitive，优雅的打印脱敏日志](https://mp.weixin.qq.com/s/xzQNDF7s705iurk7N0uheQ)
+
+[高性能日志脱敏组件（二）金融用户敏感数据如何优雅地实现脱敏？](https://mp.weixin.qq.com/s/ljChFiNLzV6GLaUDjehA0Q)
+
+[高性能日志脱敏组件（三）日志脱敏之后，无法根据信息快速定位怎么办？](https://mp.weixin.qq.com/s/tZqOH_8QTKrD1oaclNoewg)
+
+[高性能日志脱敏组件（四）基于 log4j2 插件实现统一日志脱敏，性能远超正则替换](https://mp.weixin.qq.com/s/ZlWRqT7S92aXFuy-l9Uh3Q)
+
+[高性能日志脱敏组件（五）已支持 log4j2 和 logback 插件](https://mp.weixin.qq.com/s/3ARK6PW7pyUhAbO2ctnndg)
 
 # 快速开始
 
