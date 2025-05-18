@@ -55,6 +55,20 @@
 
 [9. 支持基于 logback 的统一脱敏策略](https://github.com/houbb/sensitive#logback-%E8%84%B1%E6%95%8F%E6%8F%92%E4%BB%B6)
 
+## 项目推荐
+
+下面是一些日志、加解密、脱敏安全相关的库推荐：
+
+| 项目                                                                    | 介绍                    |
+|:----------------------------------------------------------------------|:----------------------|
+| [sensitive-word](https://github.com/houbb/sensitive-word)             | 高性能敏感词核心库             |
+| [sensitive-word-admin](https://github.com/houbb/sensitive-word-admin) | 敏感词控台，前后端分离           |
+| [sensitive](https://github.com/houbb/sensitive)                       | 高性能日志脱敏组件             |
+| [auto-log](https://github.com/houbb/auto-log)                         | 统一日志切面组件，支持全链路traceId |
+| [encryption-local](https://github.com/houbb/encryption-local)         | 离线加密机组件               |
+| [encryption](https://github.com/houbb/encryption)         | 加密机标准API+本地客户端        |
+| [encryption-server](https://github.com/houbb/encryption-server)        | 加密机服务                 |
+
 ## 变更日志
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
@@ -970,6 +984,8 @@ SensitivePatternLayout 策略的属性说明。
 | SensitiveUtil.desJson(user) | 1541    | 性能较差，拓展性最好，比较灵活            |
 
 # ROAD-MAP
+
+- [ ] 配置的抽象化
 
 - [x] 添加统一的工具类方法，便于开发单独使用
 
