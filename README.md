@@ -47,7 +47,7 @@
 
 [5. 支持用户自定义注解。](https://github.com/houbb/sensitive#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3)
 
-[6. 支持基于 FastJSON 直接生成脱敏后的 json](https://github.com/houbb/sensitive#%E7%94%9F%E6%88%90%E8%84%B1%E6%95%8F%E5%90%8E%E7%9A%84-json)
+[6. 支持基于 FastJSON2 直接生成脱敏后的 json](https://github.com/houbb/sensitive#%E7%94%9F%E6%88%90%E8%84%B1%E6%95%8F%E5%90%8E%E7%9A%84-json)
 
 [7. 支持自定义哈希策略，更加方便定位日志问题](https://github.com/houbb/sensitive#%E9%85%8D%E7%BD%AE%E5%93%88%E5%B8%8C%E7%AD%96%E7%95%A5)
 
@@ -115,7 +115,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 </dependency>
 ```
 
@@ -630,9 +630,9 @@ Assert.assertEquals(originalStr, systemBuiltInAt.toString());
 
 ## 注意
 
-本次 JSON 脱敏基于 [FastJSON](https://github.com/alibaba/fastjson)。
+本次 JSON 脱敏基于 [FastJSON2](https://github.com/alibaba/fastjson2)。
 
-FastJSON 在序列化本身存在一定限制。当对象中有集合，集合中还是对象时，结果不尽如人意。
+FastJSON2 在序列化本身存在一定限制。当对象中有集合，集合中还是对象时，结果不尽如人意。
 
 ### 示例代码
 
@@ -664,7 +664,7 @@ Assert.assertEquals(originalStr, userCollection.toString());
 
 ```java
 SensitiveBs.newInstance()
-.deepCopy(FastJsonDeepCopy.getInstance())
+.deepCopy(FastJson2DeepCopy.getInstance())
 .hash(Hashes.empty())
 ```
 
@@ -704,11 +704,11 @@ final String expectJson = "{\"email\":\"12******.com|6EAA6A25C8D832B63429C1BEF14
 
 ## 配置深度拷贝实现
 
-默认的使用 FastJson 进行对象的深度拷贝，等价于：
+默认的使用 FastJson2 进行对象的深度拷贝，等价于：
 
 ```java
 SensitiveBs.newInstance()
-                .deepCopy(FastJsonDeepCopy.getInstance())
+                .deepCopy(FastJson2DeepCopy.getInstance())
                 .desJson(user);
 ```
 
@@ -722,11 +722,9 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
 深度复制可以保证我们日志输出对象脱敏，同时不影响正常业务代码的使用。
 
-可以实现深度复制的方式有很多种，默认基于 [fastjson](https://github.com/alibaba/fastjson) 实现的。
+可以实现深度复制的方式有很多种，默认基于 [fastjson2](https://github.com/alibaba/fastjson2) 实现的。
 
-为保证后续良性发展，v0.0.13 版本之后将深度复制接口抽离为单独的项目：
-
-> [deep-copy](https://github.com/houbb/deep-copy)
+为保证后续良性发展，v1.7.1 版本之后将深度复制接口内置到项目中，移除 deep-copy 二方依赖。
 
 ## 内置策略
 
@@ -766,7 +764,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 </dependency>
 ```
 
@@ -913,7 +911,7 @@ SensitivePatternLayout 策略的属性说明。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-logback</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 </dependency>
 ```
 
@@ -980,7 +978,7 @@ SensitivePatternLayout 策略的属性说明。
 | 方法      | 耗时(ms)  | 说明                         |
 |:--------|:--------|:---------------------------|
 | 原始工具类方法 | 122     | 性能最好，但是最麻烦。拓展性最差           |
-| JSON.toJSONString(user) | 304     | 性能较好，拓展性不错。缺点是强依赖 fastjson |
+| JSON.toJSONString(user) | 304     | 性能较好，拓展性不错。缺点是强依赖 fastjson2 |
 | SensitiveUtil.desJson(user) | 1541    | 性能较差，拓展性最好，比较灵活            |
 
 # ROAD-MAP

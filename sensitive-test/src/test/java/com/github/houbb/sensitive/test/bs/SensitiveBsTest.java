@@ -1,8 +1,8 @@
 package com.github.houbb.sensitive.test.bs;
 
-import com.github.houbb.deep.copy.fastjson.FastJsonDeepCopy;
 import com.github.houbb.hash.core.core.hash.Hashes;
 import com.github.houbb.sensitive.core.bs.SensitiveBs;
+import com.github.houbb.sensitive.core.support.deepcopy.FastJson2DeepCopy;
 import com.github.houbb.sensitive.test.core.DataPrepareTest;
 import com.github.houbb.sensitive.test.model.sensitive.User;
 import org.junit.Assert;
@@ -30,7 +30,7 @@ public class SensitiveBsTest {
     @Test
     public void desJsonTest() {
         final String originalStr = "User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}";
-        final String sensitiveStr = "{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"phone\":\"1888****888\",\"username\":\"脱**\"}";
+        final String sensitiveStr = "{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"password\":null,\"phone\":\"1888****888\",\"username\":\"脱**\"}";
 
         User user = DataPrepareTest.buildUser();
         Assert.assertEquals(originalStr, user.toString());
@@ -45,7 +45,7 @@ public class SensitiveBsTest {
         User user = DataPrepareTest.buildUser();
 
         SensitiveBs.newInstance()
-                .deepCopy(FastJsonDeepCopy.getInstance())
+                .deepCopy(FastJson2DeepCopy.getInstance())
                 .hash(Hashes.empty())
                 .desJson(user);
     }

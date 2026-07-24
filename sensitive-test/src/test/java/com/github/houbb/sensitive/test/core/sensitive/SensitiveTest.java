@@ -55,7 +55,7 @@ public class SensitiveTest {
     public void commonSensitiveTest2() {
         final String originalStr = "UserIdNo{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888', idNo='130701199310308888'}";
         final String sensitiveStr = "UserIdNo{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888', idNo='1****************8'}";
-        final String expectSensitiveJson = "{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"idNo\":\"1****************8\",\"phone\":\"1888****888\",\"username\":\"脱**\"}";
+        final String expectSensitiveJson = "{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"idNo\":\"1****************8\",\"password\":null,\"phone\":\"1888****888\",\"username\":\"脱**\"}";
 
         UserIdNo user = DataPrepareTest.buildUserIdNo();
 

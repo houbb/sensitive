@@ -1,6 +1,5 @@
 package com.github.houbb.sensitive.api;
 
-import com.github.houbb.deep.copy.api.IDeepCopy;
 import com.github.houbb.hash.api.IHash;
 
 /**

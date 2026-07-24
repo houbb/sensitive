@@ -1,7 +1,7 @@
 package com.github.houbb.sensitive.core.support.filter;
 
-import com.alibaba.fastjson.serializer.BeanContext;
-import com.alibaba.fastjson.serializer.ContextValueFilter;
+import com.alibaba.fastjson2.filter.BeanContext;
+import com.alibaba.fastjson2.filter.ContextValueFilter;
 import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
@@ -53,7 +53,7 @@ public class DefaultContextValueFilter implements ContextValueFilter {
 
     @Override
     public Object process(BeanContext context, Object object, String name, Object value) {
-        // 对象为 MAP 的时候，FastJson map 对应的 context 为 NULL
+        // 对象为 MAP 的时候，FastJson2 map 对应的 context 为 NULL
         if(ObjectUtil.isNull(context)) {
             return value;
         }

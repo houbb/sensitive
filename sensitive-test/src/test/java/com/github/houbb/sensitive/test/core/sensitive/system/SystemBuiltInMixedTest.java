@@ -36,7 +36,7 @@ public class SystemBuiltInMixedTest {
     @Test
     public void systemBuiltInAndSensitiveJsonTest() {
         final String originalStr = "SystemBuiltInMixed{testField='混合'}";
-        final String sensitiveJson = "{}";
+        final String sensitiveJson = "{\"testField\":null}";
         SystemBuiltInMixed entry = DataPrepareTest.buildSystemBuiltInMixed();
 
         Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(entry));

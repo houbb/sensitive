@@ -1,8 +1,7 @@
 package com.github.houbb.sensitive.core.api;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.ContextValueFilter;
-import com.github.houbb.deep.copy.api.IDeepCopy;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.filter.ContextValueFilter;
 import com.github.houbb.heaven.annotation.ThreadSafe;
 import com.github.houbb.heaven.support.cache.impl.ClassFieldListCache;
 import com.github.houbb.heaven.util.lang.ObjectUtil;
@@ -13,13 +12,11 @@ import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
-import com.github.houbb.sensitive.api.ICondition;
-import com.github.houbb.sensitive.api.ISensitive;
-import com.github.houbb.sensitive.api.ISensitiveConfig;
-import com.github.houbb.sensitive.api.IStrategy;
+import com.github.houbb.sensitive.api.*;
 import com.github.houbb.sensitive.api.impl.SensitiveStrategyBuiltIn;
 import com.github.houbb.sensitive.core.api.context.SensitiveContext;
 import com.github.houbb.sensitive.core.exception.SensitiveRuntimeException;
+import com.github.houbb.sensitive.core.support.InnerJsonUtil;
 import com.github.houbb.sensitive.core.support.filter.DefaultContextValueFilter;
 import com.github.houbb.sensitive.core.util.entry.SensitiveEntryUtil;
 import com.github.houbb.sensitive.core.util.strategy.SensitiveStrategyBuiltInUtil;
@@ -69,7 +66,7 @@ public class SensitiveService<T> implements ISensitive<T> {
         final SensitiveContext context = SensitiveContext.newInstance();
         context.setSensitiveConfig(config);
         ContextValueFilter filter = new DefaultContextValueFilter(context);
-        return JSON.toJSONString(object, filter);
+        return InnerJsonUtil.toJson(object, filter);
     }
 
     /**

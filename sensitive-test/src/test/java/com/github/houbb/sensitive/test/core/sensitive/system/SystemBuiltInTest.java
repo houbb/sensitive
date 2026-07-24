@@ -55,7 +55,7 @@ public class SystemBuiltInTest {
     @Test
     public void sensitiveJsonTest() {
         final String originalStr = "SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}";
-        final String sensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"name\":\"脱**\",\"phone\":\"1888****888\"}";
+        final String sensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"name\":\"脱**\",\"password\":null,\"phone\":\"1888****888\"}";
 
         SystemBuiltInAt systemBuiltInAt = DataPrepareTest.buildSystemBuiltInAt();
         Assert.assertEquals(sensitiveJson, SensitiveUtil.desJson(systemBuiltInAt));
@@ -69,7 +69,7 @@ public class SystemBuiltInTest {
     @Test
     public void sensitiveEntryJsonTest() {
         final String originalStr = "SystemBuiltInAtEntry{entry=SystemBuiltInAt{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234'}}";
-        final String sensitiveJson = "{\"entry\":{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"name\":\"脱**\",\"phone\":\"1888****888\"}}";
+        final String sensitiveJson = "{\"entry\":{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"name\":\"脱**\",\"password\":null,\"phone\":\"1888****888\"}}";
 
         SystemBuiltInAtEntry entry = DataPrepareTest.buildSystemBuiltInAtEntry();
 
@@ -85,7 +85,7 @@ public class SystemBuiltInTest {
     public void sensitiveTest2() {
         final String expectOriginalStr = "SystemBuiltInAtIdNo{phone='18888888888', password='1234567', name='脱敏君', email='12345@qq.com', cardId='123456190001011234', idNo='130701199310308888'}";
         final String expectSensitiveStr = "SystemBuiltInAtIdNo{phone='1888****888', password='null', name='脱**', email='12******.com', cardId='123456**********34', idNo='1****************8'}";
-        final String expectSensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"idNo\":\"1****************8\",\"name\":\"脱**\",\"phone\":\"1888****888\"}";
+        final String expectSensitiveJson = "{\"cardId\":\"123456**********34\",\"email\":\"12******.com\",\"idNo\":\"1****************8\",\"name\":\"脱**\",\"password\":null,\"phone\":\"1888****888\"}";
 
         SystemBuiltInAtIdNo original = DataPrepareTest.buildSystemBuiltInAtIdNo();
         SystemBuiltInAtIdNo sensitive = SensitiveUtil.desCopy(original);

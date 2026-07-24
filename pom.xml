@@ -7,7 +7,7 @@
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive</artifactId>
     <packaging>pom</packaging>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <modules>
         <module>sensitive-annotation</module>
         <module>sensitive-api</module>
@@ -35,17 +35,16 @@
 
         <!--============================== MAIN ==============================-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.compiler.level>1.7</project.compiler.level>
+        <project.compiler.level>8</project.compiler.level>
 
         <!--============================== INTER ==============================-->
         <heaven.version>0.4.0</heaven.version>
-        <deep-copy.version>0.0.1</deep-copy.version>
+        <fastjson2.version>2.0.61</fastjson2.version>
         <hash.version>0.0.7</hash.version>
         <chars-scan.version>1.29.0</chars-scan.version>
 
         <!--============================== OTHER ==============================-->
         <junit.version>4.13.1</junit.version>
-        <fastjson.version>1.2.83</fastjson.version>
         <log4j2.version>2.17.1</log4j2.version>
         <logback.version>1.2.3</logback.version>
     </properties>
@@ -92,17 +91,6 @@
 
             <dependency>
                 <groupId>com.github.houbb</groupId>
-                <artifactId>deep-copy-api</artifactId>
-                <version>${deep-copy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.houbb</groupId>
-                <artifactId>deep-copy-fastjson</artifactId>
-                <version>${deep-copy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.houbb</groupId>
                 <artifactId>hash-api</artifactId>
                 <version>${hash.version}</version>
             </dependency>
@@ -126,9 +114,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
             </dependency>
 
             <dependency>

@@ -1,15 +1,15 @@
 package com.github.houbb.sensitive.core.bs;
 
-import com.github.houbb.deep.copy.api.IDeepCopy;
-import com.github.houbb.deep.copy.fastjson.FastJsonDeepCopy;
 import com.github.houbb.hash.api.IHash;
 import com.github.houbb.hash.core.core.hash.Hashes;
 import com.github.houbb.heaven.support.instance.impl.Instances;
 import com.github.houbb.heaven.util.common.ArgUtil;
+import com.github.houbb.sensitive.api.IDeepCopy;
 import com.github.houbb.sensitive.api.ISensitive;
 import com.github.houbb.sensitive.api.ISensitiveConfig;
 import com.github.houbb.sensitive.core.api.SensitiveService;
 import com.github.houbb.sensitive.core.support.config.DefaultSensitiveConfig;
+import com.github.houbb.sensitive.core.support.deepcopy.FastJson2DeepCopy;
 
 /**
  * 脱敏引导类
@@ -24,7 +24,7 @@ public final class SensitiveBs {
      * 深度拷贝
      * @since 0.0.13
      */
-    private IDeepCopy deepCopy = FastJsonDeepCopy.getInstance();
+    private IDeepCopy deepCopy = FastJson2DeepCopy.getInstance();
 
     /**
      * 脱敏实现
