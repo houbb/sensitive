@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>sensitive-test2</artifactId>
+    <name>sensitive-test2</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

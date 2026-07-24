@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>sensitive-logback</artifactId>
+    <name>sensitive-logback</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
