@@ -1,6 +1,6 @@
 package com.github.houbb.sensitive.log4j2.rewrite;
 
-import com.github.houbb.chars.scan.util.CharsScanPropertyHelper;
+import com.github.houbb.sensitive.core.support.scan.SensitiveScanBsContext;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.rewrite.RewritePolicy;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -43,7 +43,7 @@ public class SensitiveRewritePolicy implements RewritePolicy {
                 String rawMessage = message.getFormattedMessage();
 
                 // 所有基于参数，看起来只在 param 中有意义。
-                String newMessage = CharsScanPropertyHelper.scanAndReplace(rawMessage);
+                String newMessage = SensitiveScanBsContext.scanAndReplace(rawMessage);
 
                 //builder
                 Log4jLogEvent.Builder newEventBuilder = new Log4jLogEvent.Builder(log4jLogEvent);
@@ -56,7 +56,7 @@ public class SensitiveRewritePolicy implements RewritePolicy {
                 String rawMessage = message.getFormattedMessage();
 
                 // 所有基于参数，看起来只在 param 中有意义。
-                String newMessage = CharsScanPropertyHelper.scanAndReplace(rawMessage);
+                String newMessage = SensitiveScanBsContext.scanAndReplace(rawMessage);
                 log4jLogEvent.setMessage(new SimpleMessage(newMessage));
                 return source;
             }

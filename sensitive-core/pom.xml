@@ -5,7 +5,7 @@
     <parent>
         <artifactId>sensitive</artifactId>
         <groupId>com.github.houbb</groupId>
-        <version>1.8.0</version>
+        <version>1.9.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -39,6 +39,11 @@
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>chars-scan</artifactId>
         </dependency>
         <!--========================= OTHER =========================-->
     </dependencies>

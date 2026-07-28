@@ -963,6 +963,134 @@ SensitivePatternLayout 策略的属性说明。
 |  whiteList  | 白名单         | ``               | 希望跳过处理的白名单信息                             |
 |  showHash  | 是否显示哈希值    | `true`             | 控制脱敏结果中是否包含哈希值（v1.8.0 新增）               |
 
+### 自定义策略配置
+
+v1.9.0 新增支持自定义扫描和替换策略，所有内置策略（1-13）都可以自定义覆盖。
+
+**配置方式**（chars-scan-config.properties）：
+
+```properties
+# 自定义手机号扫描策略（策略标识1）
+chars.scan.custom.scan.1.class=com.example.MyPhoneScan
+
+# 自定义手机号替换策略（策略标识1）
+chars.scan.custom.replace.1.class=com.example.MyPhoneReplace
+
+# 自定义中国人名扫描策略（策略标识5）
+chars.scan.custom.scan.5.class=com.example.MyChineseNameScan
+
+# 自定义中国人名替换策略（策略标识5）
+chars.scan.custom.replace.5.class=com.example.MyChineseNameReplace
+
+# 是否覆盖内置策略（true=覆盖，false=共存，默认true）
+chars.scan.custom.override=true
+```
+
+**策略标识对照表**：
+
+| 策略标识 | 说明       | 可自定义 |
+|:---|:---|:---:|
+| 1  | 手机号   | ✅ |
+| 2  | 身份证   | ✅ |
+| 3  | 银行卡   | ✅ |
+| 4  | 邮箱     | ✅ |
+| 5  | 中国人名 | ✅ |
+| 6  | 出生日期 | ✅ |
+| 7  | GPS     | ✅ |
+| 8  | IPV4    | ✅ |
+| 9  | 地址     | ✅ |
+| 10 | 护照     | ✅ |
+| 11 | 匹配任意不掩盖 | ✅ |
+| 12 | 匹配任意半掩盖 | ✅ |
+| 13 | 匹配任意全掩盖 | ✅ |
+
+**自定义扫描策略示例**：
+
+```java
+public class MyPhoneScan extends AbstractConditionCharScan {
+    
+    @Override
+    protected boolean isCharMatchCondition(int i, char c, char[] chars) {
+        return Character.isDigit(c);
+    }
+    
+    @Override
+    protected boolean isStringMatchCondition(int i, char c, char[] chars, CharsScanContext context) {
+        StringBuilder buffer = getBuffer();
+        int bufferLen = buffer.length();
+        
+        // 支持11位国内号码 + 10-16位国际号码（00开头）
+        if (bufferLen >= 11 && bufferLen <= 16) {
+            String phone = buffer.toString();
+            return phone.startsWith("00") || phone.startsWith("1");
+        }
+        
+        return false;
+    }
+    
+    @Override
+    public String getScanType() {
+        return CharsScanTypeEnum.PHONE.getScanType();
+    }
+    
+    @Override
+    public int getPriority() {
+        return CharsScanTypeEnum.PHONE.getPriority();
+    }
+}
+```
+
+**自定义替换策略示例**：
+
+```java
+public class MyPhoneReplace extends AbstractRangeCharReplace {
+    
+    @Override
+    public String getScanType() {
+        return CharsScanTypeEnum.PHONE.getScanType();
+    }
+    
+    @Override
+    protected int getMaskStartIndex(char[] chars, int itemLen, CharsScanMatchItem item) {
+        String phone = new String(chars, item.getStartIndex(), itemLen);
+        
+        if (phone.startsWith("00")) {
+            // 国际号码：008613912345678 -> 0086****5678
+            return item.getStartIndex() + 4;
+        } else {
+            // 国内号码：13912345678 -> 139****5678
+            return item.getStartIndex() + 3;
+        }
+    }
+    
+    @Override
+    protected int getMaskStartEnd(char[] chars, int itemLen, CharsScanMatchItem item) {
+        return item.getEndIndex() - 4;
+    }
+}
+```
+
+### 统一上下文管理
+
+v1.9.0 引入了 `SensitiveScanBsContext` 统一上下文管理器，log4j2 和 logback 共享同一套配置，基于 chars-scan 的 `CharsScanBs` 实现。
+
+**优势**：
+- 零侵入：不修改 chars-scan 库
+- 统一配置：log4j2/logback 共享配置
+- 高扩展性：支持自定义扫描+替换策略
+- 配置驱动：配置文件指定策略类路径
+- 性能优化：单例模式+多种核心实现
+
+**手动重新加载配置**：
+
+```java
+// 重新加载配置
+SensitiveScanBsContext.reload();
+
+// 获取 CharsScanBs 实例（高级用法）
+CharsScanBs charsScanBs = SensitiveScanBsContext.getCharsScanBs();
+```
+
 其中 1-13 的内置策略说明如下：
 
 | 策略标识 | 说明                     |

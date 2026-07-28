@@ -1,6 +1,6 @@
 package com.github.houbb.sensitive.log4j2.layout;
 
-import com.github.houbb.chars.scan.util.CharsScanPropertyHelper;
+import com.github.houbb.sensitive.core.support.scan.SensitiveScanBsContext;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -45,7 +45,7 @@ public class SensitivePatternLayout extends AbstractStringLayout {
         String text = stringBuilder.toString();
 
         try {
-            return CharsScanPropertyHelper.scanAndReplace(text);
+            return SensitiveScanBsContext.scanAndReplace(text);
         } catch (Exception e) {
             return text;
         }

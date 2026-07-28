@@ -2,7 +2,7 @@ package com.github.houbb.sensitive.logback.layout;
 
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import com.github.houbb.chars.scan.util.CharsScanPropertyHelper;
+import com.github.houbb.sensitive.core.support.scan.SensitiveScanBsContext;
 
 /**
  * logback 通过转换类的脱敏
@@ -13,7 +13,7 @@ public class SensitiveLogbackLayout extends PatternLayout {
     @Override
     public String doLayout(ILoggingEvent event) {
         String originalMessage = super.doLayout(event);
-        return CharsScanPropertyHelper.scanAndReplace(originalMessage);
+        return SensitiveScanBsContext.scanAndReplace(originalMessage);
     }
 
 }
