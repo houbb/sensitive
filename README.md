@@ -122,7 +122,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
@@ -760,8 +760,10 @@ chars.scan.showHash=false
 配置优先级：编程式配置 > 系统属性 > 配置文件 > 默认值（true）
 
 **配置影响范围**：
-- **注解方式**：`SensitiveBs.newInstance().showHash(false)` 会影响注解方式的脱敏结果
-- **日志插件方式**：当前版本不影响 log4j2/logback 日志插件的脱敏结果（日志插件使用 chars-scan 的脱敏逻辑）
+
+- **注解方式**：编程式 `showHash`、系统属性和配置文件依次生效。
+- **日志插件方式**：log4j2/logback 共用 `chars.scan.showHash`；编程式
+  `SensitiveBs.showHash(...)` 和 `sensitive.showHash` 系统属性只属于注解脱敏，不会覆盖日志插件配置。
 
 ### 配置调试
 
@@ -830,258 +832,152 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
 > [自定义深度复制](https://github.com/houbb/deep-copy#%E8%87%AA%E5%AE%9A%E4%B9%89)
 
-# log4j2 插件统一脱敏
+# 日志插件统一脱敏
 
-## 说明
+对于历史项目、Map/字符串日志或无法逐个改造字段注解的场景，可以在日志输出层统一脱敏。
+log4j2 和 logback 只负责接入日志事件，后续都委托给
+`SensitiveScanBsContext`，因此两者共用同一份配置、策略和运行时实例。
 
-上面的方法非常适用于新的项目，按照响应的规范进行推广。
+| 内容 | log4j2 | logback |
+|:---|:---|:---|
+| 推荐接入点 | `SensitivePatternLayout` | `SensitiveLogbackConverter` |
+| 兼容接入点 | `SensitiveRewritePolicy`（已废弃） | `SensitiveLogbackLayout` |
+| 公共配置 | `chars-scan-config.properties` | `chars-scan-config.properties` |
+| 扫描与替换 | `SensitiveScanBsContext` | `SensitiveScanBsContext` |
 
-但是很多金融公司都有很多历史遗留项目，或者使用不规范，比如使用 map 等，导致上面的方法在脱敏技改时需要耗费大量的时间，而且回溯成本很高。
+## 公共配置与扩展
 
-有没有什么方法，可以直接在日志层统一处理呢？
+log4j2 和 logback 都由 `SensitiveScanBsContext` 创建底层 `CharsScanBs`，所以应用只需在
+`resources` 下维护一份 `chars-scan-config.properties`。配置按 UTF-8 读取，可以直接写
+中文前缀和白名单。
 
-## log4j2 Rewrite
+数字 `1`、`2`、`3` 等只表示 chars-scan 的**内置策略**，适合做默认选择，不再作为
+自定义扩展的配置协议。自定义扫描器和替换器的标识来自实现自身的 `getScanType()`，
+可以是 `customer-phone` 等业务标识。
 
-我们可以基于 log4j2 RewritePolicy 统一使用脱敏策略。
+### 与 CharsScanBs 一一对应
 
-说明：如果使用 slf4j 接口，实现为 log4j2 时也是支持的。
+需要完全控制底层行为时，可以直接替换 `CharsScanBs` 的组件。实现类必须是 `public`、
+具有 `public` 无参构造方法，并实现表中的接口。
 
-## 使用入门
+| 配置 | CharsScanBs 构建方法 | 实现接口 |
+|:---|:---|:---|
+| `chars.scan.charsCore.class` | `charsCore(...)` | `ICharsCore` |
+| `chars.scan.charsScanFactory.class` | `charsScanFactory(...)` | `ICharsScanFactory` |
+| `chars.scan.charsReplaceFactory.class` | `charsReplaceFactory(...)` | `ICharsReplaceFactory` |
+| `chars.scan.charsReplaceHash.class` | `charsReplaceHash(...)` | `ICharsReplaceHash` |
+| `chars.scan.whiteListTrie.class` | `whiteListTrie(...)` | `ITrieTree` |
+| `chars.scan.prefixCharSet` | `prefixCharSet(...)` | 字符集合 |
+| `chars.scan.escapePrefixCharSet` | `escapePrefixCharSet(...)` | 转义字符集合 |
+| `chars.scan.scanStartIndex` | `scanStartIndex(...)` | 非负整数 |
 
-### maven 引入
+扫描和替换各有两级扩展，优先级如下：
 
-引入核心脱敏包。
+1. `charsScanFactory.class` / `charsReplaceFactory.class`：替换整个工厂，扩展能力与
+   `CharsScanBs` 完全一致。
+2. 未配置完整工厂时，组合 `builtIn.*` 内置策略和 `custom.*` 自定义实现。
 
-```xml
-<dependency>
-    <groupId>com.github.houbb</groupId>
-    <artifactId>sensitive-log4j2</artifactId>
-    <version>1.8.0</version>
-</dependency>
-```
-
-其他的一般项目中也有，如 log4j2 包：
-
-```xml
-<dependency>
-    <groupId>org.apache.logging.log4j</groupId>
-    <artifactId>log4j-api</artifactId>
-    <version>${log4j2.version}</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.logging.log4j</groupId>
-    <artifactId>log4j-core</artifactId>
-    <version>${log4j2.version}</version>
-</dependency>
-```
-
-### log4j2.xml 配置
-
-例子如下:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages = "com.github.houbb.sensitive.log4j2.layout">
-
-    <Properties>
-        <Property name="DEFAULT_PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
-        <Property name="DEFAULT_CHARSET">UTF-8</Property>
-    </Properties>
-
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <SensitivePatternLayout/>
-        </Console>
-    </Appenders>
-
-    <Loggers>
-        <Root level="DEBUG">
-            <AppenderRef ref="Console"/>
-        </Root>
-    </Loggers>
-
-</Configuration>
-```
-
-几个步骤：
-
-1. 指定 package 为 `packages = "com.github.houbb.sensitive.log4j2.layout"`
-
-2. 按照 log4j2 layout 规范，指定 Layout 策略为 `SensitivePatternLayout`
-
-### 测试
-
-正常的日志打印：
-
-```java
-private static final String TEST_LOG = "mobile:13088887777; bankCard:6217004470007335024, email:mahuateng@qq.com, amount:123.00, " +
-        "IdNo:340110199801016666, name1:李明, name2:李晓明, name3:李泽明天, name4:山东小栗旬" +
-        ", birthday:20220517, GPS:120.882222, IPV4:127.0.0.1, address:中国上海市徐汇区888号;";
-
-logger.info(TEST_LOG);
-```
-
-自动脱敏效果如下：
-
-```
-01:37:28.010 [main] INFO  com.github.houbb.sensitive.test.log4j2.Log4j2AndSlf4jLayoutTest - mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2; bankCard:6217***********5024|444F49289B30944AB8C6C856AEA21180, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C, amount:123.00, IdNo:340110199801016666, name1:李明, name2:李晓明, name3:李泽明天, name4:山东小栗旬, birthday:20220517, GPS:120.882222, IPV4:127.0.0.1, address:中国上海市徐******|821A601949B1BD18DCBAAE27F2E27147;
-```
-
-ps: 这里是为了演示各种效果，实际默认对应为 1,2,3,4,9 这几种策略。 
-
-## log4j2 配置定制化
-
-为了满足各种用户的场景，在 V1.6.0 引入了 SensitivePatternLayout 策略的可配置化。
-
-用户可以在应用 resources 下通过 `chars-scan-config.properties` 配置文件指定。
+`chars.scan.showHash=false` 是哈希总开关，此时强制不输出哈希；其他情况下可通过
+`charsReplaceHash.class` 替换完整哈希实现。
 
 ### 默认配置
 
-log4j2 配置中，`SensitivePatternLayout` 配置默认为：
-
 ```properties
-chars.scan.prefix=:：,，'"‘“=| +()（）
-chars.scan.scanList=1,2,3,4,9
-chars.scan.replaceList=1,2,3,4,9
-chars.scan.defaultReplace=12
-chars.scan.replaceHash=md5
-chars.scan.whiteList=""
+# 完整组件扩展；留空表示使用下方默认或组合配置
+chars.scan.charsScanFactory.class=
+chars.scan.charsReplaceFactory.class=
+chars.scan.charsCore.class=
+chars.scan.charsReplaceHash.class=
+chars.scan.whiteListTrie.class=
+
+# 内置策略选择
+chars.scan.builtIn.scanTypes=1,2,3,4,5,9
+chars.scan.builtIn.replaceTypes=1,2,3,4,5,9
+chars.scan.builtIn.defaultReplaceType=12
+
+# 单个实现扩展；多个类使用英文逗号分隔
+chars.scan.custom.scans=
+chars.scan.custom.replaces=
+chars.scan.custom.override=true
+
+# 其他 CharsScanBs 配置
+chars.scan.charsCore=defaults
+chars.scan.charsCore.threadSize=10
+chars.scan.charsReplaceHash=md5
 chars.scan.showHash=true
+chars.scan.prefixCharSet=:：,，'"‘“=| +-*/()（）【】[]{}><
+chars.scan.escapePrefixCharSet=ntr
+chars.scan.whiteList=
+chars.scan.scanStartIndex=0
 ```
 
-### 属性说明
+`charsCore` 支持 `defaults`/`common`、`concurrency` 和 `threadLocal`；
+`charsReplaceHash` 支持 `md5` 和 `none`。`whiteList` 中的多项使用英文逗号分隔。
 
-SensitivePatternLayout 策略的属性说明。
+### 按实现类扩展扫描与替换
 
-| 属性 | 说明          | 默认值                | 备注                                       |
-|:---|:------------|:-------------------|:-----------------------------------------|
-|  prefix  | 需要脱敏信息的匹配前缀 | `:：,，'"‘“= +()（）` 和英文竖线 | 降低误判率                                    |
-|  replaceHash  | 哈希策略模式      | `md5`              | 支持 md5/none 两种模式                         |
-|  scanList  | 敏感扫描策略列表    | `1,2,3,4`          | 1~10 内置的10种敏感信息扫描策略，多个用逗号隔开              |
-|  replaceList  | 敏感替换策略列表    | `1,2,3,4`          | 1~10 内置的10种敏感信息替换策略，多个用逗号隔开              |
-|  defaultReplace  | 敏感替换默认策略    | `12`               | 1~13 内置的13种敏感信息替换策略，指定一个。当列表没有匹配时，默认使用这个 |
-|  whiteList  | 白名单         | ``               | 希望跳过处理的白名单信息                             |
-|  showHash  | 是否显示哈希值    | `true`             | 控制脱敏结果中是否包含哈希值（v1.8.0 新增）               |
-
-### 自定义策略配置
-
-v1.9.0 新增支持自定义扫描和替换策略，所有内置策略（1-13）都可以自定义覆盖。
-
-**配置方式**（chars-scan-config.properties）：
+这是大多数业务推荐的方式。扫描类实现 `ICharsScan`，替换类实现 `ICharsReplace`；
+两者返回相同的 `getScanType()` 即可关联，不需要再在属性名中重复填写标识。
+这些实现类同样需要是 `public` 并提供 `public` 无参构造方法；扫描器按调用创建新实例，
+避免日志并发或连续扫描时共享可变缓冲区。
 
 ```properties
-# 自定义手机号扫描策略（策略标识1）
-chars.scan.custom.scan.1.class=com.example.MyPhoneScan
+# 覆盖内置手机号和中文姓名策略；标识分别由实现返回 1 和 5
+chars.scan.custom.scans=\
+com.github.houbb.sensitive.core.support.scan.custom.InternationalPhoneScan,\
+com.github.houbb.sensitive.core.support.scan.custom.UyghurNameScan
 
-# 自定义手机号替换策略（策略标识1）
-chars.scan.custom.replace.1.class=com.example.MyPhoneReplace
+chars.scan.custom.replaces=\
+com.github.houbb.sensitive.core.support.scan.custom.InternationalPhoneReplace,\
+com.github.houbb.sensitive.core.support.scan.custom.UyghurNameReplace
 
-# 自定义中国人名扫描策略（策略标识5）
-chars.scan.custom.scan.5.class=com.example.MyChineseNameScan
-
-# 自定义中国人名替换策略（策略标识5）
-chars.scan.custom.replace.5.class=com.example.MyChineseNameReplace
-
-# 是否覆盖内置策略（true=覆盖，false=共存，默认true）
+# true：同标识时自定义优先；false：同标识时内置优先
 chars.scan.custom.override=true
 ```
 
-**策略标识对照表**：
+新增业务策略时，实现类可以返回 `customer-phone` 之类的非数字标识。该标识不需要加入
+`builtIn.scanTypes` 或 `builtIn.replaceTypes`；框架会自动追加它。也可以只扩展扫描或
+只扩展替换，缺少专用替换器时使用 `builtIn.defaultReplaceType` 的兜底规则。
 
-| 策略标识 | 说明       | 可自定义 |
-|:---|:---|:---:|
-| 1  | 手机号   | ✅ |
-| 2  | 身份证   | ✅ |
-| 3  | 银行卡   | ✅ |
-| 4  | 邮箱     | ✅ |
-| 5  | 中国人名 | ✅ |
-| 6  | 出生日期 | ✅ |
-| 7  | GPS     | ✅ |
-| 8  | IPV4    | ✅ |
-| 9  | 地址     | ✅ |
-| 10 | 护照     | ✅ |
-| 11 | 匹配任意不掩盖 | ✅ |
-| 12 | 匹配任意半掩盖 | ✅ |
-| 13 | 匹配任意全掩盖 | ✅ |
+### 内置策略标识
 
-**自定义扫描策略示例**：
+| 标识 | 说明 | 内置扫描 | 内置替换 | 可自定义 |
+|:---|:---|:---:|:---:|:---:|
+| 1 | 手机号 | ✅ | ✅ | ✅ |
+| 2 | 身份证 | ✅ | ✅ | ✅ |
+| 3 | 银行卡 | ✅ | ✅ | ✅ |
+| 4 | 邮箱 | ✅ | ✅ | ✅ |
+| 5 | 中国人名 | ✅ | ✅ | ✅ |
+| 6 | 出生日期 | ✅ | ✅ | ✅ |
+| 7 | GPS | ✅ | ✅ | ✅ |
+| 8 | IPV4 | ✅ | ✅ | ✅ |
+| 9 | 地址 | ✅ | ✅ | ✅ |
+| 10 | 护照 | ✅ | ✅ | ✅ |
+| 11 | 匹配任意不掩盖 | — | ✅ | ✅ |
+| 12 | 匹配任意半掩盖 | — | ✅ | ✅ |
+| 13 | 匹配任意全掩盖 | — | ✅ | ✅ |
 
-```java
-public class MyPhoneScan extends AbstractConditionCharScan {
-    
-    @Override
-    protected boolean isCharMatchCondition(int i, char c, char[] chars) {
-        return Character.isDigit(c);
-    }
-    
-    @Override
-    protected boolean isStringMatchCondition(int i, char c, char[] chars, CharsScanContext context) {
-        StringBuilder buffer = getBuffer();
-        int bufferLen = buffer.length();
-        
-        // 支持11位国内号码 + 10-16位国际号码（00开头）
-        if (bufferLen >= 11 && bufferLen <= 16) {
-            String phone = buffer.toString();
-            return phone.startsWith("00") || phone.startsWith("1");
-        }
-        
-        return false;
-    }
-    
-    @Override
-    public String getScanType() {
-        return CharsScanTypeEnum.PHONE.getScanType();
-    }
-    
-    @Override
-    public int getPriority() {
-        return CharsScanTypeEnum.PHONE.getPriority();
-    }
-}
-```
+11～13 是 chars-scan 内置的通用替换器，没有对应的内置扫描器；用户仍然可以自行提供
+使用任意标识的扫描实现。
 
-**自定义替换策略示例**：
+### 旧配置迁移
 
-```java
-public class MyPhoneReplace extends AbstractRangeCharReplace {
-    
-    @Override
-    public String getScanType() {
-        return CharsScanTypeEnum.PHONE.getScanType();
-    }
-    
-    @Override
-    protected int getMaskStartIndex(char[] chars, int itemLen, CharsScanMatchItem item) {
-        String phone = new String(chars, item.getStartIndex(), itemLen);
-        
-        if (phone.startsWith("00")) {
-            // 国际号码：008613912345678 -> 0086****5678
-            return item.getStartIndex() + 4;
-        } else {
-            // 国内号码：13912345678 -> 139****5678
-            return item.getStartIndex() + 3;
-        }
-    }
-    
-    @Override
-    protected int getMaskStartEnd(char[] chars, int itemLen, CharsScanMatchItem item) {
-        return item.getEndIndex() - 4;
-    }
-}
-```
+旧属性仍可读取，建议逐步迁移到语义更明确的新名称。
 
-### 统一上下文管理
+| 旧配置 | 新配置 |
+|:---|:---|
+| `chars.scan.scanList` | `chars.scan.builtIn.scanTypes` |
+| `chars.scan.replaceList` | `chars.scan.builtIn.replaceTypes` |
+| `chars.scan.defaultReplace` | `chars.scan.builtIn.defaultReplaceType` |
+| `chars.scan.core` | `chars.scan.charsCore` |
+| `chars.scan.replaceHash` | `chars.scan.charsReplaceHash` |
+| `chars.scan.prefix` | `chars.scan.prefixCharSet` |
+| `chars.scan.custom.scan.{id}.class` | 将类名加入 `chars.scan.custom.scans` |
+| `chars.scan.custom.replace.{id}.class` | 将类名加入 `chars.scan.custom.replaces` |
 
-v1.9.0 引入了 `SensitiveScanBsContext` 统一上下文管理器，log4j2 和 logback 共享同一套配置，基于 chars-scan 的 `CharsScanBs` 实现。
+### 运行时重载
 
-**优势**：
-- 零侵入：不修改 chars-scan 库
-- 统一配置：log4j2/logback 共享配置
-- 高扩展性：支持自定义扫描+替换策略
-- 配置驱动：配置文件指定策略类路径
-- 性能优化：单例模式+多种核心实现
-
-**手动重新加载配置**：
+`SensitiveScanBsContext` 默认按单例延迟初始化。如果运行时变更了配置，可主动重载：
 
 ```java
 // 重新加载配置
@@ -1091,105 +987,96 @@ SensitiveScanBsContext.reload();
 CharsScanBs charsScanBs = SensitiveScanBsContext.getCharsScanBs();
 ```
 
-其中 1-13 的内置策略说明如下：
+配置重载会重新创建底层 `CharsScanBs`，后续日志同时使用新配置。调用方不需要分别刷新
+log4j2 和 logback。
 
-| 策略标识 | 说明                     |
-|:-----|:-----------------------|
-| 1    | 手机号                    |
-| 2    | 身份证                    |
-| 3    | 银行卡                    |
-| 4    | 邮箱                     |
-| 5    | 中国人名                   |
-| 6    | 出生日期                   |
-| 7    | GPS                    |
-| 8    | IPV4                   |
-| 9    | 地址                     |
-| 10   | 护照                     |
-| 11   | 匹配任意不掩盖                |
-| 12   | 匹配任意半掩盖                |
-| 13   | 匹配任意全掩盖                |
-| m1   | 数字类合并操作(m1:1&2&3) 性能更好 |
-| m3   | 拓展类合并操作(m3:4&5&9) 性能更好 |
+## log4j2 接入
 
-### 不足之处
+### Maven 依赖
 
-这里的策略自定义和 log4j2 的插件化比起来，确实算不上强大，但是可以满足 99% 的脱敏场景。
+```xml
+<dependency>
+    <groupId>com.github.houbb</groupId>
+    <artifactId>sensitive-log4j2</artifactId>
+    <version>1.9.0</version>
+</dependency>
+```
 
-后续有时间考虑类似 log4j2 的 plugins 思想，实现更加灵活的自定义策略。
+项目还需要正常引入 `log4j-api` 和 `log4j-core`。使用 slf4j API、底层绑定到 log4j2
+的项目同样适用。
 
-# logback 脱敏插件
+### log4j2.xml
 
-## 说明
+推荐使用 `SensitivePatternLayout`：
 
-为了便于用户使用，v1.6.0 开始支持 logback 插件模式。
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.github.houbb.sensitive.log4j2.layout">
+    <Properties>
+        <Property name="PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <SensitivePatternLayout pattern="${PATTERN}" charset="UTF-8"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
 
-## 使用入门
+`SensitiveRewritePolicy` 仅用于兼容已有 Rewrite 配置，已经废弃，新项目不要再使用。
 
-### maven 引入
+## logback 接入
 
-引入核心脱敏包。
+### Maven 依赖
 
 ```xml
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-logback</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
-引入 logback 依赖包
+项目还需要正常引入 `logback-classic`。
 
-```xml
-<dependency>
-    <groupId>ch.qos.logback</groupId>
-    <artifactId>logback-classic</artifactId>
-    <version>${logback.version}</version>
-</dependency>
-```
+### logback.xml
 
-### 指定 logback.xml 配置
+推荐使用 `SensitiveLogbackConverter`：
 
 ```xml
 <configuration>
-    <!-- 基于 converter -->
-    <conversionRule conversionWord="sensitive" converterClass="com.github.houbb.sensitive.logback.converter.SensitiveLogbackConverter" />
-    <!-- 使用 converter -->
-    <appender name="STDOUTConverter" class="ch.qos.logback.core.ConsoleAppender">
+    <conversionRule
+        conversionWord="sensitive"
+        converterClass="com.github.houbb.sensitive.logback.converter.SensitiveLogbackConverter"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %sensitive%n</pattern>
         </encoder>
     </appender>
 
-    <!-- 使用 layout -->
-    <appender name="STDOUTLayout" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="com.github.houbb.sensitive.logback.layout.SensitiveLogbackLayout">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </layout>
-    </appender>
-
-    <!-- 设置根日志级别为DEBUG，并将日志输出到控制台 -->
-    <root level="DEBUG">
-        <appender-ref ref="STDOUTConverter"/>
-        <appender-ref ref="STDOUTLayout"/>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
 ```
 
-这里共计支持 Converter 和 Layout 两种模式，任选一个即可。
+`SensitiveLogbackLayout` 是可选的 Layout 接入方式。Converter 和 Layout 二选一，
+不要同时挂到 Root Logger，否则同一条日志会输出两次。
 
-建议使用 SensitiveLogbackConverter，脱敏日志内容。
+## 统一脱敏效果
 
-## 日志效果
+两个框架使用相同输入和公共配置时，脱敏结果一致。例如：
 
-脱密效果和 log4j2 类似，如下：
-
+```text
+输入：mobile:13088887777, email:mahuateng@qq.com
+输出：mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C
 ```
-01:42:32.579 [main] INFO  c.g.h.sensitive.test2.LogbackMain - mobile:130****7777|9FC4D36D63D2B6DC5AE1297544FBC5A2; bankCard:6217***********5024|444F49289B30944AB8C6C856AEA21180, email:mahu*****@qq.com|897915594C94D981BA86C9E83ADD449C, amount:123.00, " + "IdNo:340110199801016666, name1:李明, name2:李晓明, name3:李泽明天, name4:山东小栗旬" + ", birthday:20220517, GPS:120.882222, IPV4:127.0.0.1, address:中国上海市徐******|821A601949B1BD18DCBAAE27F2E27147;
-```
-
-## 配置属性
-
-同 log4j2，此处不再赘述。
 
 # 性能耗时
 

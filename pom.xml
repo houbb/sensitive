@@ -154,7 +154,7 @@
                     <target>${project.compiler.level}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgument>-proc:none</compilerArgument>
-                    <executable>D:\tool\jdk\jdk-1.8\bin\javac</executable>
+                    <executable>D:\tools\jdk\jdk1.8.0_192\bin\javac</executable>
                     <fork>true</fork>
                 </configuration>
             </plugin>

@@ -50,31 +50,35 @@ public class SensitiveScanBsContextTest {
 
     @Test
     public void testScanAndReplace_bankCard() {
-        String text = "银行卡号：6222021234567890123";
+        String bankCard = "6217000010002105024";
+        String text = "银行卡号：" + bankCard;
         String result = SensitiveScanBsContext.scanAndReplace(text);
         // 验证银行卡被脱敏（不应包含完整银行卡号）
         assertNotNull(result);
-        assertFalse("结果不应包含完整银行卡号", result.contains("6222021234567890123"));
+        assertFalse("结果不应包含完整银行卡号", result.contains(bankCard));
+        assertTrue("结果应包含银行卡掩码", result.contains("6217***********5024"));
     }
 
     @Test
     public void testScanAndReplace_email() {
-        String text = "邮箱：test@example.com";
+        String email = "tester@example.com";
+        String text = "邮箱：" + email;
         String result = SensitiveScanBsContext.scanAndReplace(text);
         // 验证邮箱被脱敏（不应包含完整邮箱）
         assertNotNull(result);
-        assertFalse("结果不应包含完整邮箱", result.contains("test@example.com"));
+        assertFalse("结果不应包含完整邮箱", result.contains(email));
+        assertTrue("结果应包含邮箱掩码", result.contains("test**@example.com"));
     }
 
     @Test
     public void testScanAndReplace_multipleSensitive() {
-        String text = "用户手机：13912345678，身份证：320123199001011234，邮箱：test@example.com";
+        String text = "用户手机：13912345678，身份证：320123199001011234，邮箱：tester@example.com";
         String result = SensitiveScanBsContext.scanAndReplace(text);
         // 验证多个敏感信息都被脱敏
         assertNotNull(result);
         assertFalse("结果不应包含完整手机号", result.contains("13912345678"));
         assertFalse("结果不应包含完整身份证号", result.contains("320123199001011234"));
-        assertFalse("结果不应包含完整邮箱", result.contains("test@example.com"));
+        assertFalse("结果不应包含完整邮箱", result.contains("tester@example.com"));
     }
 
     @Test
