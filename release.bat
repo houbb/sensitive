@@ -24,7 +24,7 @@ SET snapshot_version=%version%"-SNAPSHOT"
 :::: 新的版本号
 SET release_version=%version%
 
-$env:JAVA_HOME="D:\tool\jdk\jdk-1.8";
+:: $env:JAVA_HOME="D:\tool\jdk\jdk-1.8";
 
 call mvn versions:set -DgroupId=%groupName% -DartifactId=%projectName% -DoldVersion=%snapshot_version% -DnewVersion=%release_version%
 call mvn -N versions:update-child-modules
