@@ -26,15 +26,36 @@ public abstract class AbstractStrategy implements IStrategy {
         // 哈希的值
         if(resultValue != null) {
             String resultValueStr = ObjectUtil.objectToString(resultValue);
-            String hashValue = getHashValue(resultValueStr, context);
-            if(StringUtil.isNotEmpty(hashValue)) {
-                resultValue = resultValueStr + '|' + hashValue;
-            }
 
+            // 判断是否需要显示哈希值
+            if(needShowHash(context)) {
+                String hashValue = getHashValue(resultValueStr, context);
+                if(StringUtil.isNotEmpty(hashValue)) {
+                    resultValue = resultValueStr + '|' + hashValue;
+                }
+            }
         }
 
-
         return resultValue;
+    }
+
+    /**
+     * 判断是否需要显示哈希值
+     * @param context 上下文
+     * @return 是否需要显示哈希值
+     * @since 1.8.0
+     */
+    private boolean needShowHash(IContext context) {
+        if(context == null) {
+            return true;
+        }
+
+        final ISensitiveConfig sensitiveConfig = context.getSensitiveConfig();
+        if(sensitiveConfig == null) {
+            return true;
+        }
+
+        return sensitiveConfig.showHash();
     }
 
     /**

@@ -34,4 +34,30 @@ public class SensitiveBsHashTest {
         Assert.assertEquals(expectJson, sensitiveJson);
     }
 
+    /**
+     * 测试不显示哈希值
+     * @since 1.8.0
+     */
+    @Test
+    public void desCopyNoHashTest() {
+        final String originalStr = "User{username='脱敏君', idCard='123456190001011234', password='1234567', email='12345@qq.com', phone='18888888888'}";
+        final String sensitiveStr = "User{username='脱**', idCard='123456**********34', password='null', email='12******.com', phone='1888****888'}";
+        final String expectJson = "{\"email\":\"12******.com\",\"idCard\":\"123456**********34\",\"password\":null,\"phone\":\"1888****888\",\"username\":\"脱**\"}";
+
+        User user = DataPrepareTest.buildUser();
+        Assert.assertEquals(originalStr, user.toString());
+
+        // 指定哈希策略，但不显示哈希值
+        final SensitiveBs sensitiveBs = SensitiveBs.newInstance()
+                .hash(Hashes.md5())
+                .showHash(false);
+
+        User sensitiveUser = sensitiveBs.desCopy(user);
+        String sensitiveJson = sensitiveBs.desJson(user);
+
+        Assert.assertEquals(sensitiveStr, sensitiveUser.toString());
+        Assert.assertEquals(originalStr, user.toString());
+        Assert.assertEquals(expectJson, sensitiveJson);
+    }
+
 }

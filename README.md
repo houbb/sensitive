@@ -73,6 +73,13 @@
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
 
+### v-1.8.0 新特性
+
+- 新增 showHash 配置项，支持控制是否显示哈希值
+- 新增全局配置类 SensitiveConfig，统一配置管理
+- 新增配置文件 sensitive.properties，便于配置管理
+- 支持多种配置方式：编程式配置、系统属性、配置文件
+
 ### v-1.6.0 新特性
 
 - 添加 logback 脱敏插件
@@ -115,7 +122,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.7.2</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
@@ -702,6 +709,91 @@ final String sensitiveStr = "User{username='脱**|00871641C1724BB717DD01E7E5F7D9
 final String expectJson = "{\"email\":\"12******.com|6EAA6A25C8D832B63429C1BEF149109C\",\"idCard\":\"123456**********34|1421E4C0F5BF57D3CC557CFC3D667C4E\",\"phone\":\"1888****888|5425DE6EC14A0722EC09A6C2E72AAE18\",\"username\":\"脱**|00871641C1724BB717DD01E7E5F7D98A\"}";
 ```
 
+## 控制哈希值显示
+
+### 说明
+
+默认情况下，配置哈希策略后，脱敏结果会包含哈希值，格式为 `脱敏值|哈希值`。
+
+v1.8.0 新增 `showHash` 配置项，支持控制是否显示哈希值。
+
+### 配置方式
+
+支持多种配置方式，优先级从高到低：
+
+1. **编程式配置**（最高优先级）
+
+```java
+// 不显示哈希值
+SensitiveBs.newInstance()
+    .hash(Hashes.md5())
+    .showHash(false)
+    .desJson(user);
+
+// 显示哈希值（默认）
+SensitiveBs.newInstance()
+    .hash(Hashes.md5())
+    .showHash(true)
+    .desJson(user);
+```
+
+2. **系统属性配置**
+
+```bash
+# 通过 JVM 参数配置
+java -Dsensitive.showHash=false -jar app.jar
+```
+
+3. **配置文件配置**
+
+在 `chars-scan-config.properties` 文件中配置：
+
+```properties
+# 是否显示哈希值（默认 true）
+chars.scan.showHash=false
+```
+
+配置文件需要放在 classpath 根目录下。
+
+### 优先级说明
+
+配置优先级：编程式配置 > 系统属性 > 配置文件 > 默认值（true）
+
+**配置影响范围**：
+- **注解方式**：`SensitiveBs.newInstance().showHash(false)` 会影响注解方式的脱敏结果
+- **日志插件方式**：当前版本不影响 log4j2/logback 日志插件的脱敏结果（日志插件使用 chars-scan 的脱敏逻辑）
+
+### 配置调试
+
+首次使用时会自动输出配置信息，方便排查问题：
+
+```
+========== Sensitive Configuration ==========
+chars.scan.showHash    = false      (source: config file (chars-scan-config.properties))
+=============================================
+```
+
+也可以手动调用：
+
+```java
+String configInfo = SensitiveConfig.dumpConfig();
+System.out.println(configInfo);
+```
+
+### 效果对比
+
+- 显示哈希值（showHash=true）：
+
+```json
+{"phone":"1888****888|5425DE6EC14A0722EC09A6C2E72AAE18"}
+```
+
+- 不显示哈希值（showHash=false）：
+
+```json
+{"phone":"1888****888"}
+```
+
 ## 配置深度拷贝实现
 
 默认的使用 FastJson2 进行对象的深度拷贝，等价于：
@@ -764,7 +856,7 @@ deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.7.2</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
@@ -854,6 +946,7 @@ chars.scan.replaceList=1,2,3,4,9
 chars.scan.defaultReplace=12
 chars.scan.replaceHash=md5
 chars.scan.whiteList=""
+chars.scan.showHash=true
 ```
 
 ### 属性说明
@@ -868,6 +961,7 @@ SensitivePatternLayout 策略的属性说明。
 |  replaceList  | 敏感替换策略列表    | `1,2,3,4`          | 1~10 内置的10种敏感信息替换策略，多个用逗号隔开              |
 |  defaultReplace  | 敏感替换默认策略    | `12`               | 1~13 内置的13种敏感信息替换策略，指定一个。当列表没有匹配时，默认使用这个 |
 |  whiteList  | 白名单         | ``               | 希望跳过处理的白名单信息                             |
+|  showHash  | 是否显示哈希值    | `true`             | 控制脱敏结果中是否包含哈希值（v1.8.0 新增）               |
 
 其中 1-13 的内置策略说明如下：
 
@@ -911,7 +1005,7 @@ SensitivePatternLayout 策略的属性说明。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-logback</artifactId>
-    <version>1.7.2</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 

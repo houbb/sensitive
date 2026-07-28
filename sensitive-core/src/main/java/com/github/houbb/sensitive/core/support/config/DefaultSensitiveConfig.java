@@ -23,6 +23,12 @@ public class DefaultSensitiveConfig implements ISensitiveConfig {
     private IHash hash;
 
     /**
+     * 是否显示哈希值
+     * @since 1.8.0
+     */
+    private boolean showHash = true;
+
+    /**
      * 新建对象实例
      * @since 0.0.9
      * @return 实例
@@ -48,6 +54,16 @@ public class DefaultSensitiveConfig implements ISensitiveConfig {
 
     public DefaultSensitiveConfig hash(IHash hash) {
         this.hash = hash;
+        return this;
+    }
+
+    @Override
+    public boolean showHash() {
+        return showHash;
+    }
+
+    public DefaultSensitiveConfig showHash(boolean showHash) {
+        this.showHash = showHash;
         return this;
     }
 

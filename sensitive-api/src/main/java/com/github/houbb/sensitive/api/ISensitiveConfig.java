@@ -23,5 +23,14 @@ public interface ISensitiveConfig {
      */
     IHash hash();
 
+    /**
+     * 是否显示哈希值
+     * @return 是否显示哈希值，默认 true
+     * @since 1.8.0
+     */
+    default boolean showHash() {
+        return true;
+    }
+
 }
 
