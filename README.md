@@ -115,7 +115,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
 </dependency>
 ```
 
@@ -911,7 +911,7 @@ SensitivePatternLayout 策略的属性说明。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-logback</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
 </dependency>
 ```
 
