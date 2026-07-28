@@ -27,6 +27,11 @@ public final class SensitiveEntryUtil {
      * @since 0.0.11
      */
     public static boolean hasSensitiveEntry(Field field) {
+        // 防御性编程：当 field 为 null 时直接返回 false，避免 NPE
+        if (field == null) {
+            return false;
+        }
+        
         SensitiveEntry sensitiveEntry = field.getAnnotation(SensitiveEntry.class);
         if (ObjectUtil.isNotNull(sensitiveEntry)) {
             return true;
