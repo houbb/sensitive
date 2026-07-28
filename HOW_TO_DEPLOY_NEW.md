@@ -9,14 +9,26 @@
 
 # 指定 jdk 版本
 
+## test
+
+```
+$env:JAVA_HOME="D:\tool\jdk\jdk-1.8"; mvn clean test
+```
+
+or
+
+```
+$env:JAVA_HOME="D:\tools\jdk\jdk1.8.0_192"; mvn clean test
+```
+
 ## 发布
 
 ```
 $env:JAVA_HOME="D:\tool\jdk\jdk-1.8"; mvn clean deploy -P release
 ```
 
-## 测试
+or
 
 ```
-$env:JAVA_HOME="D:\tool\jdk\jdk-1.8"; mvn clean deploy -P release
+$env:JAVA_HOME="D:\tools\jdk\jdk1.8.0_192"; mvn clean deploy -P release
 ```
