@@ -8,7 +8,6 @@ import com.github.houbb.heaven.util.lang.ObjectUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassTypeUtil;
 import com.github.houbb.heaven.util.lang.reflect.ClassUtil;
 import com.github.houbb.heaven.util.util.ArrayUtil;
-import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.sensitive.annotation.Sensitive;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveCondition;
 import com.github.houbb.sensitive.annotation.metadata.SensitiveStrategy;
@@ -26,7 +25,10 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 脱敏服务实现类
@@ -43,6 +45,10 @@ public class SensitiveService<T> implements ISensitive<T> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public T desCopy(T object, final ISensitiveConfig config) {
+        if (ObjectUtil.isNull(object)) {
+            return null;
+        }
+
         //1. 初始化对象
         final Class clazz = object.getClass();
         final SensitiveContext context = SensitiveContext.newInstance();
@@ -53,7 +59,8 @@ public class SensitiveService<T> implements ISensitive<T> {
 
         //3. 处理
         context.setSensitiveConfig(config);
-        handleClassField(context, copyObject, clazz);
+        Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
+        handleClassField(context, copyObject, clazz, visited);
         return copyObject;
     }
 
@@ -79,7 +86,14 @@ public class SensitiveService<T> implements ISensitive<T> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void handleClassField(final SensitiveContext context,
                                   final Object copyObject,
-                                  final Class clazz) {
+                                  final Class clazz,
+                                  final Set<Object> visited) {
+        if (ObjectUtil.isNull(copyObject)
+                || ObjectUtil.isNull(clazz)
+                || !visited.add(copyObject)) {
+            return;
+        }
+
         // 每一个实体对应的字段，只对当前 clazz 生效。
         List<Field> fieldList = ClassFieldListCache.getInstance().get(clazz);
         context.setAllFieldList(fieldList);
@@ -96,52 +110,52 @@ public class SensitiveService<T> implements ISensitive<T> {
                     if (ClassTypeUtil.isJavaBean(fieldTypeClass)) {
                         // 为普通 javabean 对象
                         final Object fieldNewObject = field.get(copyObject);
-                        handleClassField(context, fieldNewObject, fieldTypeClass);
+                        if (ObjectUtil.isNotNull(fieldNewObject)) {
+                            handleClassField(context, fieldNewObject, fieldNewObject.getClass(), visited);
+                        }
                     } else if (ClassTypeUtil.isArray(fieldTypeClass)) {
                         // 为数组类型
-                        Object[] arrays = (Object[]) field.get(copyObject);
-                        if (ArrayUtil.isNotEmpty(arrays)) {
-                            Object firstArrayEntry = arrays[0];
-                            final Class entryFieldClass = firstArrayEntry.getClass();
+                        Object array = field.get(copyObject);
+                        if (ObjectUtil.isNotNull(array)) {
+                            final int arrayLength = Array.getLength(array);
+                            for (int i = 0; i < arrayLength; i++) {
+                                Object entry = Array.get(array, i);
+                                if (ObjectUtil.isNull(entry)) {
+                                    continue;
+                                }
 
-                            //1. 如果需要特殊处理，则循环特殊处理
-                            if (needHandleEntryType(entryFieldClass)) {
-                                for (Object arrayEntry : arrays) {
-                                    handleClassField(context, arrayEntry, entryFieldClass);
-                                }
-                            } else {
-                                //2, 基础值，直接循环设置即可
-                                final int arrayLength = arrays.length;
-                                Object newArray = Array.newInstance(entryFieldClass, arrayLength);
-                                for (int i = 0; i < arrayLength; i++) {
-                                    Object entry = arrays[i];
+                                Class entryClass = entry.getClass();
+                                if (needHandleEntryType(entryClass)) {
+                                    handleClassField(context, entry, entryClass, visited);
+                                } else {
                                     Object result = handleSensitiveEntry(context, entry, field);
-                                    Array.set(newArray, i, result);
+                                    Array.set(array, i, result);
                                 }
-                                field.set(copyObject, newArray);
                             }
                         }
                     } else if (ClassTypeUtil.isCollection(fieldTypeClass)) {
                         // Collection 接口的子类
                         final Collection<Object> entryCollection = (Collection<Object>) field.get(copyObject);
-                        if (CollectionUtil.isNotEmpty(entryCollection)) {
-                            Object firstCollectionEntry = entryCollection.iterator().next();
-                            Class collectionEntryClass = firstCollectionEntry.getClass();
+                        if (ObjectUtil.isNotNull(entryCollection) && !entryCollection.isEmpty()) {
+                            List<Object> newResultList = new ArrayList<>(entryCollection.size());
+                            for (Object entry : entryCollection) {
+                                if (ObjectUtil.isNull(entry)) {
+                                    newResultList.add(null);
+                                    continue;
+                                }
 
-                            //1. 如果需要特殊处理，则循环特殊处理
-                            if (needHandleEntryType(collectionEntryClass)) {
-                                for (Object collectionEntry : entryCollection) {
-                                    handleClassField(context, collectionEntry, collectionEntryClass);
+                                Class entryClass = entry.getClass();
+                                if (needHandleEntryType(entryClass)) {
+                                    handleClassField(context, entry, entryClass, visited);
+                                    newResultList.add(entry);
+                                } else {
+                                    newResultList.add(handleSensitiveEntry(context, entry, field));
                                 }
-                            } else {
-                                //2, 基础值，直接循环设置即可
-                                List<Object> newResultList = new ArrayList<>(entryCollection.size());
-                                for (Object entry : entryCollection) {
-                                    Object result = handleSensitiveEntry(context, entry, field);
-                                    newResultList.add(result);
-                                }
-                                field.set(copyObject, newResultList);
                             }
+
+                            // 保留原集合类型（例如 Set），避免以 ArrayList 覆盖后类型不兼容或语义丢失。
+                            entryCollection.clear();
+                            entryCollection.addAll(newResultList);
                         }
                     } else {
                         // 1. 常见的基本类型，不做处理

@@ -60,6 +60,11 @@ public class DefaultContextValueFilter implements ContextValueFilter {
 
         // 信息初始化
         final Field field = context.getField();
+        // Fastjson2 的方法属性上下文中 field 可能为 null，此时没有字段注解可用于脱敏。
+        if (ObjectUtil.isNull(field)) {
+            return value;
+        }
+
         final Class clazz = context.getBeanClass();
         final List<Field> fieldList = ClassFieldListCache.getInstance().get(clazz);
         sensitiveContext.setCurrentField(field);

@@ -73,6 +73,12 @@
 
 > [变更日志](https://github.com/houbb/sensitive/blob/master/CHANGE_LOG.md)
 
+### v-1.9.1 修复
+
+- 新增可选的深度拷贝循环引用检测，启用后避免递归层级溢出（默认关闭）
+- 修复多层嵌套空对象、空数组元素以及 FastJSON2 无字段上下文导致的空指针异常
+- 修复基础类型集合脱敏时替换集合实现造成的数据与类型问题
+
 ### v-1.8.0 新特性
 
 - 新增 showHash 配置项，支持控制是否显示哈希值
@@ -122,7 +128,7 @@ Maven 3.x
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-core</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ```
 
@@ -810,6 +816,21 @@ SensitiveBs.newInstance()
 
 deepCopy 用于指定深度复制的具体实现，支持用户自定义。
 
+### 循环引用检测开关
+
+循环引用检测默认关闭，因此 `SensitiveUtil.desCopy(...)` 和
+`FastJson2DeepCopy.getInstance()` 保持原有性能路径，不会扫描对象图。
+
+对象中存在循环引用时，可以显式开启：
+
+```java
+SensitiveBs.newInstance()
+        .deepCopy(FastJson2DeepCopy.getInstance(true))
+        .desCopy(user);
+```
+
+`getInstance(false)` 与无参 `getInstance()` 等价。开启后会先检测对象图，只有确认存在环时才为 FastJSON2 启用 `ReferenceDetection`。
+
 # 深度复制（DeepCopy）
 
 ## 说明
@@ -998,7 +1019,7 @@ log4j2 和 logback。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-log4j2</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ```
 
@@ -1038,7 +1059,7 @@ log4j2 和 logback。
 <dependency>
     <groupId>com.github.houbb</groupId>
     <artifactId>sensitive-logback</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
 </dependency>
 ```
 
@@ -1113,3 +1134,5 @@ log4j2 和 logback。
 - [x] log4j2 脱敏配置添加指定配置文件，而不是放在 pattern 中
 
 - [ ] 日志插件脱敏的 benchmark 性能报告
+
+- [ ] 评估循环引用检测的类元数据缓存方案，补充动态类卸载、ClassLoader 生命周期、内存占用及 benchmark 验证
